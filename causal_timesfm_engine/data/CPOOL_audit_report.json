@@ -1,0 +1,47 @@
+{
+  "symbol": "CPOOL",
+  "econometrics": {
+    "lags": 2,
+    "f_statistic": 1.879,
+    "p_value": 0.4,
+    "causality_confirmed": false,
+    "verdict": "SPURIOUS / CO-TRENDING ARTIFACT: Driver does NOT Granger-cause target once trend is decoupled."
+  },
+  "engine_1_timesfm": {
+    "engine": "TimesFM-Quantile-Statistical",
+    "current_price": 0.0228,
+    "horizon_days": 30,
+    "p10_downside": 0.0203,
+    "p50_expected": 0.024,
+    "p90_upside": 0.0304,
+    "expected_return_pct": 5.28,
+    "upside_tail_pct": 33.19,
+    "downside_risk_pct": -11.0,
+    "volatility_squeeze": true,
+    "bandwidth": 1.76
+  },
+  "engine_2_structural": {
+    "current_price": 0.0228,
+    "structural_target": 0.042,
+    "structural_multiplier": 1.844,
+    "structural_return_pct": 84.36,
+    "minsky_stage": "Hedge",
+    "minsky_description": "Robust balance sheet; organic income exceeds commitments. Highly resilient through economic cycles.",
+    "dilution_severity": "Low (Float Clean)",
+    "circulating_ratio": 0.79
+  },
+  "reconciliation": {
+    "current_price": 0.0228,
+    "timesfm_p10_floor": 0.0203,
+    "timesfm_p50_baseline": 0.024,
+    "timesfm_p90_ceiling": 0.0304,
+    "structural_target": 0.042,
+    "delta_dollar": 0.018,
+    "delta_pct": 78.95,
+    "regime": "COILED_ASYMMETRIC_SPRING",
+    "interpretation": "STRUCTURAL SURPLUS DETECTED: Fundamental adoption and clean tokenomics exceed pure chart momentum. High-probability asymmetric setup.",
+    "tactical_action": "ACCUMULATE systematically in controlled tranches. Upside convexity active.",
+    "allocation_recommendation": "Maintain speculative allocation up to 35% max threshold.",
+    "falsifiability_check": "Thesis falsified if price closes below P10 support ($0.0203) or if Minsky regime degrades into Ponzi insolvency."
+  }
+}
