@@ -372,12 +372,10 @@ def test_machine_testable_falsification_objects():
     res = pipeline.run_crypto_pipeline(ticker="BTC-USD")
     
     f_obj = res["falsifiability_object"]
-    assert "primary_metric" in f_obj
-    assert "threshold" in f_obj
-    assert "operator" in f_obj
+    assert "logic" in f_obj
+    assert f_obj["logic"]["condition"] == "AND"
+    assert "rules" in f_obj["logic"]
     assert "evaluated_status" in f_obj
-    assert f_obj["operator"] == "<"
-    assert isinstance(f_obj["threshold"], (float, int))
     print("  [PASS] Test 22: Structured Machine-Testable Falsification Objects")
 
 def test_multi_horizon_theils_u_gate_fail_closed():
@@ -595,14 +593,14 @@ def test_infold_structural_alpha_optimization():
     tfm_fold = [100.5, 102.2, 104.8, 106.9, 109.8]  # Close to actual
     bad_struct = [50.0, 48.0, 45.0, 42.0, 40.0]     # Massive error
     
-    res_bad = engine.estimate_optimal_structural_weight(actual_fold, tfm_fold, bad_struct)
+    res_bad = engine.estimate_optimal_structural_weight(actual_fold, tfm_fold, bad_struct, min_inner_train=2)
     assert res_bad["alpha_star"] == 0.0
     assert res_bad["structural_value_added"] is False
     
     # Case B: Structural target provides superior signal -> alpha* > 0.0
     good_struct = [100.0, 102.0, 105.0, 107.0, 110.0]  # Perfect
     noisy_tfm = [120.0, 125.0, 130.0, 135.0, 140.0]
-    res_good = engine.estimate_optimal_structural_weight(actual_fold, noisy_tfm, good_struct)
+    res_good = engine.estimate_optimal_structural_weight(actual_fold, noisy_tfm, good_struct, min_inner_train=2)
     assert res_good["alpha_star"] > 0.5
     assert res_good["structural_value_added"] is True
     print("  [PASS] Test 30: In-Fold Structural Alpha* Estimation & Truthful Zero Collapse")
@@ -684,17 +682,18 @@ def test_media_hill_corner_cases():
     from core.pipeline import CausalTimesFmPipeline
     pipeline = CausalTimesFmPipeline()
     
-    # gamma <= 1.0: should return a valid positive number safely
-    s_star_gamma = pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=1000000.0, gamma=0.9)
-    assert s_star_gamma > 0.0
+    # gamma <= 1.0: should raise ValueError
+    import pytest
+    with pytest.raises(ValueError, match="INVALID_PARAMETER"):
+        pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=1000000.0, gamma=0.9)
     
-    # K_max <= 0: should return 0.0 spend budget
-    s_star_k = pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=0.0, gamma=1.5)
-    assert s_star_k == 0.0
+    # K_max <= 0: should raise ValueError
+    with pytest.raises(ValueError, match="INVALID_PARAMETER"):
+        pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=0.0, gamma=1.5)
     
-    # Non-positive spend run: should not crash and should return safe budget
-    res = pipeline.run_media_pipeline(monthly_spend=-500.0, cpm=12.0)
-    assert res["media_decision"]["target_spend_budget"] >= 0.0
+    # Non-positive spend run: should raise ValueError
+    with pytest.raises(ValueError, match="INVALID_PARAMETER"):
+        pipeline.run_media_pipeline(monthly_spend=-500.0, cpm=12.0)
     print("  [PASS] Test 34: Media Hill Model Defensive Guardrails (Corner Cases Gamma <= 1, K_max <= 0)")
 
 if __name__ == "__main__":

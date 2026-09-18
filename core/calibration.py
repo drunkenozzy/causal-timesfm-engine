@@ -80,8 +80,11 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
       M1  : Autoregressive Baseline (TimesFM Target-Only Prior Proxy)
       M4  : Fitted Hybrid (Ensemble with in-fold estimated alpha)
       
-    Computes RMSE, Theil's U2, and Delta Skill incremental gain.
+    Computes RMSE, Theil's U2, and formal statistical significance (Clark-West test).
     """
+    from core.econometrics import EconometricFilter
+    from core.markov_regime import InstitutionalMarkovEngine
+
     series = [float(x) for x in series]
     n = len(series)
     if n < min_train_len + h:
@@ -92,6 +95,19 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
     err_m1 = []
     err_m4 = []
     actuals = []
+
+    # Precompute historical mock predictions for nested alpha optimization
+    p_m1_hist = []
+    v_struct_hist = []
+    for t in range(n):
+        if t < 5:
+            p_m1_hist.append(series[t])
+            v_struct_hist.append(series[t])
+            continue
+        w = min(5, t)
+        mom = (series[t] / series[t-w]) ** (1.0 / w)
+        p_m1_hist.append(series[t] * (mom ** h))
+        v_struct_hist.append(series[t] * (mom ** (h * 0.8)))
 
     for t in range(min_train_len, n - h + 1):
         train = series[:t]
@@ -113,9 +129,30 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
         p_m1 = train[-1] * (mom ** h)
         err_m1.append(y_actual - p_m1)
 
-        # M4: Hybrid with in-fold alpha
+        # M4: Hybrid with nested in-fold alpha
         v_struct = train[-1] * (mom ** (h * 0.8))  # damped structural target
-        alpha_fold = 0.20
+        
+        # We pass histories up to t (length t). Since they align with y_{k+h},
+        # wait, actual_history needs to align with the predictions made h steps prior.
+        # For simplicity in this mock tournament, we align the histories up to t-h.
+        
+        # Proper alignment: prediction made at k for k+h should be compared to series[k+h]
+        hist_actual = []
+        hist_p_m1 = []
+        hist_v_struct = []
+        for k in range(5, t - h + 1):
+            hist_actual.append(series[k + h - 1])
+            hist_p_m1.append(p_m1_hist[k-1])
+            hist_v_struct.append(v_struct_hist[k-1])
+            
+        if len(hist_actual) >= 10:
+            alpha_res = InstitutionalMarkovEngine.estimate_optimal_structural_weight(
+                hist_actual, hist_p_m1, hist_v_struct, min_inner_train=5
+            )
+            alpha_fold = alpha_res["alpha_star"]
+        else:
+            alpha_fold = 0.20
+
         p_m4 = ((1.0 - alpha_fold) * p_m1) + (alpha_fold * v_struct)
         err_m4.append(y_actual - p_m4)
 
@@ -135,6 +172,21 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
     delta_m1_m0 = round((1.0 - (r1 / r0)) * 100, 2) if r0 > 0 else 0.0
     delta_m4_m1 = round(((r1 - r4) / r1) * 100, 2) if r1 > 0 else 0.0
 
+    # Formal statistical significance
+    ef = EconometricFilter()
+    cw_res = ef.compute_clark_west_test(err_m4, err_m1, h=h)
+    
+    is_significant = cw_res.get("is_statistically_significant", False)
+    cw_stat = cw_res.get("clark_west_stat", 0.0)
+    cw_pval = cw_res.get("p_value", 1.0)
+    
+    if is_significant and delta_m4_m1 > 0.0:
+        inference_status = "STRUCTURAL_ALPHA_SIGNIFICANT"
+    elif delta_m4_m1 > 0.0:
+        inference_status = "INSIGNIFICANT_POINT_IMPROVEMENT"
+    else:
+        inference_status = "NO_IMPROVEMENT"
+
     return {
         "status": "EVALUATED",
         "n_origins": len(actuals),
@@ -148,6 +200,9 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
         "incremental_skill": {
             "delta_skill_m1_vs_m0_pct": delta_m1_m0,
             "delta_skill_m4_vs_m1_pct": delta_m4_m1,
-            "structural_layer_adds_value": bool(delta_m4_m1 > 0.0)
+            "structural_layer_adds_value": bool(delta_m4_m1 > 0.0),
+            "clark_west_stat": cw_stat,
+            "clark_west_p_value": cw_pval,
+            "structural_inference_status": inference_status
         }
     }

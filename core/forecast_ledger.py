@@ -34,6 +34,7 @@ def compute_sha256(data_obj) -> str:
 class ImmutableForecastLedger:
     """
     Append-only ledger for point-in-time forecast registration and validation.
+    Maintains a Cryptographic Hash Chain.
     """
     def __init__(self, ledger_file_path: str = LEDGER_DEFAULT_PATH):
         self.ledger_file_path = ledger_file_path
@@ -41,6 +42,57 @@ class ImmutableForecastLedger:
         if not os.path.exists(self.ledger_file_path):
             with open(self.ledger_file_path, "w", encoding="utf-8") as f:
                 pass  # Initialize empty ledger
+
+    def _get_git_status(self):
+        import subprocess
+        git_exe = r"C:\Users\Ozgur\AppData\Local\GitHubDesktop\app-3.6.5\resources\app\git\cmd\git.exe"
+        if not os.path.exists(git_exe):
+            git_exe = "git" # Fallback to PATH
+        try:
+            sha = subprocess.check_output([git_exe, 'rev-parse', 'HEAD'], stderr=subprocess.DEVNULL).decode('ascii').strip()
+            dirty = bool(subprocess.check_output([git_exe, 'status', '--porcelain'], stderr=subprocess.DEVNULL).strip())
+            return sha, dirty
+        except Exception:
+            return "HEAD", False
+
+    def _get_last_record(self):
+        """Reads the last JSONL record to retrieve the previous hash and sequence number."""
+        if not os.path.exists(self.ledger_file_path) or os.path.getsize(self.ledger_file_path) == 0:
+            return None
+        last_line = ""
+        with open(self.ledger_file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.strip():
+                    last_line = line
+        if not last_line:
+            return None
+        try:
+            return json.loads(last_line)
+        except json.JSONDecodeError:
+            return None
+
+    def _append_record(self, record: dict) -> dict:
+        """Appends a record using the cryptographic hash chain."""
+        last_rec = self._get_last_record()
+        seq = (last_rec.get("sequence_number", 0) + 1) if last_rec else 1
+        prev_hash = last_rec.get("record_hash") if last_rec else "GENESIS"
+
+        record["sequence_number"] = seq
+        record["previous_record_hash"] = prev_hash
+
+        # Cryptographic Hash Chain: H_t = SHA256(H_{t-1} || record_t)
+        payload = json.dumps(record, sort_keys=True, default=str)
+        chain_material = f"{prev_hash}||{payload}"
+        record_hash = hashlib.sha256(chain_material.encode("utf-8")).hexdigest()
+
+        record["sha256_hash"] = record_hash
+        record["record_hash"] = record_hash
+
+        # Append to file
+        with open(self.ledger_file_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, sort_keys=True) + "\n")
+
+        return record
 
     def record_forecast(self,
                         asset_name: str,
@@ -68,6 +120,8 @@ class ImmutableForecastLedger:
         nonce = uuid.uuid4().hex[:8]
         id_material = f"{asset_name}_{origin_timestamp}_{horizon_steps}_{cutoff}_{nonce}"
         forecast_id = f"fc_{compute_sha256(id_material)[:16]}"
+        
+        git_sha, git_dirty = self._get_git_status()
 
         record = {
             "record_type": "FORECAST_REGISTRATION",
@@ -79,7 +133,8 @@ class ImmutableForecastLedger:
             "frequency": frequency,
             "data_cutoff_timestamp": cutoff,
             "dataset_hash": dataset_hash or "NOT_HASHED",
-            "commit_sha": commit_sha or "HEAD",
+            "commit_sha": commit_sha or git_sha,
+            "git_dirty": git_dirty,
             "raw_prior": {
                 "p10": raw_prior.get("p10_downside") or raw_prior.get("p10"),
                 "p50": raw_prior.get("p50_expected") or raw_prior.get("p50"),
@@ -101,15 +156,8 @@ class ImmutableForecastLedger:
             "status": "ACTIVE_MONITORING",
             "metadata": metadata or {}
         }
-        record_hash = compute_sha256(record)
-        record["sha256_hash"] = record_hash
-        record["record_hash"] = record_hash
-
-        # Append to file
-        with open(self.ledger_file_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(record, sort_keys=True) + "\n")
-
-        return record
+        
+        return self._append_record(record)
 
     def resolve_forecast(self,
                          forecast_id: str,
@@ -146,10 +194,7 @@ class ImmutableForecastLedger:
             "notes": notes or ""
         }
 
-        with open(self.ledger_file_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(resolution_entry, sort_keys=True) + "\n")
-
-        return resolution_entry
+        return self._append_record(resolution_entry)
 
     def get_forecast(self, forecast_id: str) -> dict:
         """Retrieves original forecast registration record by ID."""

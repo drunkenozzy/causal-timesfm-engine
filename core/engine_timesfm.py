@@ -120,7 +120,7 @@ class TimesFmBaselineEngine:
         p10 = p50 * math.exp(-z_score * horizon_vol)
 
         return {
-            "engine": "GEOMETRIC_AUTOREGRESSIVE_BASELINE",
+            "engine": "M1_GEOMETRIC_FALLBACK",
             "timesfm_executed": False,
             "degraded_mode": True,
             "failure_reason": self._init_failure_reason or "Neural runtime not detected in environment.",

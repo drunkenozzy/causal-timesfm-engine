@@ -302,15 +302,54 @@ class EconometricFilter:
             "loss_differential_mean": round(float(d_mean), 6)
         }
 
+    def compute_clark_west_test(self, errors_model, errors_benchmark, h=1):
+        """
+        Computes the Clark-West (2007) test for nested models.
+        M_benchmark (null) is nested within M_model (alternative).
+        Adjusts the MSFE difference to account for parameter estimation noise under the null.
+        """
+        T = len(errors_model)
+        if T < 2 or len(errors_benchmark) != T:
+            return {"clark_west_stat": 0.0, "p_value": 1.0, "is_statistically_significant": False, "adjusted_msfe_diff": 0.0}
+
+        # CW adjustment: f_t = err_bench^2 - (err_model^2 - (err_bench - err_model)^2)
+        f_t = []
+        for em, eb in zip(errors_model, errors_benchmark):
+            f_t.append((eb ** 2) - ((em ** 2) - ((eb - em) ** 2)))
+
+        mean_f = sum(f_t) / T
+        
+        # Sample variance of f_t
+        var_f = sum((x - mean_f) ** 2 for x in f_t) / (T - 1)
+        if var_f <= 1e-12:
+            return {"clark_west_stat": 0.0, "p_value": 1.0, "is_statistically_significant": False, "adjusted_msfe_diff": mean_f}
+
+        cw_stat = mean_f / math.sqrt(var_f / T)
+        
+        # One-sided test (alternative is M_model is better)
+        try:
+            from scipy.stats import norm
+            p_val = float(norm.sf(cw_stat))
+        except ImportError:
+            p_val = float(0.5 * math.erfc(cw_stat / math.sqrt(2.0)))
+        
+        return {
+            "clark_west_stat": round(float(cw_stat), 4),
+            "p_value": round(float(p_val), 4),
+            "is_statistically_significant": bool(p_val < 0.05),
+            "adjusted_msfe_diff": round(float(mean_f), 6)
+        }
+
     def compute_block_bootstrap_theils_u(self, errors_model, errors_benchmark, h=1, n_boot=200, block_size=None):
         """
-        Computes Moving Block Bootstrap (MBB) 95% confidence intervals for Theil's U2.
+        Computes Moving Block Bootstrap (MBB) 95% confidence intervals for Theil's U2
+        and paired loss differentials.
         Preserves serial dependence in overlapping multi-step forecast errors.
         """
         import random
         T = len(errors_model)
         if T < 4:
-            return {"theils_u2_point": 1.0, "ci_95_lower": 1.0, "ci_95_upper": 1.0, "superiority_established": False}
+            return {"theils_u2_point": 1.0, "ci_95_lower": 1.0, "ci_95_upper": 1.0, "diff_ci_95_lower": 0.0, "diff_ci_95_upper": 0.0, "superiority_established": False}
 
         b = block_size if block_size else max(2, min(int(h), T // 3))
         rmse_m = math.sqrt(sum(e**2 for e in errors_model) / T)
@@ -318,6 +357,7 @@ class EconometricFilter:
         u_point = rmse_m / rmse_b if rmse_b > 1e-12 else 1.0
 
         boot_u = []
+        boot_diff = []
         n_blocks = max(1, (T + b - 1) // b)
 
         rng = random.Random(42)  # Deterministic seed for reproducible testing
@@ -332,21 +372,38 @@ class EconometricFilter:
             
             sample_m_sq = sample_m_sq[:T]
             sample_b_sq = sample_b_sq[:T]
-            r_m = math.sqrt(sum(sample_m_sq) / len(sample_m_sq))
-            r_b = math.sqrt(sum(sample_b_sq) / len(sample_b_sq))
+            
+            mean_m = sum(sample_m_sq) / len(sample_m_sq)
+            mean_b = sum(sample_b_sq) / len(sample_b_sq)
+            
+            r_m = math.sqrt(mean_m)
+            r_b = math.sqrt(mean_b)
             boot_u.append(r_m / r_b if r_b > 1e-12 else 1.0)
+            
+            # Paired loss differential: M - B
+            boot_diff.append(mean_m - mean_b)
 
         boot_u.sort()
+        boot_diff.sort()
         idx_low = int(0.025 * len(boot_u))
         idx_high = int(0.975 * len(boot_u))
+        
         ci_low = boot_u[idx_low]
         ci_high = boot_u[min(len(boot_u) - 1, idx_high)]
+        
+        diff_ci_low = boot_diff[idx_low]
+        diff_ci_high = boot_diff[min(len(boot_diff) - 1, idx_high)]
+
+        # Superiority is established if the upper bound of the differential is < 0
+        superiority = bool(diff_ci_high < 0.0)
 
         return {
             "theils_u2_point": round(float(u_point), 4),
             "ci_95_lower": round(float(ci_low), 4),
             "ci_95_upper": round(float(ci_high), 4),
-            "superiority_established": bool(ci_high < 1.0),
+            "diff_ci_95_lower": round(float(diff_ci_low), 6),
+            "diff_ci_95_upper": round(float(diff_ci_high), 6),
+            "superiority_established": superiority,
             "n_bootstraps": n_boot,
             "block_size": b
         }

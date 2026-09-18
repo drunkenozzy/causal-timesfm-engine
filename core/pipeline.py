@@ -330,13 +330,15 @@ def create_parameter_record(value, source, as_of=None, avail=None, transformatio
 def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized_metric_value=None):
     """
     Popperian Machine-Evaluated Falsification Resolver.
-    Evaluates whether empirical observations have breached the falsification boundary.
+    Evaluates a Compound-Event Boolean AST against current observations.
+    AST schema:
+      - Leaf node: {"metric": str, "operator": "<" | ">" | "<=" | ">=", "threshold": float}
+      - Logical node: {"condition": "AND" | "OR", "rules": [AST nodes]}
+      
     States:
-      - NOT_FALSIFIED: Data has not breached the boundary (refusal to claim 'validated').
+      - NOT_FALSIFIED: Data has not breached the boundary.
       - FALSIFIED: Falsification condition breached.
-      - INCONCLUSIVE: Primary condition breached, but secondary confirmation metric is ambiguous.
       - DATA_UNAVAILABLE: Metric not found in current observations.
-      - EXPIRED: Target horizon elapsed without boundary breach.
     """
     if not falsify_obj or not isinstance(falsify_obj, dict):
         return {"status": "DATA_UNAVAILABLE", "is_falsified": False, "reason": "No falsification object provided."}
@@ -345,52 +347,92 @@ def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized
         if isinstance(realized_metric_value, dict):
             current_metrics = realized_metric_value
         else:
+            # Backwards compatibility fallback
             p_metric = falsify_obj.get("primary_metric", "price")
+            if "logic" in falsify_obj:
+                # If using AST, try to map to 'price' if not found
+                p_metric = "price"
             current_metrics = {p_metric: realized_metric_value}
     elif current_metrics is None:
         current_metrics = {}
 
-    p_metric = falsify_obj.get("primary_metric", "price")
-    threshold = falsify_obj.get("threshold")
-    operator = falsify_obj.get("operator", "<")
-    
-    if p_metric not in current_metrics or current_metrics[p_metric] is None:
-        return {"status": "DATA_UNAVAILABLE", "is_falsified": False, "reason": f"Metric {p_metric} not found in current observations."}
-
-    p_val = float(current_metrics[p_metric])
-    breached = False
-    if operator == "<":
-        breached = (p_val < threshold)
-    elif operator == ">":
-        breached = (p_val > threshold)
-    elif operator == "<=":
-        breached = (p_val <= threshold)
-    elif operator == ">=":
-        breached = (p_val >= threshold)
-
-    # Check secondary condition if defined
-    s_metric = falsify_obj.get("secondary_metric")
-    s_thresh = falsify_obj.get("secondary_threshold")
-    if breached and s_metric and s_thresh is not None:
-        if s_metric in current_metrics and current_metrics[s_metric] is not None:
-            s_val = float(current_metrics[s_metric])
-            if s_val < s_thresh:
-                status = "FALSIFIED"
+    def eval_node(node):
+        if "condition" in node:
+            cond = node["condition"].upper()
+            rules = node.get("rules", [])
+            if not rules:
+                return False, "Empty logical node"
+            
+            results = [eval_node(r) for r in rules]
+            # Check for data unavailability propagation
+            for res, reason in results:
+                if res is None:
+                    return None, reason
+            
+            bools = [r[0] for r in results]
+            if cond == "AND":
+                return all(bools), f"Evaluated AND over {len(rules)} rules"
+            elif cond == "OR":
+                return any(bools), f"Evaluated OR over {len(rules)} rules"
             else:
-                status = "INCONCLUSIVE"
-        else:
-            status = "DATA_UNAVAILABLE"
+                return None, f"Unknown condition: {cond}"
+                
+        else: # Leaf node
+            metric = node.get("metric", node.get("primary_metric")) # fallback
+            op = node.get("operator", "<")
+            thresh = node.get("threshold")
+            
+            if metric not in current_metrics or current_metrics[metric] is None:
+                return None, f"Metric {metric} not found in current observations."
+                
+            val = float(current_metrics[metric])
+            
+            if op == "<":
+                return (val < thresh), f"{metric} ({val}) < {thresh}"
+            elif op == ">":
+                return (val > thresh), f"{metric} ({val}) > {thresh}"
+            elif op == "<=":
+                return (val <= thresh), f"{metric} ({val}) <= {thresh}"
+            elif op == ">=":
+                return (val >= thresh), f"{metric} ({val}) >= {thresh}"
+            else:
+                return None, f"Unknown operator {op}"
+
+    # Check if using the new AST format under "logic" key
+    if "logic" in falsify_obj:
+        root_node = falsify_obj["logic"]
     else:
-        status = "FALSIFIED" if breached else "NOT_FALSIFIED"
+        # Translate old flat format to AST
+        root_node = {
+            "metric": falsify_obj.get("primary_metric", "price"),
+            "operator": falsify_obj.get("operator", "<"),
+            "threshold": falsify_obj.get("threshold")
+        }
+        if falsify_obj.get("secondary_metric") and falsify_obj.get("secondary_threshold") is not None:
+            root_node = {
+                "condition": "AND",
+                "rules": [
+                    root_node,
+                    {
+                        "metric": falsify_obj["secondary_metric"],
+                        "operator": "<", # hardcoded in old logic
+                        "threshold": falsify_obj["secondary_threshold"]
+                    }
+                ]
+            }
+            
+    is_breached, reason = eval_node(root_node)
+    
+    if is_breached is None:
+        status = "DATA_UNAVAILABLE"
+    else:
+        status = "FALSIFIED" if is_breached else "NOT_FALSIFIED"
 
     return {
         "status": status,
         "is_falsified": (status == "FALSIFIED"),
-        "primary_metric": p_metric,
-        "primary_value": p_val,
-        "threshold": threshold,
-        "operator": operator,
-        "validated_intact": (status == "NOT_FALSIFIED")  # Compatibility alias
+        "reason": reason,
+        "validated_intact": (status == "NOT_FALSIFIED")
     }
 
 class CausalTimesFmPipeline:
@@ -599,14 +641,15 @@ class CausalTimesFmPipeline:
         currency = "£" if "GBP" in ticker or "UK" in ticker else "$"
         floor = cond["downside_floor"]
 
-        # Machine-testable falsification object
         falsify_obj = {
             "target_asset": ticker,
-            "primary_metric": "price",
-            "threshold": floor,
-            "operator": "<",
-            "secondary_metric": "stablecoin_float_growth_30d",
-            "secondary_threshold": -0.05,
+            "logic": {
+                "condition": "AND",
+                "rules": [
+                    {"metric": "price", "operator": "<", "threshold": floor},
+                    {"metric": "stablecoin_float_growth_30d", "operator": "<", "threshold": -0.05}
+                ]
+            },
             "registered_date": latest_date,
             "horizon_steps": model_steps,
             "frequency": frequency,
@@ -769,11 +812,13 @@ class CausalTimesFmPipeline:
 
         falsify_obj = {
             "target_asset": f"Housing_{postcode}",
-            "primary_metric": "mortgage_rate",
-            "threshold": 6.5,
-            "operator": ">",
-            "secondary_metric": "transaction_volume_pct_change",
-            "secondary_threshold": -30.0,
+            "logic": {
+                "condition": "OR",
+                "rules": [
+                    {"metric": "mortgage_rate", "operator": ">", "threshold": 6.5},
+                    {"metric": "transaction_volume_pct_change", "operator": "<", "threshold": -30.0}
+                ]
+            },
             "registered_date": latest_date,
             "horizon_steps": model_steps,
             "frequency": frequency,
@@ -1032,10 +1077,13 @@ class CausalTimesFmPipeline:
     def solve_optimal_media_spend(self, target_cpm, ec50_spend, k_max_impressions, gamma=1.3, multiplier=1.5):
         """
         Solves for the Marginal-Efficiency Threshold S* on the diminishing returns branch of the Hill curve.
-        Guards against non-positive inputs and handles gamma <= 1.0 safely.
+        Fails closed on non-positive inputs or gamma <= 1.0 (invalid Hill parameters).
         """
         if target_cpm <= 0 or ec50_spend <= 0 or k_max_impressions <= 0:
-            return 0.0
+            raise ValueError(f"INVALID_PARAMETER: Target CPM ({target_cpm}), EC50 ({ec50_spend}), and K_max ({k_max_impressions}) must be strictly positive.")
+            
+        if gamma <= 1.0:
+            raise ValueError(f"INVALID_PARAMETER: Hill coefficient gamma must be strictly > 1.0 for an S-curve (got {gamma}).")
             
         cpm_ceiling = target_cpm * multiplier
         
@@ -1045,10 +1093,7 @@ class CausalTimesFmPipeline:
             return (1000.0 / m_yield) if m_yield > 0 else 999999.0
 
         # Start search strictly at or past inflection point
-        if gamma > 1.0:
-            s_inflect = ec50_spend * (((gamma - 1.0) / (gamma + 1.0)) ** (1.0 / gamma))
-        else:
-            s_inflect = max(1.0, ec50_spend * 0.01)
+        s_inflect = ec50_spend * (((gamma - 1.0) / (gamma + 1.0)) ** (1.0 / gamma))
 
         low = s_inflect
         high = ec50_spend * 30.0
@@ -1077,11 +1122,20 @@ class CausalTimesFmPipeline:
         Marketing-native Media Investment & Pacing Engine.
         Completely decoupled from financial Ponzi/risk abstractions.
         """
-        monthly_spend = max(0.0, float(monthly_spend))
-        cpm = max(0.01, float(cpm))
-        ec50_spend = max(1.0, float(ec50_spend))
-        k_max_impressions = max(0.0, float(k_max_impressions))
-        gamma = max(0.01, float(gamma))
+        monthly_spend = float(monthly_spend)
+        cpm = float(cpm)
+        ec50_spend = float(ec50_spend)
+        k_max_impressions = float(k_max_impressions)
+        gamma = float(gamma)
+
+        if monthly_spend < 0.0:
+            raise ValueError(f"INVALID_PARAMETER: Spend cannot be negative (got {monthly_spend}).")
+        if gamma <= 1.0:
+            raise ValueError(f"INVALID_PARAMETER: Gamma must be > 1.0 (got {gamma}).")
+        if k_max_impressions <= 0.0:
+            raise ValueError(f"INVALID_PARAMETER: K_max must be > 0 (got {k_max_impressions}).")
+        if ec50_spend <= 0.0 or cpm <= 0.0:
+            raise ValueError(f"INVALID_PARAMETER: EC50 and target CPM must be > 0.")
 
         if monthly_spend <= 0.0 or k_max_impressions <= 0.0:
             saturated_impressions = 0.0

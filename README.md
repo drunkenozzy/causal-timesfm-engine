@@ -1,4 +1,4 @@
-# Causal TimesFM Engine v3.0
+# CTE R3.1: Research Validation Core
 > **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
 > *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, Domain-Specific Causal Constraints, and Fail-Closed Institutional Validation.*
 

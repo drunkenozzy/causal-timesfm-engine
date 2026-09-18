@@ -249,41 +249,55 @@ class InstitutionalMarkovEngine:
         }
 
     @staticmethod
-    def estimate_optimal_structural_weight(actual_history, tfm_p50_history, struct_target_history, loss_metric="mae"):
+    def estimate_optimal_structural_weight(actual_history, tfm_p50_history, struct_target_history, min_inner_train=10, loss_metric="mae"):
         """
-        Estimates the optimal structural blending weight alpha* in [0, 1] that minimizes
-        loss L(y, (1 - alpha)*tfm + alpha*struct) in-sample over training fold.
-        
-        If alpha* <= 0.02 or loss does not improve beyond pure statistical prior (alpha=0),
-        it sets alpha* = 0.0 and flags that the structural economic layer added no incremental value.
+        Nested In-Fold Walk-Forward Optimization for alpha*.
+        Strictly prevents lookahead by evaluating alpha on out-of-sample inner folds.
+        The outer out-of-sample test observation is strictly excluded from this inner alpha* fit.
         """
-        if len(actual_history) != len(tfm_p50_history) or len(actual_history) != len(struct_target_history) or len(actual_history) < 5:
-            return {"alpha_star": 0.0, "structural_value_added": False, "loss_base": 0.0, "loss_optimal": 0.0, "reason": "Insufficient history"}
-
+        n = len(actual_history)
+        if len(tfm_p50_history) != n or len(struct_target_history) != n:
+            return {"alpha_star": 0.0, "structural_value_added": False, "loss_base_alpha_zero": 0.0, "loss_optimal": 0.0, "reason": "Length mismatch"}
+            
+        if n <= min_inner_train:
+            return {"alpha_star": 0.0, "structural_value_added": False, "loss_base_alpha_zero": 0.0, "loss_optimal": 0.0, "reason": "Insufficient history for nested CV"}
+            
         best_alpha = 0.0
         best_loss = float("inf")
         base_loss = None
-
+        
         # Grid search over alpha in [0.0, 1.0] in steps of 0.02
         for step in range(51):
             alpha = step * 0.02
-            blend = [((1.0 - alpha) * p) + (alpha * s) for p, s in zip(tfm_p50_history, struct_target_history)]
-            if loss_metric == "mae":
-                loss = sum(abs(y - b) for y, b in zip(actual_history, blend)) / len(actual_history)
-            else:
-                loss = math.sqrt(sum((y - b)**2 for y, b in zip(actual_history, blend)) / len(actual_history))
             
+            # Walk-forward inner loop
+            inner_losses = []
+            for t in range(min_inner_train, n):
+                y = actual_history[t]
+                p = tfm_p50_history[t]
+                s = struct_target_history[t]
+                
+                blend = ((1.0 - alpha) * p) + (alpha * s)
+                if loss_metric == "mae":
+                    inner_losses.append(abs(y - blend))
+                else:
+                    inner_losses.append((y - blend)**2)
+                    
+            if loss_metric == "mae":
+                loss = sum(inner_losses) / len(inner_losses)
+            else:
+                loss = math.sqrt(sum(inner_losses) / len(inner_losses))
+                
             if step == 0:
                 base_loss = loss
-
+                
             if loss < best_loss:
                 best_loss = loss
                 best_alpha = alpha
-
-        # Require meaningful out-of-sample improvement (>0.5% relative loss reduction)
+                
         rel_gain = (base_loss - best_loss) / base_loss if base_loss and base_loss > 1e-6 else 0.0
         value_added = bool(best_alpha > 0.02 and rel_gain >= 0.005)
-
+        
         return {
             "alpha_star": round(best_alpha if value_added else 0.0, 3),
             "structural_value_added": value_added,
