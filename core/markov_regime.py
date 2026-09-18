@@ -129,12 +129,27 @@ class InstitutionalMarkovEngine:
             "transition_matrix": P_t
         }
 
-    def condition_timesfm_quantiles(self, tfm_p10, tfm_p50, tfm_p90, forward_xi, asset_vol_scale=0.05):
+    def propagate_forward_state(self, P_t, horizon_steps=30):
         """
-        Reconciles TimesFM foundation forecasts with forward Markov probabilities.
-        Dynamically adapts quantile compression to the asset's volatility scale.
-        Preserves original statistical quantiles while computing the mechanism-aware envelope.
+        Propagates the current Markov filtered state xi_t forward across h periods:
+          xi_{t+h} = (P_t^T)^h @ xi_t
+        Eliminates the defect of treating t-filtered state as t+h forward state.
         """
+        h = max(1, int(horizon_steps))
+        P_forward = np.linalg.matrix_power(P_t.T, h)
+        xi_h = P_forward @ self.xi
+        return xi_h / np.sum(xi_h)
+
+    def condition_timesfm_quantiles(self, tfm_p10, tfm_p50, tfm_p90, forward_xi, asset_vol_scale=0.05, horizon_steps=30, transition_matrix=None):
+        """
+        Reconciles TimesFM statistical priors against forward structural Markov scenarios.
+        Propagates state vector to horizon h if transition_matrix is provided.
+        Outputs a mechanism-aware scenario corridor (Downside Floor, Central Target, Upside Ceiling).
+        """
+        # Propagate forward if matrix provided and forward_xi is current state
+        if transition_matrix is not None and horizon_steps > 1:
+            forward_xi = self.propagate_forward_state(transition_matrix, horizon_steps)
+
         p_h, p_s, p_p = forward_xi[0], forward_xi[1], forward_xi[2]
 
         reconciled_p50 = (p_h * tfm_p50) + (p_s * min(tfm_p50, tfm_p90 * 0.95)) + (p_p * tfm_p10)
@@ -145,9 +160,15 @@ class InstitutionalMarkovEngine:
         reconciled_ceiling = max(reconciled_p50, tfm_p90 * (0.85 if p_p > 0.35 else 1.00))
 
         return {
-            "reconciled_p10": round(reconciled_floor, 2),
-            "reconciled_p50": round(reconciled_p50, 2),
-            "reconciled_p90": round(reconciled_ceiling, 2),
+            "downside_floor": round(reconciled_floor, 2),
+            "expected_target": round(reconciled_p50, 2),
+            "upside_ceiling": round(reconciled_ceiling, 2),
+            "reconciled_p10": round(reconciled_floor, 2),  # Compatibility alias
+            "reconciled_p50": round(reconciled_p50, 2),  # Compatibility alias
+            "reconciled_p90": round(reconciled_ceiling, 2),  # Compatibility alias
+            "forward_xi": [round(float(x), 4) for x in forward_xi],
             "fragility_score": round(float(p_p) * 100, 1),
-            "ponzi_probability": round(float(p_p), 4)
+            "ponzi_probability": round(float(p_p), 4),
+            "corridor_type": "MECHANISM_AWARE_SCENARIO_ENVELOPE",
+            "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles."
         }

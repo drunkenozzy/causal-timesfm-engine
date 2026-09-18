@@ -56,54 +56,65 @@ class OnChainLiquidityEngine:
         
         return {"mcap": None, "status": "INVALID_NO_DATA", "staleness_days": 999, "as_of": None}
 
-    def get_stablecoin_mcap(self, date_str):
+    def get_stablecoin_mcap(self, date_str, refuse_stale=True):
         prov = self.get_stablecoin_mcap_with_provenance(date_str)
         if prov["status"] == "DATA_STALE_CRITICAL":
-            print(f"[DATA WARNING] Stablecoin observation is STALE: {prov['as_of']} (requested {date_str}, lag: {prov['staleness_days']} days)")
+            print(f"[DATA BLOCKED] Stablecoin observation is critically STALE: {prov['as_of']} (requested {date_str}, lag: {prov['staleness_days']} days).")
+            if refuse_stale:
+                return None
         return prov["mcap"]
 
     def compute_rolling_features(self, date_list, window=252):
         """
         Computes 30-day net float expansion and rolling 252-day Z-scores.
-        Note: Float expansion measures aggregate net supply growth of base money (M),
-        distinct from turnover velocity (V = Y / M).
+        Zero-Lookahead Guaranteed: Observations during the 30-day warm-up period
+        are strictly set to None, never backfilled from future observations.
         """
         n = len(date_list)
         mcaps = []
         provenances = []
         for d in date_list:
             p = self.get_stablecoin_mcap_with_provenance(d)
-            mcaps.append(p["mcap"] if p["mcap"] is not None else 0.0)
+            mcaps.append(p["mcap"])
             provenances.append(p)
 
         # 30-day Net Float Growth (Liquidity Impulse)
-        float_growth_30d = [0.0] * n
+        # Warmup index 0..29 is strictly None (no backward lookahead leak)
+        float_growth_30d = [None] * n
         for i in range(30, n):
             prev = mcaps[i - 30]
             curr = mcaps[i]
-            float_growth_30d[i] = (curr - prev) / prev if prev > 0 else 0.0
+            if prev is not None and curr is not None and prev > 0:
+                float_growth_30d[i] = (curr - prev) / prev
+            else:
+                float_growth_30d[i] = None
 
-        for i in range(min(30, n)):
-            float_growth_30d[i] = float_growth_30d[min(30, n - 1)] if n > 30 else 0.0
-
-        z_scores = [0.0] * n
-        for i in range(window, n):
-            hist = float_growth_30d[i - window : i]
-            mu = sum(hist) / len(hist)
-            var = sum((x - mu) ** 2 for x in hist) / len(hist)
-            sigma = math.sqrt(var) if var > 1e-12 else 1e-6
-            z_scores[i] = (float_growth_30d[i] - mu) / sigma
-
-        for i in range(min(window, n)):
-            z_scores[i] = 0.0
+        # Rolling Z-scores computed strictly on past non-null float growth
+        z_scores = [None] * n
+        for i in range(30 + window, n):
+            hist = [x for x in float_growth_30d[i - window : i] if x is not None]
+            if len(hist) >= window * 0.8:
+                mu = sum(hist) / len(hist)
+                var = sum((x - mu) ** 2 for x in hist) / len(hist)
+                sigma = math.sqrt(var) if var > 1e-12 else 1e-6
+                if float_growth_30d[i] is not None:
+                    z_scores[i] = (float_growth_30d[i] - mu) / sigma
 
         results = []
         for i in range(n):
             d = date_list[i]
             v = float_growth_30d[i]
             z = z_scores[i]
+            prov_status = provenances[i]["status"]
             
-            if z < -1.5:
+            # Hard refusal on critical staleness
+            if prov_status == "DATA_STALE_CRITICAL":
+                regime = "DATA_STALE_REFUSED"
+                decoupling_active = False
+            elif v is None or z is None:
+                regime = "WARMUP_INSUFFICIENT_HISTORY"
+                decoupling_active = False
+            elif z < -1.5:
                 regime = "SYSTEMIC_LIQUIDITY_DRAIN"
                 decoupling_active = False
             elif z < -0.5:
@@ -122,10 +133,11 @@ class OnChainLiquidityEngine:
             results.append({
                 "date": d,
                 "stablecoin_mcap": mcaps[i],
-                "float_growth_30d": round(v, 4),
-                "liquidity_impulse": round(v, 4),
-                "velocity_30d": round(v, 4),  # Preserved for backward compatibility
-                "z_score": round(z, 2),
+                "data_status": prov_status,
+                "float_growth_30d": round(v, 4) if v is not None else None,
+                "liquidity_impulse": round(v, 4) if v is not None else None,
+                "velocity_30d": round(v, 4) if v is not None else None,  # Backward compatibility
+                "z_score": round(z, 2) if z is not None else None,
                 "regime": regime,
                 "decoupling_active": decoupling_active
             })

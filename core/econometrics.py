@@ -31,26 +31,43 @@ class EconometricFilter:
         """Takes logs and first differences to remove deterministic trend."""
         log_series = self.log_transform(raw_levels)
         diff_series = self.first_difference(log_series)
-        is_stationary, stat_p = self.check_stationarity(diff_series)
+        stat_res = self.check_stationarity(diff_series)
+        is_stationary, stat_p = stat_res[0], stat_res[1]
+        method_used = stat_res[2] if len(stat_res) > 2 else "Dickey-Fuller OLS"
         return {
             "log_levels": log_series,
             "diff_growth": diff_series,
             "is_stationary": is_stationary,
-            "adf_p_value": stat_p
+            "p_value": stat_p,
+            "adf_p_value": stat_p,
+            "method": method_used
         }
 
     def check_stationarity(self, series):
         """
-        Dickey-Fuller Unit Root Test:
-        Regresses Delta y_t on y_{t-1}.
-        H0: Unit root present (Non-stationary).
+        Dickey-Fuller / Augmented Dickey-Fuller Unit Root Test:
+        Tests H0: Unit root present (Non-stationary).
+        Uses statsmodels.tsa.stattools.adfuller if installed for exact MacKinnon p-values;
+        falls back to pure-Python first-order Dickey-Fuller OLS when statsmodels is absent.
         """
         vals = [float(x) for x in series]
         n = len(vals)
         if n < 20:
-            # Short sample: Insufficient statistical power for asymptotic Dickey-Fuller distribution
-            return False, 1.0
+            return False, 1.0, "INSUFFICIENT_SAMPLE (<20 observations)"
 
+        # 1. Preferred Institutional Path: statsmodels ADF with AIC lag selection
+        try:
+            from statsmodels.tsa.stattools import adfuller
+            res = adfuller(vals, autolag='AIC')
+            t_stat = float(res[0])
+            p_val = float(res[1])
+            lags_used = int(res[2])
+            is_stat = p_val < self.p_threshold
+            return is_stat, round(p_val, 4), f"Statsmodels ADF (MacKinnon p-value, AIC lags={lags_used})"
+        except ImportError:
+            pass
+
+        # 2. Transparent Pure-Python Fallback: First-Order Dickey-Fuller OLS
         dy = [vals[i] - vals[i - 1] for i in range(1, n)]
         y_lag = vals[:-1]
 
@@ -59,7 +76,7 @@ class EconometricFilter:
 
         denom = sum((y - mean_y)**2 for y in y_lag)
         if denom == 0:
-            return False, 1.0
+            return False, 1.0, "ZERO_VARIANCE_SERIES"
 
         beta = sum((y - mean_y) * (d - mean_dy) for y, d in zip(y_lag, dy)) / denom
         residuals = [d - (mean_dy + beta * (y - mean_y)) for y, d in zip(y_lag, dy)]
@@ -68,22 +85,20 @@ class EconometricFilter:
 
         t_stat = beta / (std_beta if std_beta > 0 else 1e-9)
 
-        # MacKinnon (1994) approximate p-value for Dickey-Fuller with constant
-        # Approximate response surface:
-        # Critical values: 1%: -3.43, 5%: -2.86, 10%: -2.57
+        # Standard Dickey-Fuller asymptotic response surface approximation (with constant)
+        # 1%: -3.43, 5%: -2.86, 10%: -2.57
         if t_stat <= -3.43:
             p_val = 0.01 * math.exp(t_stat + 3.43)
         elif t_stat <= -2.86:
-            # Interpolate between 0.01 and 0.05
             p_val = 0.01 + 0.04 * (t_stat - (-3.43)) / (-2.86 - (-3.43))
         elif t_stat <= -2.57:
-            # Interpolate between 0.05 and 0.10
             p_val = 0.05 + 0.05 * (t_stat - (-2.86)) / (-2.57 - (-2.86))
         else:
             p_val = min(1.0, 0.10 + 0.90 * (1.0 / (1.0 + math.exp(-1.5 * (t_stat + 2.57)))))
 
         is_stat = p_val < self.p_threshold
-        return is_stat, round(float(p_val), 4)
+        method_desc = "First-Order Dickey-Fuller OLS (No lag augmentation; install statsmodels for automated AIC-lag ADF)"
+        return is_stat, round(float(p_val), 4), method_desc
 
     def _solve_ols_1d(self, X_matrix, Y_vec):
         """Solves (X'X)^(-1) X'Y for small matrix using normal equations."""
@@ -182,10 +197,11 @@ class EconometricFilter:
         try:
             from scipy.stats import f as f_dist
             exact_p = float(f_dist.sf(f_stat, df_num, df_denom))
+            p_calc_method = "SciPy exact F-distribution sf"
         except ImportError:
-            # Rigorous analytical survival function approximation
-            x = df_num * f_stat / (df_num * f_stat + df_denom)
+            # Heuristic exponential tail approximation when SciPy is absent
             exact_p = math.exp(-0.5 * f_stat) if f_stat > 0 else 1.0
+            p_calc_method = "Heuristic exponential approximation (Install scipy for exact F p-value)"
 
         # Scientific Causal Taxonomy (Correlation != Causation)
         has_precedence = exact_p < self.p_threshold
@@ -207,6 +223,7 @@ class EconometricFilter:
             "f_statistic": round(float(f_stat), 3),
             "p_value": round(float(exact_p), 4),
             "exact_p_value": round(float(exact_p), 4),
+            "p_value_method": p_calc_method,
             "predictive_precedence": has_precedence,
             "evidence_grade": grade,
             "epistemic_status": grade,

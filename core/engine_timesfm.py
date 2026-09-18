@@ -13,8 +13,9 @@ class TimesFmBaselineEngine:
         self.backend = backend
         self._model = None
         self._initialized = False
+        self._init_failure_reason = None
 
-    def _try_init_timesfm(self):
+    def _try_init_timesfm(self, required_horizon=90):
         """Attempts to load official TimesFM PyTorch weights if installed."""
         if self._initialized:
             return self._model is not None
@@ -24,15 +25,17 @@ class TimesFmBaselineEngine:
                 hparams=timesfm.TimesFmHparams(
                     backend=self.backend,
                     per_core_batch_size=1,
-                    horizon_len=90
+                    horizon_len=max(90, required_horizon)
                 ),
                 checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=self.repo_id)
             )
             self._initialized = True
+            self._init_failure_reason = None
             return True
-        except Exception:
+        except Exception as e:
             self._initialized = True
             self._model = None
+            self._init_failure_reason = f"TimesFM neural runtime unavailable ({e.__class__.__name__}: {e})"
             return False
 
     def detect_volatility_squeeze(self, series, short_window=20, long_window=60):
@@ -57,15 +60,20 @@ class TimesFmBaselineEngine:
         return is_squeezed, round(float(bw_recent), 2)
 
     def forecast(self, history_series, horizon_days=30, freq_indicator=0):
-        """Generates probabilistic quantile corridors (P10, P50, P90)."""
+        """
+        Generates probabilistic statistical prior corridors.
+        Exposes full runtime provenance: whether neural TimesFM executed or degraded baseline was used.
+        """
         vals = [float(x) for x in history_series]
         n = len(vals)
+        if n < 5:
+            raise ValueError("Insufficient history length for time-series forecasting (minimum 5 bars required).")
         current_price = vals[-1]
 
         is_squeezed, bandwidth = self.detect_volatility_squeeze(vals)
 
-        # 1. Official TimesFM if loaded
-        if self._try_init_timesfm():
+        # 1. Official Neural TimesFM
+        if self._try_init_timesfm(required_horizon=horizon_days):
             try:
                 point_forecast, quantile_forecast = self._model.forecast(
                     inputs=[vals],
@@ -76,6 +84,9 @@ class TimesFmBaselineEngine:
                 p90 = float(quantile_forecast[0, horizon_days - 1, 9])
                 return {
                     "engine": "TimesFM-Neural",
+                    "timesfm_executed": True,
+                    "degraded_mode": False,
+                    "provenance_note": f"Inferred using neural weights ({self.repo_id}).",
                     "current_price": current_price,
                     "horizon_days": horizon_days,
                     "p10_downside": round(p10, 4),
@@ -87,10 +98,10 @@ class TimesFmBaselineEngine:
                     "volatility_squeeze": is_squeezed,
                     "bandwidth": bandwidth
                 }
-            except Exception:
-                pass
+            except Exception as e:
+                self._init_failure_reason = f"Inference execution failed ({e.__class__.__name__}: {e})"
 
-        # 2. Geometric Quantile Autoregressive Engine
+        # 2. Transparent Geometric Autoregressive Baseline Prior
         log_diffs = [math.log(vals[i]) - math.log(vals[i - 1]) for i in range(1, n)]
         mean_diff = sum(log_diffs) / len(log_diffs)
         daily_vol = math.sqrt(sum((r - mean_diff)**2 for r in log_diffs) / len(log_diffs))
@@ -109,7 +120,11 @@ class TimesFmBaselineEngine:
         p10 = p50 * math.exp(-z_score * horizon_vol)
 
         return {
-            "engine": "TimesFM-Quantile-Statistical",
+            "engine": "GEOMETRIC_AUTOREGRESSIVE_BASELINE",
+            "timesfm_executed": False,
+            "degraded_mode": True,
+            "failure_reason": self._init_failure_reason or "Neural runtime not detected in environment.",
+            "provenance_note": "Geometric autoregressive baseline prior (Neural TimesFM weights not loaded).",
             "current_price": current_price,
             "horizon_days": horizon_days,
             "p10_downside": round(float(p10), 4),

@@ -1,12 +1,13 @@
-# Causal TimesFM Engine v2.0
-> **Institutional Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
-> *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, 24/7 On-Chain Money Velocity, and Time-Varying Markov Regime Switching.*
+# Causal TimesFM Engine v2.1
+> **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
+> *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, 24/7 On-Chain Net Float Dynamics, and Time-Varying Markov Regime Switching.*
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/drunkenozzy/causal-timesfm-engine/blob/main/quickstart.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Production Grade](https://img.shields.io/badge/Status-Institutional%20Grade-emerald.svg)]()
-[![Theil's U Tested](https://img.shields.io/badge/Theil's%20U-Audited-purple.svg)]()
+[![Status: Research Prototype](https://img.shields.io/badge/Status-Research%20Prototype%20v2.1-blue.svg)]()
+[![Tests: 16 Passing](https://img.shields.io/badge/Tests-16%20Passing%20(100%25)-emerald.svg)]()
+[![Epistemology: Falsifiable](https://img.shields.io/badge/Epistemology-Falsifiable%20Framework-purple.svg)]()
 
 ---
 
