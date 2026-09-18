@@ -65,6 +65,57 @@ def test_plain_english_summary():
     assert "WHAT WOULD PROVE THIS ANALYSIS WRONG" in summary
     print("  [PASS] Test 4: Plain-English Summary Generation & Falsifiability")
 
+def test_data_provenance_and_staleness():
+    engine = OnChainLiquidityEngine()
+    fresh = engine.get_stablecoin_mcap_with_provenance("2024-01-01")
+    assert fresh["status"] in ["FRESH", "STALE_ACCEPTABLE"]
+    
+    # Far-future date beyond cache must trigger critical staleness, never silent fallback
+    future = engine.get_stablecoin_mcap_with_provenance("2035-01-01")
+    assert future["status"] == "DATA_STALE_CRITICAL"
+    assert future["staleness_days"] > 1000
+    print("  [PASS] Test 5: Data Provenance & Staleness Refusal (No Silent Fallback)")
+
+def test_no_lookahead_in_rolling_features():
+    engine = OnChainLiquidityEngine()
+    dates_short = [f"2024-01-{i:02d}" for i in range(1, 20)]
+    dates_long = [f"2024-01-{i:02d}" for i in range(1, 31)]
+    
+    feats_short = engine.compute_rolling_features(dates_short, window=5)
+    feats_long = engine.compute_rolling_features(dates_long, window=5)
+    
+    # The feature at index 10 must be identical regardless of whether future bars exist
+    for k in ["z_score", "float_growth_30d", "regime"]:
+        assert feats_short[10][k] == feats_long[10][k]
+    print("  [PASS] Test 6: Zero-Lookahead Rolling Window Invariance")
+
+def test_epistemic_granger_taxonomy():
+    ef = EconometricFilter()
+    np.random.seed(42)
+    x = list(np.random.randn(100))
+    y = [0.5 * x[i-1] + np.random.randn() * 0.1 for i in range(1, 100)]
+    res = ef.test_granger_causality(x[1:], y, max_lag=2)
+    
+    # Must never claim structural / mechanical causality
+    assert "TRUE MECHANICAL CAUSALITY" not in res.get("epistemic_status", "")
+    assert res.get("epistemic_status") in [
+        "ROBUST_PREDICTIVE_PRECEDENCE",
+        "MODERATE_PREDICTIVE_PRECEDENCE",
+        "WEAK_LEAD_LAG_EVIDENCE",
+        "NO_PREDICTIVE_EVIDENCE"
+    ]
+    assert "exact_p_value" in res
+    print("  [PASS] Test 7: Epistemic Causal Hierarchy & Exact P-Values")
+
+def test_theils_u_hurdle():
+    ef = EconometricFilter()
+    actual = [100, 102, 101, 104, 107, 106, 110]
+    # Forecast that tracks direction better than naive random walk
+    good_forecast = [100.5, 101.8, 101.2, 103.8, 106.5, 106.2, 109.5]
+    u_good = ef.compute_theils_u(actual, good_forecast)
+    assert u_good < 1.0  # Beats naive random walk
+    print("  [PASS] Test 8: Theil's U Naive Hurdle Gate (U < 1.0)")
+
 if __name__ == "__main__":
     print("\n=======================================================")
     print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.0 AUTOMATED TESTS")
@@ -73,6 +124,10 @@ if __name__ == "__main__":
     test_schmitt_trigger_hysteresis()
     test_asset_calibrated_volatility()
     test_plain_english_summary()
+    test_data_provenance_and_staleness()
+    test_no_lookahead_in_rolling_features()
+    test_epistemic_granger_taxonomy()
+    test_theils_u_hurdle()
     print("=======================================================")
-    print("   ALL 4 TEST SUITES PASSED (100% SUCCESS)")
+    print("   ALL 8 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
     print("=======================================================\n")

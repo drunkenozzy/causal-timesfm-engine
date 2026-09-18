@@ -118,11 +118,13 @@ class InstitutionalMarkovEngine:
         effective_regime = "PONZI" if self.in_ponzi_regime else (
             "SPECULATIVE" if self.xi[1] > 0.50 else "HEDGE"
         )
+        fragility_score = round(raw_ponzi_prob * 100, 1)
 
         return {
             "state_vector": self.xi.copy(),
             "effective_regime": effective_regime,
             "in_ponzi_regime": self.in_ponzi_regime,
+            "fragility_score": fragility_score,
             "raw_ponzi_prob": round(raw_ponzi_prob, 4),
             "transition_matrix": P_t
         }
@@ -131,6 +133,7 @@ class InstitutionalMarkovEngine:
         """
         Reconciles TimesFM foundation forecasts with forward Markov probabilities.
         Dynamically adapts quantile compression to the asset's volatility scale.
+        Preserves original statistical quantiles while computing the mechanism-aware envelope.
         """
         p_h, p_s, p_p = forward_xi[0], forward_xi[1], forward_xi[2]
 
@@ -145,5 +148,6 @@ class InstitutionalMarkovEngine:
             "reconciled_p10": round(reconciled_floor, 2),
             "reconciled_p50": round(reconciled_p50, 2),
             "reconciled_p90": round(reconciled_ceiling, 2),
+            "fragility_score": round(float(p_p) * 100, 1),
             "ponzi_probability": round(float(p_p), 4)
         }

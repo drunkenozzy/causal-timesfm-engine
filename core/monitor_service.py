@@ -51,7 +51,7 @@ class ContinuousMonitorService:
         latest = features[-1]
 
         z_liq = latest["z_score"]
-        v_30 = latest["velocity_30d"]
+        float_growth = latest.get("float_growth_30d", latest.get("velocity_30d", 0.0))
         decoupling = latest["decoupling_active"]
 
         # Run Markov Filter update
@@ -63,6 +63,7 @@ class ContinuousMonitorService:
         )
         effective_regime = update_info["effective_regime"]
         p_ponzi = update_info["raw_ponzi_prob"]
+        fragility_score = update_info.get("fragility_score", round(p_ponzi * 100, 1))
 
         alert_triggered = False
         alert_message = ""
@@ -71,7 +72,7 @@ class ContinuousMonitorService:
             alert_triggered = True
             alert_message = (
                 f"🚨 URGENT RISK-OFF ALERT: Systemic Liquidity Drain Detected!\n"
-                f"Stablecoin Velocity Z-Score: {z_liq} | Ponzi Probability: {p_ponzi*100:.1f}%.\n"
+                f"Stablecoin Float Growth Z-Score: {z_liq:.2f} | Fragility Score: {fragility_score:.1f}/100.\n"
                 f"Action Required: Execute Rule 6 capital rotation. Cut high-beta exposure to 15%."
             )
         elif effective_regime != "PONZI" and self.last_state == "PONZI":
@@ -90,8 +91,10 @@ class ContinuousMonitorService:
             "date": today_str,
             "regime": effective_regime,
             "z_liq": z_liq,
-            "velocity_30d": v_30,
-            "ponzi_probability": p_ponzi,
+            "float_growth_30d": float_growth,
+            "velocity_30d": float_growth,  # Backwards compatibility
+            "fragility_score": fragility_score,
+            "ponzi_probability": p_ponzi,  # Backwards compatibility
             "alert_triggered": alert_triggered
         }
 
