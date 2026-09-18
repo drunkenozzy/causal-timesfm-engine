@@ -1,4 +1,4 @@
-# CTE R3.1: Research Validation Core
+# CTE R3.2: Research Protocol Freeze & Inference Rigor
 > **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
 > *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, Domain-Specific Causal Constraints, and Fail-Closed Institutional Validation.*
 

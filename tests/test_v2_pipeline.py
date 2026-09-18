@@ -671,7 +671,7 @@ def test_baseline_tournament():
     assert "models" in res
     assert "M0_Persistence" in res["models"]
     assert "M0b_Drift" in res["models"]
-    assert "M1_TimesFM_Target_Only" in res["models"]
+    assert "M1_GEOMETRIC_FALLBACK" in res["models"]
     assert "M4_Fitted_Structural_Hybrid" in res["models"]
     assert "incremental_skill" in res
     assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0

@@ -187,14 +187,24 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
     else:
         inference_status = "NO_IMPROVEMENT"
 
-    return {
+    # Determine M1 telemetry label
+    from core.engine_timesfm import TimesFmBaselineEngine
+    tfm = TimesFmBaselineEngine()
+    tfm_res = tfm.forecast(series[:min_train_len], horizon_days=h)
+    m1_label = tfm_res.get("engine", "M1_GEOMETRIC_FALLBACK")
+    
+    # Guard against masquerading
+    if not tfm_res.get("timesfm_executed", False):
+        m1_label = "M1_GEOMETRIC_FALLBACK"
+
+    tourney_results = {
         "status": "EVALUATED",
         "n_origins": len(actuals),
         "horizon": h,
         "models": {
             "M0_Persistence": {"rmse": round(r0, 4), "theils_u2": u0},
             "M0b_Drift": {"rmse": round(r0b, 4), "theils_u2": u0b},
-            "M1_TimesFM_Target_Only": {"rmse": round(r1, 4), "theils_u2": u1},
+            m1_label: {"rmse": round(r1, 4), "theils_u2": u1},
             "M4_Fitted_Structural_Hybrid": {"rmse": round(r4, 4), "theils_u2": u4}
         },
         "incremental_skill": {
@@ -206,3 +216,4 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
             "structural_inference_status": inference_status
         }
     }
+    return tourney_results

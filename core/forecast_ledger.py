@@ -94,6 +94,16 @@ class ImmutableForecastLedger:
 
         return record
 
+    def _get_dependency_lock_hash(self):
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        lock_file = os.path.join(root_dir, "uv.lock")
+        if not os.path.exists(lock_file):
+            lock_file = os.path.join(root_dir, "requirements.txt")
+        if os.path.exists(lock_file):
+            with open(lock_file, "rb") as f:
+                return hashlib.sha256(f.read()).hexdigest()
+        return "UNKNOWN_DEPENDENCIES"
+
     def record_forecast(self,
                         asset_name: str,
                         origin_timestamp: str,
@@ -113,6 +123,7 @@ class ImmutableForecastLedger:
         Immutably registers a new forecast entry into the ledger.
         Returns the registered forecast record with unique forecast_id.
         """
+        import sys
         now_utc = datetime.now(timezone.utc).isoformat()
         cutoff = data_cutoff_timestamp or origin_timestamp or now_utc
         
@@ -122,6 +133,8 @@ class ImmutableForecastLedger:
         forecast_id = f"fc_{compute_sha256(id_material)[:16]}"
         
         git_sha, git_dirty = self._get_git_status()
+        dep_hash = self._get_dependency_lock_hash()
+        py_version = sys.version.split(' ')[0]
 
         record = {
             "record_type": "FORECAST_REGISTRATION",
@@ -135,6 +148,8 @@ class ImmutableForecastLedger:
             "dataset_hash": dataset_hash or "NOT_HASHED",
             "commit_sha": commit_sha or git_sha,
             "git_dirty": git_dirty,
+            "dependency_lock_hash": dep_hash,
+            "python_runtime_version": py_version,
             "raw_prior": {
                 "p10": raw_prior.get("p10_downside") or raw_prior.get("p10"),
                 "p50": raw_prior.get("p50_expected") or raw_prior.get("p50"),
@@ -247,3 +262,25 @@ class ImmutableForecastLedger:
                 except json.JSONDecodeError:
                     continue
         return resolutions
+
+    def generate_audit_anchor(self) -> dict:
+        """
+        Generates a WORM-compliant audit anchor manifest representing the current state of the ledger.
+        Institutional users should externally timestamp or Git-sign this manifest to ensure
+        cryptographic immutability rather than mere tamper-evidence.
+        """
+        last_record = self._get_last_record()
+        if not last_record:
+            return {"status": "EMPTY_LEDGER"}
+            
+        return {
+            "anchor_generated_at_utc": datetime.now(timezone.utc).isoformat(),
+            "ledger_head_sequence": last_record.get("sequence_number"),
+            "ledger_head_hash": last_record.get("record_hash"),
+            "latest_forecast_id": last_record.get("forecast_id"),
+            "instructions": (
+                "To ensure cryptographic WORM immutability, this anchor hash should be externally "
+                "timestamped, published to an independent WORM ledger, or committed to Git via an "
+                "annotated signed tag (e.g., git tag -s audit_anchor_{sequence} -m '{hash}')."
+            )
+        }

@@ -319,12 +319,19 @@ class EconometricFilter:
 
         mean_f = sum(f_t) / T
         
-        # Sample variance of f_t
-        var_f = sum((x - mean_f) ** 2 for x in f_t) / (T - 1)
-        if var_f <= 1e-12:
+        # Sample long-run variance of f_t (HAC Bartlett Kernel for overlapping forecasts)
+        lr_var = sum((x - mean_f) ** 2 for x in f_t) / T
+        
+        if h > 1:
+            for k in range(1, int(h)):
+                cov_k = sum((f_t[t] - mean_f) * (f_t[t - k] - mean_f) for t in range(k, T)) / T
+                weight = 1.0 - (k / h)
+                lr_var += 2.0 * weight * cov_k
+                
+        if lr_var <= 1e-12:
             return {"clark_west_stat": 0.0, "p_value": 1.0, "is_statistically_significant": False, "adjusted_msfe_diff": mean_f}
 
-        cw_stat = mean_f / math.sqrt(var_f / T)
+        cw_stat = mean_f / math.sqrt(lr_var / T)
         
         # One-sided test (alternative is M_model is better)
         try:
@@ -345,33 +352,50 @@ class EconometricFilter:
         Computes Moving Block Bootstrap (MBB) 95% confidence intervals for Theil's U2
         and paired loss differentials.
         Preserves serial dependence in overlapping multi-step forecast errors.
+        Imposes the null hypothesis by recentering the paired loss differentials.
         """
         import random
         T = len(errors_model)
         if T < 4:
-            return {"theils_u2_point": 1.0, "ci_95_lower": 1.0, "ci_95_upper": 1.0, "diff_ci_95_lower": 0.0, "diff_ci_95_upper": 0.0, "superiority_established": False}
+            return {
+                "theils_u2_point": 1.0, "ci_95_lower": 1.0, "ci_95_upper": 1.0, 
+                "diff_ci_95_lower": 0.0, "diff_ci_95_upper": 0.0, 
+                "superiority_established": False, "bootstrap_p_value": 1.0,
+                "n_bootstrap": n_boot, "block_length": 1, "CI_method": "percentile"
+            }
 
         b = block_size if block_size else max(2, min(int(h), T // 3))
         rmse_m = math.sqrt(sum(e**2 for e in errors_model) / T)
         rmse_b = math.sqrt(sum(e**2 for e in errors_benchmark) / T)
         u_point = rmse_m / rmse_b if rmse_b > 1e-12 else 1.0
 
+        diffs = [(errors_benchmark[t]**2) - (errors_model[t]**2) for t in range(T)]
+        mean_diff = sum(diffs) / T
+        
+        # Recenter differentials under the null hypothesis (mean = 0)
+        recentered_diffs = [d - mean_diff for d in diffs]
+
         boot_u = []
-        boot_diff = []
+        boot_diff_c = []  # Recentered bootstrap means (for p-value)
+        boot_diff = []    # Raw bootstrap means (for CI)
+        
         n_blocks = max(1, (T + b - 1) // b)
 
         rng = random.Random(42)  # Deterministic seed for reproducible testing
         for _ in range(n_boot):
             sample_m_sq = []
             sample_b_sq = []
+            sample_diff_c = []
             for _ in range(n_blocks):
                 start_idx = rng.randint(0, max(0, T - b))
                 for idx in range(start_idx, min(T, start_idx + b)):
                     sample_m_sq.append(errors_model[idx] ** 2)
                     sample_b_sq.append(errors_benchmark[idx] ** 2)
+                    sample_diff_c.append(recentered_diffs[idx])
             
             sample_m_sq = sample_m_sq[:T]
             sample_b_sq = sample_b_sq[:T]
+            sample_diff_c = sample_diff_c[:T]
             
             mean_m = sum(sample_m_sq) / len(sample_m_sq)
             mean_b = sum(sample_b_sq) / len(sample_b_sq)
@@ -380,8 +404,18 @@ class EconometricFilter:
             r_b = math.sqrt(mean_b)
             boot_u.append(r_m / r_b if r_b > 1e-12 else 1.0)
             
-            # Paired loss differential: M - B
+            # Differential CI (Model vs Bench, using raw differentials)
+            # Actually, mean_m - mean_b is -(mean_bench - mean_model)
+            # Wait, earlier code did mean_m - mean_b. If M is better, mean_m < mean_b, diff < 0.
+            # Let's keep the sign convention: diff = mean_m - mean_b (Negative means M is better).
             boot_diff.append(mean_m - mean_b)
+            
+            # Bootstrap p-value for H0: M is not better than Bench (mean_diff <= 0)
+            # which is equivalent to mean_m - mean_b >= 0.
+            # So under H0, we check how often the recentered (mean_m_c - mean_b_c) is <= observed (mean_m - mean_b).
+            # We recentered diff = bench - model. So M is better if diff > 0.
+            # Let's use the recentered bench - model:
+            boot_diff_c.append(sum(sample_diff_c) / len(sample_diff_c))
 
         boot_u.sort()
         boot_diff.sort()
@@ -396,6 +430,10 @@ class EconometricFilter:
 
         # Superiority is established if the upper bound of the differential is < 0
         superiority = bool(diff_ci_high < 0.0)
+        
+        # P-value: H0 is that true mean_diff <= 0.
+        # We observed mean_diff. What fraction of recentered boot_diff_c > mean_diff?
+        p_val = sum(1 for dc in boot_diff_c if dc >= mean_diff) / len(boot_diff_c) if mean_diff > 0 else 1.0
 
         return {
             "theils_u2_point": round(float(u_point), 4),
@@ -404,8 +442,11 @@ class EconometricFilter:
             "diff_ci_95_lower": round(float(diff_ci_low), 6),
             "diff_ci_95_upper": round(float(diff_ci_high), 6),
             "superiority_established": superiority,
-            "n_bootstraps": n_boot,
-            "block_size": b
+            "bootstrap_p_value": round(float(p_val), 4),
+            "n_bootstrap": n_boot,
+            "block_length": b,
+            "random_seed": 42,
+            "CI_method": "percentile"
         }
 
     def evaluate_rolling_origin_theils_u(self, series, forecast_fn, min_train_len=30, horizon=1):

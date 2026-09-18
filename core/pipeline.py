@@ -364,16 +364,22 @@ def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized
                 return False, "Empty logical node"
             
             results = [eval_node(r) for r in rules]
-            # Check for data unavailability propagation
-            for res, reason in results:
-                if res is None:
-                    return None, reason
             
             bools = [r[0] for r in results]
+            reasons = [r[1] for r in results]
+            
             if cond == "AND":
-                return all(bools), f"Evaluated AND over {len(rules)} rules"
+                if False in bools:
+                    return False, f"Evaluated AND: at least one rule is FALSE ({reasons[bools.index(False)]})"
+                if None in bools:
+                    return None, f"Evaluated AND: at least one rule is UNKNOWN ({reasons[bools.index(None)]})"
+                return True, "Evaluated AND: all rules are TRUE"
             elif cond == "OR":
-                return any(bools), f"Evaluated OR over {len(rules)} rules"
+                if True in bools:
+                    return True, f"Evaluated OR: at least one rule is TRUE ({reasons[bools.index(True)]})"
+                if None in bools:
+                    return None, f"Evaluated OR: at least one rule is UNKNOWN ({reasons[bools.index(None)]})"
+                return False, "Evaluated OR: all rules are FALSE"
             else:
                 return None, f"Unknown condition: {cond}"
                 
