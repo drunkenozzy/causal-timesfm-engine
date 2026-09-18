@@ -1,11 +1,11 @@
-﻿"""
-Causal TimesFM Engine v2.2: Unified Multi-Domain CLI
+"""
+Causal TimesFM Engine v2.3: Unified Multi-Domain CLI
 ====================================================
 Supported Modes:
-  1. --mode crypto      : Ingests on-chain stablecoins, Yahoo BTC/ETH/Altcoins, runs TVTP filter.
-  2. --mode housing     : Ingests Land Registry series, BoE mortgage rates, runs property valuation.
+  1. --mode crypto      : Ingests on-chain stablecoins, empirical series, runs TVTP filter & Theil's U gate.
+  2. --mode housing     : Ingests Land Registry series, BoE mortgage rates, maps frequency-adjusted horizon.
   3. --mode portfolio   : Audits multi-asset portfolio against Rule 6 capital preservation.
-  4. --mode media       : Hill saturation analysis and CPM pacing directives.
+  4. --mode media       : Exact Hill derivative root-finding for optimal CPM spending ceiling.
   5. --mode monitor     : Runs continuous 24/7 liquidity monitoring daemon.
 """
 
@@ -21,7 +21,7 @@ from core.pipeline import CausalTimesFmPipeline
 from core.monitor_service import ContinuousMonitorService
 
 def main():
-    parser = argparse.ArgumentParser(description="Causal TimesFM Engine v2.2")
+    parser = argparse.ArgumentParser(description="Causal TimesFM Engine v2.3")
     parser.add_argument("--mode", choices=["crypto", "housing", "macro", "monitor", "portfolio", "media"], default="crypto")
     parser.add_argument("--ticker", default="BTC-USD")
     parser.add_argument("--price", type=float, default=None)
@@ -40,23 +40,23 @@ def main():
 
     if args.mode == "crypto":
         price = args.price if args.price else 94000.0
-        print(f"\n[Causal TimesFM Engine v2.2] Analyzing Crypto Asset: {args.ticker}...")
+        print(f"\n[Causal TimesFM Engine v2.3] Analyzing Crypto Asset: {args.ticker}...")
         res = pipeline.run_crypto_pipeline(ticker=args.ticker, current_price=price, history_file=args.history_file)
         print("\n" + res["summary"])
 
     elif args.mode == "housing":
         price = args.price if args.price else 450000.0
-        print(f"\n[Causal TimesFM Engine v2.2] Analyzing Real Estate: {args.postcode} (£{price:,.2f})...")
+        print(f"\n[Causal TimesFM Engine v2.3] Analyzing Real Estate: {args.postcode} (£{price:,.2f})...")
         res = pipeline.run_housing_pipeline(property_price=price, postcode=args.postcode, history_file=args.history_file)
         print("\n" + res["summary"])
 
     elif args.mode == "portfolio":
-        print("\n[Causal TimesFM Engine v2.2] Analyzing Multi-Asset Portfolio...")
+        print("\n[Causal TimesFM Engine v2.3] Analyzing Multi-Asset Portfolio...")
         res = pipeline.run_portfolio_pipeline(holdings_str=args.holdings, file_path=args.file, history_file=args.history_file)
         print("\n" + res["summary"])
 
     elif args.mode == "media":
-        print(f"\n[Causal TimesFM Engine v2.2] Analyzing Media Investment & Audience Attention...")
+        print(f"\n[Causal TimesFM Engine v2.3] Analyzing Media Investment & Audience Attention...")
         res = pipeline.run_media_pipeline(monthly_spend=args.spend, cpm=args.cpm, ec50_spend=args.ec50, k_max_impressions=args.kmax)
         print("\n" + res["summary"])
 

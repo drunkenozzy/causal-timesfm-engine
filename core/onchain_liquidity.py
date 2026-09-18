@@ -142,3 +142,46 @@ class OnChainLiquidityEngine:
                 "decoupling_active": decoupling_active
             })
         return results
+
+    def get_liquidity_features_as_of(self, target_date_str=None):
+        """
+        Retrieves empirical rolling liquidity features as of target_date_str.
+        If target_date_str is None or beyond available range, uses latest verified date.
+        Derives rolling 30-day float growth, rolling Z-score, and decoupling impulse.
+        """
+        sorted_dates = sorted(self.history_by_date.keys())
+        if not sorted_dates:
+            return {
+                "as_of_date": None,
+                "z_score": 0.0,
+                "float_growth_30d": 0.0,
+                "decoupling_active": False,
+                "regime": "NO_DATA",
+                "data_status": "INVALID_NO_DATA"
+            }
+        
+        if target_date_str and target_date_str in self.history_by_date:
+            anchor_date = target_date_str
+        elif target_date_str:
+            eligible = [d for d in sorted_dates if d <= target_date_str]
+            anchor_date = eligible[-1] if eligible else sorted_dates[0]
+        else:
+            anchor_date = sorted_dates[-1]
+
+        anchor_idx = sorted_dates.index(anchor_date)
+        window_size = min(anchor_idx + 1, 300)
+        eval_dates = sorted_dates[anchor_idx - window_size + 1 : anchor_idx + 1]
+        
+        features = self.compute_rolling_features(eval_dates, window=min(120, max(20, len(eval_dates) - 35)))
+        latest = features[-1]
+        
+        return {
+            "as_of_date": latest["date"],
+            "stablecoin_mcap": latest["stablecoin_mcap"],
+            "z_score": latest["z_score"] if latest["z_score"] is not None else 0.0,
+            "float_growth_30d": latest["float_growth_30d"] if latest["float_growth_30d"] is not None else 0.0,
+            "decoupling_active": latest["decoupling_active"],
+            "regime": latest["regime"],
+            "data_status": latest["data_status"]
+        }
+

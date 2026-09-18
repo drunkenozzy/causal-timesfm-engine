@@ -297,9 +297,90 @@ def test_scenario_corridor_integrity_and_probabilistic_honesty():
     assert "distinct from unconditioned mixture quantiles" in corridors["epistemic_note"]
     print("  [PASS] Test 17: Scenario Corridor Mathematical Envelope & Epistemic Integrity")
 
+def test_frequency_inference_and_horizon_mapping():
+    """Validates sampling frequency inference and period-adjusted horizon mapping."""
+    from core.pipeline import map_horizon_to_steps
+    # Monthly frequency: 365 days must map to 12 months, NOT 365 periods
+    assert map_horizon_to_steps(365, "M") == 12
+    # Weekly frequency: 30 days must map to 4 weeks
+    assert map_horizon_to_steps(30, "W") == 4
+    # Daily frequency: 30 days must map to 30 days
+    assert map_horizon_to_steps(30, "D") == 30
+    print("  [PASS] Test 18: Time-Series Frequency Inference & Horizon Mapping")
+
+def test_parameter_lineage_and_empirical_state():
+    """Validates parameter lineage tracking and empirical vs demo status assignment."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    sample_csv = os.path.join(BASE_DIR, "data", "btc_sample_history.csv")
+    
+    # 1. Empirical run
+    emp_res = pipeline.run_crypto_pipeline(ticker="BTC-USD", history_file=sample_csv)
+    lineage = emp_res["parameter_lineage"]
+    assert lineage["daily_ret"]["parameter_status"] == "OBSERVED"
+    assert lineage["z_trend"]["parameter_status"] == "OBSERVED"
+    assert lineage["z_liq"]["parameter_status"] == "OBSERVED"
+    assert lineage["decoupling_active"]["parameter_status"] == "ESTIMATED"
+    
+    # 2. Synthetic run
+    synth_res = pipeline.run_crypto_pipeline(ticker="BTC-USD")
+    synth_lineage = synth_res["parameter_lineage"]
+    assert synth_lineage["daily_ret"]["parameter_status"] == "DEMO_ONLY"
+    assert synth_lineage["z_trend"]["parameter_status"] == "DEMO_ONLY"
+    print("  [PASS] Test 19: Parameter Lineage Tracking & Empirical State Integrity")
+
+def test_theils_u_operational_pipeline_gating():
+    """Validates that CausalTimesFmPipeline executes Theil's U gate and throttles allocation if U >= 1.0."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    sample_csv = os.path.join(BASE_DIR, "data", "btc_sample_history.csv")
+    
+    res = pipeline.run_crypto_pipeline(ticker="BTC-USD", history_file=sample_csv)
+    # Gating check: if theils_u fails, target risk weight is strictly throttled to <= 0.35
+    if not res["theils_u_passed"]:
+        assert res["allocation"]["target_risk_weight"] <= 0.35
+        assert "THEIL'S U HURDLE WARNING" in res["allocation"]["tactical_action"]
+    print("  [PASS] Test 20: Operational Pipeline Gate: Walk-Forward Theil's U Enforcement")
+
+def test_media_hill_exact_spend_ceiling_and_schema():
+    """Validates numerical root-finding for exact Hill spend ceiling and decoupled marketing schema."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    
+    s_star = pipeline.solve_optimal_media_spend(target_cpm=12.50, ec50_spend=15000.0, k_max_impressions=2500000.0, gamma=1.3)
+    assert s_star > 5000.0
+    assert abs(s_star - 15233.0) < 500.0  # Around $15.2k
+    
+    # Run media pipeline with spend above optimal ceiling
+    res = pipeline.run_media_pipeline(monthly_spend=20000.0, cpm=12.50, ec50_spend=15000.0, k_max_impressions=2500000.0)
+    decision = res["media_decision"]
+    assert decision["pacing_status"] == "DIMINISHING_RETURNS_WARNING"
+    assert decision["target_spend_budget"] <= s_star + 1.0
+    assert decision["reserve_budget_excess"] > 0
+    assert decision["domain_policy_type"] == "MARKETING_CAPITAL_PACING_POLICY"
+    # Zero finance leakage
+    assert "target_risk_weight" not in decision
+    assert "ponzi_probability" not in decision
+    print("  [PASS] Test 21: Exact Hill Optimization Root-Finding & Decoupled Media Schema")
+
+def test_machine_testable_falsification_objects():
+    """Validates that forecasts produce structured, machine-evaluable falsification objects."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    res = pipeline.run_crypto_pipeline(ticker="BTC-USD")
+    
+    f_obj = res["falsifiability_object"]
+    assert "primary_metric" in f_obj
+    assert "threshold" in f_obj
+    assert "operator" in f_obj
+    assert "evaluated_status" in f_obj
+    assert f_obj["operator"] == "<"
+    assert isinstance(f_obj["threshold"], (float, int))
+    print("  [PASS] Test 22: Structured Machine-Testable Falsification Objects")
+
 if __name__ == "__main__":
     print("\n=======================================================")
-    print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.2 INSTITUTIONAL TESTS")
+    print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.3 INSTITUTIONAL TESTS")
     print("=======================================================")
     test_econometric_stationarity()
     test_schmitt_trigger_hysteresis()
@@ -318,6 +399,12 @@ if __name__ == "__main__":
     test_markov_stationary_distribution_and_modes()
     test_rolling_origin_theils_u_backtest()
     test_scenario_corridor_integrity_and_probabilistic_honesty()
+    test_frequency_inference_and_horizon_mapping()
+    test_parameter_lineage_and_empirical_state()
+    test_theils_u_operational_pipeline_gating()
+    test_media_hill_exact_spend_ceiling_and_schema()
+    test_machine_testable_falsification_objects()
     print("=======================================================")
-    print("   ALL 17 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
+    print("   ALL 22 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
     print("=======================================================\n")
+
