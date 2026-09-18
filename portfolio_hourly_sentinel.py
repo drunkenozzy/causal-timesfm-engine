@@ -57,12 +57,12 @@ class PortfolioHourlySentinel:
         now_utc = datetime.now(timezone.utc)
         print(f"\n[{now_utc.strftime('%Y-%m-%d %H:%M:%S UTC')}] Running Hourly Institutional Risk Audit...")
 
-        # 1. Evaluate on-chain liquidity velocity
+        # 1. Evaluate on-chain stablecoin float dynamics
         dates = [datetime.fromtimestamp(time.time() - i*86400).strftime("%Y-%m-%d") for i in range(60, -1, -1)]
         features = self.liq_engine.compute_rolling_features(dates, window=30)
         latest_liq = features[-1]
         z_liq = latest_liq["z_score"]
-        v_30 = latest_liq["velocity_30d"]
+        fg_30 = latest_liq.get("float_growth_30d", latest_liq.get("velocity_30d", 0.0))
         decoupling = latest_liq["decoupling_active"]
 
         # 2. Run Markov Transition Filter
@@ -92,9 +92,9 @@ class PortfolioHourlySentinel:
             is_emergency = True
             alerts.append(f"CRITICAL: Systemic Liquidity Drain! Ponzi probability is {p_ponzi*100:.1f}%. Cut high-beta risk to 15%.")
         
-        # Alert Condition B: Velocity Outflow
-        if z_liq < -1.5:
-            alerts.append(f"WARNING: Stablecoin velocity is negative ({z_liq:.2f}s). Capital is exiting the ecosystem.")
+        # Alert Condition B: Float Outflow
+        if z_liq is not None and z_liq < -1.5:
+            alerts.append(f"WARNING: Stablecoin 30-day float growth is negative ({z_liq:.2f}s). Capital is exiting the ecosystem.")
 
         # Alert Condition C: Rule 6 Portfolio Breach
         max_allowed_crypto = alloc["target_risk_weight"] * 100
@@ -109,6 +109,9 @@ class PortfolioHourlySentinel:
         p90 = self.portfolio_value * 1.22
         
         forecast_output = {
+            "downside_floor": p10,
+            "expected_target": p50,
+            "upside_ceiling": p90,
             "reconciled_p10": p10,
             "reconciled_p50": p50,
             "reconciled_p90": p90
@@ -134,12 +137,12 @@ class PortfolioHourlySentinel:
             "regime": effective_regime,
             "regime_description": alloc["regime"],
             "ponzi_probability": round(p_ponzi * 100, 1),
-            "stablecoin_z_score": round(z_liq, 2),
-            "stablecoin_velocity_30d_pct": round(v_30 * 100, 2),
+            "stablecoin_z_score": round(z_liq, 2) if z_liq is not None else None,
+            "stablecoin_float_growth_30d_pct": round(fg_30 * 100, 2) if fg_30 is not None else None,
             "tactical_action": alloc["tactical_action"],
-            "downside_floor_p10": round(p10, 2),
-            "expected_value_p50": round(p50, 2),
-            "upside_ceiling_p90": round(p90, 2),
+            "downside_floor": round(p10, 2),
+            "expected_target": round(p50, 2),
+            "upside_ceiling": round(p90, 2),
             "falsifiability_condition": falsify,
             "active_alerts": alerts,
             "is_emergency": is_emergency,

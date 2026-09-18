@@ -1,4 +1,4 @@
-# ?? AI Prompt Guide for Causal TimesFM Engine
+ï»¿# ?? AI Prompt Guide for Causal TimesFM Engine
 > **How to run institutional quantitative risk analysis using ChatGPT, Claude Opus, or Gemini**
 
 When you want an AI model to analyze your assets, portfolio, or media investments using this repository, **do not give it a vague prompt**. LLMs tend to generate generic, hand-waving financial advice unless explicitly instructed to execute the quantitative pipeline.
@@ -23,16 +23,16 @@ I am providing my asset/portfolio data below:
  - Bitcoin (BTC): \,700
  - Solana (SOL): \,110
  - Tether (USDT): \
-OR SPECIFY: Real Estate (London, £450k) / Media Campaign (\/mo budget)]
+OR SPECIFY: Real Estate (London, Â£450k) / Media Campaign (\/mo budget)]
 
 Your Directives:
 1. REJECT RETAIL FLUFF & EMH DOGMA: Do not give textbook diversification homilies. 
-   Evaluate structural causality, on-chain base money velocity, and Minsky financial fragility.
+   Evaluate structural causality, on-chain stablecoin float dynamics, and Minsky financial fragility.
 2. SYSTEMIC LIQUIDITY CHECK: Assess current global liquidity conditions (DefiLlama aggregate stablecoins 
-   Z-score and velocity). Is macro liquidity expanding or draining?
+   Z-score and 30-day net float growth). Is macro liquidity expanding or draining?
 3. REGIME CLASSIFICATION: Classify the environment into Hedge (stable), Speculative (overextension), 
    or Ponzi (liquidity crunch) using Schmitt Trigger hysteresis.
-4. VOLATILITY-SCALED QUANTILES: Compute TimesFM downside floor (P10), median (P50), and upside (P90) 
+4. VOLATILITY-SCALED QUANTILES: Compute TimesFM foundation quantile prior and mechanism-aware scenario corridors (Downside Floor, Central Target, Upside Ceiling) 
    scaled to historical asset volatility (do not use a fixed 2% assumption).
 5. RULE 6 CAPITAL AUDIT: Audit this portfolio against Rule 6:
    - Speculative High-Beta Assets: Strictly max 35% cap.
@@ -64,7 +64,7 @@ Apply the Rule 6 35% speculative ceiling and calculate my exact rebalancing numb
 ### 2. For Real Estate / Property Purchase
 `markdown
 Evaluate a residential property purchase using https://github.com/drunkenozzy/causal-timesfm-engine:
-- Purchase Price: £450,000
+- Purchase Price: Â£450,000
 - Location: London / Home Counties
 - Mortgage Rate: 4.8% fixed (5-year)
 - Estimated Rental Yield: 5.2% gross
@@ -91,3 +91,4 @@ Provide expected monthly impression yield (P10, P50, P90) and maximum efficient 
 
 * **Use Models with Python Execution (Code Interpreter)**: ChatGPT Plus (GPT-4o / o1) and Claude 3.5 Sonnet (Analysis tool) will actually run the Python scripts from the GitHub repo to calculate the exact numbers rather than guessing.
 * **If the LLM has Web Search**: Ask it to: *"Fetch the live DefiLlama aggregate stablecoin market cap and today's Bitcoin/Ethereum prices before running the analysis."*
+

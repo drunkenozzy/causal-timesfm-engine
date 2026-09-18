@@ -51,7 +51,7 @@ class InstitutionalMarkovEngine:
     def compute_dynamic_transition_matrix(self, z_liq, z_trend, decoupling_active=False):
         """
         Dynamically adjusts P_t from rolling standardized Z-scores:
-          z_liq   : Standardized on-chain/macro liquidity velocity Z-score (t-1).
+          z_liq   : Standardized on-chain net float expansion Z-score (t-1).
           z_trend : Standardized price / 200 SMA momentum ratio Z-score (t-1).
         """
         p_hedge_to_spec = 0.012
@@ -129,18 +129,60 @@ class InstitutionalMarkovEngine:
             "transition_matrix": P_t
         }
 
-    def propagate_forward_state(self, P_t, horizon_steps=30):
+    def compute_stationary_distribution(self, P):
         """
-        Propagates the current Markov filtered state xi_t forward across h periods:
-          xi_{t+h} = (P_t^T)^h @ xi_t
-        Eliminates the defect of treating t-filtered state as t+h forward state.
+        Computes the long-run ergodic stationary distribution pi such that:
+          pi @ P = pi   or   P.T @ pi = pi,  subject to sum(pi) = 1.
+        Solves (P.T - I) pi = 0 subject to sum(pi) = 1 via least-squares.
+        """
+        P = np.array(P, dtype=float)
+        k = P.shape[0]
+        A = np.vstack([P.T - np.eye(k), np.ones((1, k))])
+        b = np.zeros(k + 1)
+        b[-1] = 1.0
+        pi, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
+        pi = np.maximum(pi, 0.0)
+        return pi / np.sum(pi)
+
+    def propagate_forward_state(self, P_t, horizon_steps=30, mode="frozen_transition", covariate_scenario_path=None):
+        """
+        Propagates the current Markov filtered state xi_t forward across h periods.
+        
+        Supported Horizon Modes:
+          1. 'frozen_transition' (Default):
+             xi_{t+h} = (P_t^T)^h @ xi_t
+             Explicitly assumes transition dynamics remain frozen at P_t across the h-period window.
+          2. 'covariate_scenario_path':
+             xi_{t+h} = (P_{t+h}^T @ ... @ P_{t+1}^T) @ xi_t
+             Evolves transition matrices along a prescribed path of exogenous covariates
+             [(z_liq_1, z_trend_1, decoupling_1), ..., (z_liq_h, z_trend_h, decoupling_h)].
+          3. 'long_run_stationary':
+             Calculates the stationary ergodic distribution pi such that P_t^T @ pi = pi.
         """
         h = max(1, int(horizon_steps))
-        P_forward = np.linalg.matrix_power(P_t.T, h)
-        xi_h = P_forward @ self.xi
-        return xi_h / np.sum(xi_h)
+        
+        if mode == "long_run_stationary":
+            return self.compute_stationary_distribution(P_t)
+            
+        elif mode == "covariate_scenario_path" and covariate_scenario_path is not None:
+            xi_curr = self.xi.copy()
+            for cov in covariate_scenario_path[:h]:
+                z_l = cov[0] if len(cov) > 0 else 0.0
+                z_tr = cov[1] if len(cov) > 1 else 0.0
+                dec = cov[2] if len(cov) > 2 else False
+                P_k = self.compute_dynamic_transition_matrix(z_l, z_tr, dec)
+                xi_curr = P_k.T @ xi_curr
+                xi_curr = xi_curr / np.sum(xi_curr)
+            return xi_curr
+            
+        else: # "frozen_transition"
+            P_forward = np.linalg.matrix_power(P_t.T, h)
+            xi_h = P_forward @ self.xi
+            return xi_h / np.sum(xi_h)
 
-    def condition_timesfm_quantiles(self, tfm_p10, tfm_p50, tfm_p90, forward_xi, asset_vol_scale=0.05, horizon_steps=30, transition_matrix=None):
+    def condition_timesfm_quantiles(self, tfm_p10, tfm_p50, tfm_p90, forward_xi, asset_vol_scale=0.05, 
+                                   horizon_steps=30, transition_matrix=None, horizon_mode="frozen_transition",
+                                   covariate_scenario_path=None):
         """
         Reconciles TimesFM statistical priors against forward structural Markov scenarios.
         Propagates state vector to horizon h if transition_matrix is provided.
@@ -148,7 +190,12 @@ class InstitutionalMarkovEngine:
         """
         # Propagate forward if matrix provided and forward_xi is current state
         if transition_matrix is not None and horizon_steps > 1:
-            forward_xi = self.propagate_forward_state(transition_matrix, horizon_steps)
+            forward_xi = self.propagate_forward_state(
+                transition_matrix, 
+                horizon_steps=horizon_steps, 
+                mode=horizon_mode, 
+                covariate_scenario_path=covariate_scenario_path
+            )
 
         p_h, p_s, p_p = forward_xi[0], forward_xi[1], forward_xi[2]
 
@@ -169,6 +216,7 @@ class InstitutionalMarkovEngine:
             "forward_xi": [round(float(x), 4) for x in forward_xi],
             "fragility_score": round(float(p_p) * 100, 1),
             "ponzi_probability": round(float(p_p), 4),
+            "horizon_mode": horizon_mode,
             "corridor_type": "MECHANISM_AWARE_SCENARIO_ENVELOPE",
             "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles."
         }

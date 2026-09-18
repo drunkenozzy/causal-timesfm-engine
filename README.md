@@ -1,12 +1,12 @@
-# Causal TimesFM Engine v2.1
+﻿# Causal TimesFM Engine v2.2
 > **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
 > *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, 24/7 On-Chain Net Float Dynamics, and Time-Varying Markov Regime Switching.*
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/drunkenozzy/causal-timesfm-engine/blob/main/quickstart.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Research Prototype](https://img.shields.io/badge/Status-Research%20Prototype%20v2.1-blue.svg)]()
-[![Tests: 16 Passing](https://img.shields.io/badge/Tests-16%20Passing%20(100%25)-emerald.svg)]()
+[![Status: Research Prototype](https://img.shields.io/badge/Status-Research%20Prototype%20v2.2-blue.svg)]()
+[![Tests: 21 Passing](https://img.shields.io/badge/Tests-21%20Passing%20(100%25)-emerald.svg)]()
 [![Epistemology: Falsifiable](https://img.shields.io/badge/Epistemology-Falsifiable%20Framework-purple.svg)]()
 
 ---
@@ -18,7 +18,9 @@
 > - **Distinguish Causal Mechanism $\neq$ Correlation $\neq$ Liquidity Regime $\neq$ Market Positioning.**
 > - **Candidate Causal Constraints (The Liquidity Hypothesis)**: Central bank liquidity and on-chain stablecoin issuance ($M$) are primary candidate constraints whose lead/lag relationship must be empirically tested by market and regime. If evidence fails, report it.
 > - **Epistemic Separation of Concerns**: Maintain a strict firewall between **empirical model findings** (TimesFM prior, econometric precedence, regime fragility) and **normative risk policy** (Rule 6 investor allocation preferences).
+> - **Probabilistic Integrity**: Conditioned distribution outputs represent structural **Scenario Corridors** (Downside Floor, Central Target, Upside Ceiling), strictly avoiding the quantile mixture fallacy ($Q_{\sum w_s F_s} \neq \sum w_s Q_{F_s}$).
 > - **Rule 6 Capital Allocation**: Normative investor risk discipline: Earned Surplus $\to$ Speculative High-Beta (35% Max) $\to$ Harvest Gains $\to$ Durable Real Assets (50%) + Cash Buffer (15%).
+> - **Synthetic Benchmark Guardrail**: Hard-suppresses real capital deployment recommendations when executing on synthetic mock cones.
 > - **Always generate a Plain-English Executive Summary** alongside quantitative outputs with an explicit, one-sentence **falsifiability condition**.
 >
 > 📋 **Looking for ready-to-use copy-paste prompts?** See the [AI Prompt Guide (LLM_PROMPT.md)](LLM_PROMPT.md).
@@ -29,22 +31,23 @@
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│ 1. RAW DATA & PROVENANCE                               │
+│ 1. RAW DATA & LINEAGE PROVENANCE                       │
 │    DefiLlama on-chain stablecoins, Yahoo, FRED, Land   │
 │    (Explicit freshness check: Reject silent fallbacks) │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 2. STATISTICAL PRIOR (Google TimesFM 2.5/3.0)         │
-│    Unbiased time-series pattern recognition            │
-│    Outputs raw unconditioned quantiles: P10 / P50 / P90│
+│ 2. FOUNDATION MODEL PRIOR (Google TimesFM 2.5/3.0)     │
+│    Unbiased zero-shot statistical pattern recognition  │
+│    Outputs unconditioned quantiles: P10 / P50 / P90    │
+│    (Exposes full degraded-mode fallback telemetry)     │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │ 3. ECONOMIC MECHANISM LAYER                            │
-│    - Net Float Expansion (Base money growth vs velocity)│
+│    - Net Float Expansion (Stablecoin supply dynamics)  │
 │    - Minsky Balance Sheet Fragility (Hedge/Spec/Ponzi) │
 │    - Circulating Float Dilution Drag (Vesting overhang)│
 └───────────────────────────┬────────────────────────────┘
@@ -55,21 +58,23 @@
 │    - Stationarity: Log-differencing & MacKinnon ADF    │
 │    - Precedence: SciPy exact p-value Granger testing   │
 │      (Taxonomy: Robust/Moderate/Weak Precedence)       │
-│    - Naive Hurdle: Theil's U Gate (U < 1.0 required)   │
+│    - Walk-Forward Gate: Rolling-Origin Theil's U < 1.0 │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │ 5. REGIME & FRAGILITY FILTER (TVTP Markov)             │
 │    Schmitt Trigger Hysteresis (0.40 entry / 0.20 exit) │
+│    Multi-mode Horizon: Frozen, Covariate Path, Ergodic │
 │    Outputs uncalibrated Fragility State Score (0-100)  │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 6. MECHANISM-AWARE SCENARIO ENVELOPE                   │
-│    Conditions statistical prior against causal shocks   │
-│    Preserves both raw prior and reconciled quantiles   │
+│ 6. MECHANISM-AWARE SCENARIO CORRIDOR ENVELOPE          │
+│    Conditions prior into structural stress corridors:  │
+│    Downside Floor / Central Target / Upside Ceiling    │
+│    (Avoids quantile mixture fallacy Q_sum != sum Q)    │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
@@ -77,6 +82,7 @@
 │ 7. NORMATIVE DECISION POLICY (Rule 6 Risk Framework)   │
 │    Explicit investor policy (Not an empirical output): │
 │    Caps speculative beta at 35% | Cash buffer at 15%   │
+│    (Hard-suppressed during Synthetic Benchmark Demos)  │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
@@ -88,17 +94,18 @@
 
 ---
 
-## ⚡ Key Innovations in Version 2.0 (v2)
+## ⚡ Key Innovations in Version 2.2 (v2.2)
 
-1. **Schmitt Trigger Hysteresis**: Eliminates the "sideways chop meat-grinder" by preventing rapid borderline oscillation between 15% and 85% allocations. Enters Ponzi risk-off at $P > 0.40$, exits only below $P < 0.20$ with two-bar confirmation.
-2. **24/7 On-Chain Endogenous Base Money ($M$)**: Ingests DefiLlama aggregate stablecoin float (USDT + USDC + DAI), eliminating traditional market weekend blind spots.
-3. **The Decoupling Switch**: Overrides macro interest-rate drag when on-chain capital creation ($Z_{\text{liq}} > 0.8\sigma$) is actively expanding, eliminating cash drag in bull markets.
-4. **Asset-Calibrated Volatility Scaling**: Automatically scales Gaussian densities and quantile cones across asset classes:
-   - Real Estate: $0.7\% - 1.7\%$ MAPE (Contractual)
-   - US Equities: $3.5\% - 4.8\%$ MAPE (Public Corporate)
-   - Crypto / High-Beta: $8.7\% - 14.2\%$ MAPE (7-day rolling)
-5. **Continuous 24/7 Monitoring Daemon**: A standalone service (`core/monitor_service.py`) that monitors liquidity in the background and issues urgent push alerts.
-6. **Plain-English Executive Translation**: Every analysis concludes with an unjargonized 4-point decision sheet for real-world capital deployment.
+1. **Unified Pipeline Architecture (`core/pipeline.py`)**: A single centralized source of truth (`CausalTimesFmPipeline`) orchestrates data lineage, model execution, TVTP filtering, scenario envelopes, and allocation governance across both CLI (`run_analysis.py`) and Web Dashboard (`app.py`).
+2. **Probabilistic Honesty & Scenario Corridors**: Mechanism-conditioned envelopes are formally structured as structural scenario bounds (`downside_floor`, `expected_target`, `upside_ceiling`) rather than pseudo-quantiles, eliminating the linear quantile mixture error.
+3. **Synthetic Demo Hard Guardrail**: Suppresses capital allocation directives and risk percentages when running on synthetic benchmark cones (`SYNTHETIC_DEMO_BENCHMARK`), requiring empirical time-series data for execution.
+4. **Multi-Mode Markov Forward Propagation**:
+   - `frozen_transition`: $(P_t^\top)^h \xi_t$ explicitly documented as holding current dynamics constant across $h$.
+   - `covariate_scenario_path`: Propagates states across user-defined paths of exogenous shocks $[(z_{\text{liq}, k}, z_{\text{trend}, k}, \text{dec}_k)]$.
+   - `long_run_stationary`: Computes the ergodic stationary distribution $\pi$ solving $(P^\top - I)\pi = 0$.
+5. **Institutional Walk-Forward Theil's U Evaluator**: Implements `evaluate_rolling_origin_theils_u` in `core/econometrics.py` to gate predictive advantage ($U < 1.0$) across strictly out-of-sample rolling windows.
+6. **Schmitt Trigger Hysteresis**: Eliminates the "sideways chop meat-grinder" by preventing rapid borderline oscillation between 15% and 85% allocations.
+7. **24/7 On-Chain Endogenous Base Money ($M$)**: Ingests DefiLlama aggregate stablecoin float, eliminating weekend blinds with zero-lookahead rolling features.
 
 ---
 
@@ -135,14 +142,14 @@ streamlit run app.py
 # 1. Custom Multi-Asset Portfolio (Checks Rule 6 35% cap & 15% cash buffer)
 python run_analysis.py --mode portfolio --holdings "ETH:2580,ARB:1850,BTC:1700,SOL:1110,USDT:300"
 
-# 2. Single Crypto Asset
-python run_analysis.py --mode crypto --ticker BTC-USD --price 94000
+# 2. Single Crypto Asset (With Empirical History Series)
+python run_analysis.py --mode crypto --ticker BTC-USD --history-file data/btc_sample_history.csv
 
 # 3. Real Estate / Housing Valuation
 python run_analysis.py --mode housing --price 450000 --postcode "NW1 4NP"
 
-# 4. Media Campaign & Audience Attention (Diminishing Marginal Returns)
-python run_analysis.py --mode media --spend 15000 --cpm 14.00
+# 4. Media Campaign & Audience Attention (Hill Saturation)
+python run_analysis.py --mode media --spend 15000 --cpm 14.00 --ec50 15000 --kmax 2500000
 
 # 5. Continuous 24/7 Liquidity Daemon (Background Warnings)
 python run_analysis.py --mode monitor --interval 3600
@@ -150,7 +157,7 @@ python run_analysis.py --mode monitor --interval 3600
 
 ### 4. Run Automated Test Suite
 ```bash
-python tests/test_v2_pipeline.py
+python -m pytest tests/
 ```
 
 ---
@@ -167,9 +174,9 @@ python tests/test_v2_pipeline.py
 7. **Dilution Drag & Tokenomics**: FDV float ratio and vesting schedule haircuts.
 8. **Asymmetric Risk Management**: Multi-tranche profit taking and stop-loss trailing.
 9. **Falsifiability**: Every projection exposes the exact data condition that would prove it wrong.
-10. **Theil's U Hurdle**: Every model must mathematically beat a Naive Random Walk ($U < 1.0$).
+10. **Theil's U Hurdle**: Every model must mathematically beat a Naive Random Walk ($U < 1.0$) on out-of-sample rollouts.
 
 ---
 
 ## 📄 License
-MIT License. Created for institutional capital preservation and reproducible quantitative research.\n
+MIT License. Created for institutional capital preservation and reproducible quantitative research.

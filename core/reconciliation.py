@@ -55,16 +55,30 @@ class ReconciliationEngine:
             "statistical_p50": round(p50, 2)
         }
 
-    def compute_allocation_weights(self, markov_output, decoupling_active=False, momentum_positive=True, tax_drag_threshold=0.15):
+    def compute_allocation_weights(self, markov_output, decoupling_active=False, momentum_positive=True, tax_drag_threshold=0.15, is_synthetic_mode=False):
         """
         Computes dynamic Rule 6 asset allocation weights using Schmitt Trigger Hysteresis.
         NOTE: This expresses a normative risk policy (Rule 6), not an empirical discovery of TimesFM.
+        If is_synthetic_mode is True, allocation execution is hard-suppressed to prevent capital deployment on synthetic data.
         """
         in_ponzi = markov_output.get("in_ponzi_regime", False)
         xi_state = markov_output.get("state_vector", [0.8, 0.15, 0.05])
         p_spec = float(xi_state[1])
         p_ponzi = float(xi_state[2])
         fragility_score = markov_output.get("fragility_score", round(p_ponzi * 100, 1))
+
+        if is_synthetic_mode:
+            return {
+                "target_risk_weight": 0.0,
+                "cash_buffer_weight": 0.0,
+                "regime": "SYNTHETIC_BENCHMARK_DEMO",
+                "tactical_action": "[ALLOCATION SUPPRESSED: SYNTHETIC DEMONSTRATION ONLY - CANNOT MAKE REAL CAPITAL ALLOCATIONS WITHOUT EMPIRICAL TIME-SERIES DATA]",
+                "fragility_score": fragility_score,
+                "ponzi_probability": round(p_ponzi, 4),
+                "in_ponzi_regime": in_ponzi,
+                "allocation_disabled": True,
+                "policy_type": "NORMATIVE_RULE_6_RISK_POLICY (SUPPRESSED)"
+            }
 
         if in_ponzi or p_ponzi > 0.40:
             target_risk_weight = 0.15  # Rule 6 Risk-Off Floor
@@ -88,7 +102,7 @@ class ReconciliationEngine:
             target_risk_weight = 0.70
             cash_buffer_weight = 0.30
             regime = "CONGRUENT_HEDGE_EXPANSION"
-            tactical_action = "MAINTAIN EXPOSURE: Systemic conditions balanced. Trail stops at TimesFM P10 floor."
+            tactical_action = "MAINTAIN EXPOSURE: Systemic conditions balanced. Trail stops at Downside Scenario Floor."
 
         else:
             target_risk_weight = 0.40
@@ -104,6 +118,7 @@ class ReconciliationEngine:
             "fragility_score": fragility_score,
             "ponzi_probability": round(p_ponzi, 4),  # Preserved for backward compatibility
             "in_ponzi_regime": in_ponzi,
+            "allocation_disabled": False,
             "policy_type": "NORMATIVE_RULE_6_RISK_POLICY"
         }
 
@@ -116,24 +131,27 @@ class ReconciliationEngine:
         Cleanly separates:
           1. Empirical Model Findings
           2. Normative Decision Policy (Rule 6)
-          3. Valuation & Risk Numbers (Statistical Prior vs Mechanism-Aware)
+          3. Valuation & Risk Numbers (Foundation Prior vs Scenario Envelope)
           4. Observable Falsifiability Condition
         """
         regime = allocation_output["regime"]
-        risk_w = int(allocation_output["target_risk_weight"] * 100)
-        cash_w = int(allocation_output["cash_buffer_weight"] * 100)
-        p10 = forecast_output["reconciled_p10"]
-        p50 = forecast_output["reconciled_p50"]
-        p90 = forecast_output["reconciled_p90"]
+        alloc_disabled = allocation_output.get("allocation_disabled", False)
+        risk_w = int(allocation_output.get("target_risk_weight", 0.0) * 100)
+        cash_w = int(allocation_output.get("cash_buffer_weight", 0.0) * 100)
+        
+        floor = forecast_output.get("downside_floor", forecast_output.get("reconciled_p10", current_price * 0.9))
+        target = forecast_output.get("expected_target", forecast_output.get("reconciled_p50", current_price))
+        ceiling = forecast_output.get("upside_ceiling", forecast_output.get("reconciled_p90", current_price * 1.1))
+        
         frag_score = allocation_output.get("fragility_score", round(allocation_output.get("ponzi_probability", 0.0) * 100, 1))
 
-        # Plain English regime translation
         regime_translations = {
             "PONZI_LIQUIDATION_CRUNCH": "LIQUIDITY CRUNCH / ELEVATED FRAGILITY (Net money supply contraction; high sensitivity to selloffs)",
             "SPECULATIVE_OVEREXTENSION": "LATE-CYCLE SPECULATION (Elevated leverage / momentum; upside constrained relative to tail risk)",
             "ORGANIC_DECOUPLING_EXPANSION": "ORGANIC EXPANSION (Net on-chain base money creation; macro tailwinds)",
             "CONGRUENT_HEDGE_EXPANSION": "BALANCED EXPANSION (Fundamentals and price momentum in healthy alignment)",
-            "TRANSITIONAL_DEFENSIVE": "CONSOLIDATION / DEFENSIVE (Directional trend unconfirmed; rangebound)"
+            "TRANSITIONAL_DEFENSIVE": "CONSOLIDATION / DEFENSIVE (Directional trend unconfirmed; rangebound)",
+            "SYNTHETIC_BENCHMARK_DEMO": "SYNTHETIC DEMONSTRATION MODE (No empirical time-series data supplied)"
         }
         plain_regime = regime_translations.get(regime, regime)
 
@@ -141,12 +159,30 @@ class ReconciliationEngine:
         prior_section = ""
         if raw_prior:
             prior_section = f"""
-   [FORECAST PROVENANCE: STATISTICAL PRIOR vs. MECHANISM-AWARE SCENARIOS]
-   - TimesFM Statistical Prior:
-       P10: {currency_symbol}{raw_prior.get('p10_downside', p10):,.2f} | P50: {currency_symbol}{raw_prior.get('p50_expected', p50):,.2f} | P90: {currency_symbol}{raw_prior.get('p90_upside', p90):,.2f}
-   - Mechanism-Aware Conditioned Distribution:
-       P10: {currency_symbol}{p10:,.2f} ({((p10/current_price)-1)*100:+.1f}%) | P50: {currency_symbol}{p50:,.2f} ({((p50/current_price)-1)*100:+.1f}%) | P90: {currency_symbol}{p90:,.2f} ({((p90/current_price)-1)*100:+.1f}%)
+   [FORECAST PROVENANCE: FOUNDATION PRIOR vs. MECHANISM-AWARE SCENARIOS]
+   - TimesFM Foundation Model Quantile Prior:
+       P10 (10th percentile): {currency_symbol}{raw_prior.get('p10_downside', floor):,.2f}
+       P50 (Median expected): {currency_symbol}{raw_prior.get('p50_expected', target):,.2f}
+       P90 (90th percentile): {currency_symbol}{raw_prior.get('p90_upside', ceiling):,.2f}
+   - Mechanism-Aware Conditioned Scenario Corridors:
+       Downside Scenario Floor:       {currency_symbol}{floor:,.2f} ({((floor/current_price)-1)*100:+.1f}%)
+       Mechanism-Adjusted Central Target: {currency_symbol}{target:,.2f} ({((target/current_price)-1)*100:+.1f}%)
+       Upside Scenario Ceiling:       {currency_symbol}{ceiling:,.2f} ({((ceiling/current_price)-1)*100:+.1f}%)
+   [Note: Scenario corridors represent structural stress bounds, not linear mixture quantiles (Q_sum != sum Q).]
 """
+
+        # Section 2 Allocation Display
+        if alloc_disabled:
+            section_2 = f"""2. WHAT TO DO WITH YOUR MONEY (RULE 6 CAPITAL ALLOCATION):
+   [ALLOCATION DISABLED: SYNTHETIC DEMONSTRATION CONE ACTIVE]
+   Real capital allocation is disabled when running on synthetic benchmark cones.
+   Supply empirical historical prices via --history-file or live on-chain feeds to activate Rule 6 capital execution.
+   - Status Directive:  {allocation_output['tactical_action']}"""
+        else:
+            section_2 = f"""2. WHAT TO DO WITH YOUR MONEY (RULE 6 CAPITAL ALLOCATION):
+   [Note: Investor risk framework rule, distinct from empirical model forecasts.]
+   - Position Target:   {risk_w}% Invested in {asset_name} | {cash_w}% in Cash Buffer / Real Assets.
+   - Tactical Action:   {allocation_output['tactical_action']}"""
 
         summary = f"""
 ================================================================================
@@ -159,15 +195,13 @@ Asset Evaluated: {asset_name} (Current Price: {currency_symbol}{current_price:,.
    - Systemic Fragility Score: {frag_score:.1f} / 100
      [Note: State posterior score from dynamic TVTP filter; not an empirical frequency probability.]
 
-2. WHAT TO DO WITH YOUR MONEY (RULE 6 CAPITAL ALLOCATION):
-   [Note: Investor risk framework rule, distinct from empirical model forecasts.]
-   - Position Target:   {risk_w}% Invested in {asset_name} | {cash_w}% in Cash Buffer / Real Assets.
-   - Tactical Action:   {allocation_output['tactical_action']}
+{section_2}
 
 3. VALUATION & SCENARIO CORRIDORS (EXPECTED HORIZON):{prior_section if prior_section else f'''
-   - Downside Stress Floor (P10):       {currency_symbol}{p10:,.2f} ({((p10/current_price)-1)*100:+.1f}%)
-   - Most Likely Expected Target (P50):  {currency_symbol}{p50:,.2f} ({((p50/current_price)-1)*100:+.1f}%)
-   - Upside Scenario Ceiling (P90):    {currency_symbol}{p90:,.2f} ({((p90/current_price)-1)*100:+.1f}%)'''}
+   - Downside Scenario Floor:       {currency_symbol}{floor:,.2f} ({((floor/current_price)-1)*100:+.1f}%)
+   - Mechanism-Adjusted Central Target: {currency_symbol}{target:,.2f} ({((target/current_price)-1)*100:+.1f}%)
+   - Upside Scenario Ceiling:       {currency_symbol}{ceiling:,.2f} ({((ceiling/current_price)-1)*100:+.1f}%)
+   [Note: Scenario corridors represent structural stress bounds, not linear mixture quantiles (Q_sum != sum Q).]'''}
 
 4. WHAT WOULD PROVE THIS ANALYSIS WRONG (FALSIFIABILITY):
    {falsifiability_condition}

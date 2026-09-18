@@ -252,5 +252,68 @@ class EconometricFilter:
         u = math.sqrt(forecast_mse) / math.sqrt(naive_mse)
         return round(float(u), 4)
 
+    def evaluate_rolling_origin_theils_u(self, series, forecast_fn, min_train_len=30, horizon=1):
+        """
+        Executes an institutional rolling-origin (walk-forward) backtest evaluation:
+        At each time step t from min_train_len to N - horizon:
+          - Train history: series[:t]
+          - Forecast y_hat_{t+horizon} using forecast_fn(train_history, horizon)
+          - Compare against actual target series[t + horizon - 1]
+          - Compare against naive random walk benchmark series[t - 1]
+        
+        Returns:
+          {
+            "theils_u": float,
+            "hurdle_passed": bool,
+            "n_evaluations": int,
+            "forecast_rmse": float,
+            "naive_rmse": float,
+            "horizon": int
+          }
+        """
+        series = [float(x) for x in series]
+        n = len(series)
+        if n < min_train_len + horizon:
+            raise ValueError(f"Series length ({n}) insufficient for rolling-origin evaluation with min_train_len={min_train_len} and horizon={horizon}.")
+
+        forecast_errors_sq = []
+        naive_errors_sq = []
+
+        for t in range(min_train_len, n - horizon + 1):
+            train_history = series[:t]
+            actual_val = series[t + horizon - 1]
+            naive_pred = series[t - 1]
+
+            pred_val = forecast_fn(train_history, horizon)
+            if isinstance(pred_val, dict):
+                pred_val = pred_val.get("p50_expected", pred_val.get("expected_target", pred_val.get("reconciled_p50", train_history[-1])))
+
+            forecast_errors_sq.append((float(pred_val) - actual_val) ** 2)
+            naive_errors_sq.append((naive_pred - actual_val) ** 2)
+
+        m_fc = sum(forecast_errors_sq) / len(forecast_errors_sq)
+        m_nv = sum(naive_errors_sq) / len(naive_errors_sq)
+
+        rmse_fc = math.sqrt(m_fc)
+        rmse_nv = math.sqrt(m_nv)
+
+        if rmse_nv <= 1e-12:
+            theils_u = 1.0 if rmse_fc <= 1e-12 else 999.0
+        else:
+            theils_u = rmse_fc / rmse_nv
+
+        theils_u = round(float(theils_u), 4)
+        hurdle_passed = bool(theils_u < 1.0)
+
+        return {
+            "theils_u": theils_u,
+            "hurdle_passed": hurdle_passed,
+            "n_evaluations": len(forecast_errors_sq),
+            "forecast_rmse": round(rmse_fc, 4),
+            "naive_rmse": round(rmse_nv, 4),
+            "horizon": horizon
+        }
+
     # Method alias for institutional testing API
     test_granger_causality = granger_causality_test
+

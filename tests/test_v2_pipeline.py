@@ -198,9 +198,108 @@ def test_timesfm_provenance_observability():
     assert "engine" in res
     print("  [PASS] Test 12: TimesFM Provenance & Degraded Mode Observability")
 
+def test_unified_pipeline_crypto_and_guardrails():
+    """Validates CausalTimesFmPipeline and synthetic demo allocation suppression guardrail."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    
+    # 1. Synthetic cone run (no history file)
+    synth_res = pipeline.run_crypto_pipeline(ticker="BTC-USD", current_price=94000.0)
+    assert synth_res["is_synthetic"] is True
+    assert synth_res["allocation"]["allocation_disabled"] is True
+    assert synth_res["allocation"]["target_risk_weight"] == 0.0
+    assert "[ALLOCATION DISABLED: SYNTHETIC DEMONSTRATION CONE ACTIVE]" in synth_res["summary"]
+    assert "Downside Scenario Floor" in synth_res["summary"]
+    
+    # 2. Empirical history run
+    sample_csv = os.path.join(BASE_DIR, "data", "btc_sample_history.csv")
+    emp_res = pipeline.run_crypto_pipeline(ticker="BTC-USD", history_file=sample_csv)
+    assert emp_res["is_synthetic"] is False
+    assert emp_res["allocation"]["allocation_disabled"] is False
+    assert emp_res["allocation"]["target_risk_weight"] > 0.0
+    assert emp_res["data_mode"] == "EMPIRICAL_HISTORICAL_DATA"
+    print("  [PASS] Test 13: Unified Pipeline Crypto & Synthetic Guardrail Gating")
+
+def test_unified_pipeline_multi_domain():
+    """Validates pipeline execution across Portfolio, Housing, and Media domains."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    
+    # Portfolio
+    port_res = pipeline.run_portfolio_pipeline(holdings={"BTC": 5000.0, "USDT": 1000.0})
+    assert port_res["total_value"] == 6000.0
+    assert "Custom Multi-Asset Portfolio" in port_res["summary"]
+    
+    # Housing
+    house_res = pipeline.run_housing_pipeline(property_price=500000.0, postcode="NW1 4NP")
+    assert house_res["current_price"] == 500000.0
+    assert "Residential Property (NW1 4NP)" in house_res["summary"]
+    
+    # Media
+    media_res = pipeline.run_media_pipeline(monthly_spend=12000.0, cpm=12.0)
+    assert media_res["saturated_impressions"] > 0
+    assert media_res["marginal_cpm"] > 0
+    print("  [PASS] Test 14: Unified Multi-Domain Pipeline (Portfolio, Housing, Media)")
+
+def test_markov_stationary_distribution_and_modes():
+    """Validates stationary distribution computation and covariate scenario path propagation."""
+    engine = InstitutionalMarkovEngine()
+    P_t = engine.compute_dynamic_transition_matrix(z_liq=0.2, z_trend=0.5)
+    
+    # Stationary distribution: pi @ P = pi
+    pi = engine.compute_stationary_distribution(P_t)
+    assert abs(np.sum(pi) - 1.0) < 1e-6
+    pi_next = pi @ P_t
+    assert np.allclose(pi, pi_next, atol=1e-5), "Stationary distribution failed eigenvalue condition pi @ P = pi"
+    
+    # Covariate scenario path propagation
+    path = [(0.5, 0.2, False), (-1.2, -0.5, False), (-2.0, -1.0, False)]
+    xi_path = engine.propagate_forward_state(P_t, horizon_steps=3, mode="covariate_scenario_path", covariate_scenario_path=path)
+    assert abs(np.sum(xi_path) - 1.0) < 1e-6
+    # In adverse liquidity shocks, ponzi/fragility state must increase relative to base
+    assert xi_path[2] > engine.xi[2]
+    print("  [PASS] Test 15: Markov Ergodic Stationary Distribution & Dynamic Covariate Path")
+
+def test_rolling_origin_theils_u_backtest():
+    """Validates institutional rolling-origin walk-forward Theil's U backtesting engine."""
+    ef = EconometricFilter()
+    # Simulated series with predictable momentum trend
+    np.random.seed(42)
+    series = [100.0]
+    for i in range(50):
+        series.append(series[-1] * 1.01 + np.random.normal(0, 0.2))
+        
+    def naive_persistence_model(train_history, horizon):
+        return train_history[-1]
+        
+    def momentum_model(train_history, horizon):
+        # Extrapolates recent 5-step drift
+        drift = train_history[-1] / train_history[-5]
+        return train_history[-1] * (drift ** (horizon / 5.0))
+
+    res_naive = ef.evaluate_rolling_origin_theils_u(series, naive_persistence_model, min_train_len=30, horizon=1)
+    assert abs(res_naive["theils_u"] - 1.0) < 1e-3
+    assert res_naive["n_evaluations"] == 21
+    
+    res_mom = ef.evaluate_rolling_origin_theils_u(series, momentum_model, min_train_len=30, horizon=1)
+    assert res_mom["hurdle_passed"] is True
+    assert res_mom["theils_u"] < 1.0
+    print("  [PASS] Test 16: Institutional Rolling-Origin (Walk-Forward) Theil's U Evaluator")
+
+def test_scenario_corridor_integrity_and_probabilistic_honesty():
+    """Validates structural scenario envelope bounds and explicit mixture disclaimer."""
+    engine = InstitutionalMarkovEngine()
+    corridors = engine.condition_timesfm_quantiles(
+        tfm_p10=90.0, tfm_p50=100.0, tfm_p90=120.0, forward_xi=[0.7, 0.2, 0.1]
+    )
+    assert corridors["downside_floor"] <= corridors["expected_target"] <= corridors["upside_ceiling"]
+    assert "epistemic_note" in corridors
+    assert "distinct from unconditioned mixture quantiles" in corridors["epistemic_note"]
+    print("  [PASS] Test 17: Scenario Corridor Mathematical Envelope & Epistemic Integrity")
+
 if __name__ == "__main__":
     print("\n=======================================================")
-    print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.1 INSTITUTIONAL TESTS")
+    print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.2 INSTITUTIONAL TESTS")
     print("=======================================================")
     test_econometric_stationarity()
     test_schmitt_trigger_hysteresis()
@@ -214,6 +313,11 @@ if __name__ == "__main__":
     test_media_hill_diminishing_marginal_returns()
     test_markov_horizon_propagation()
     test_timesfm_provenance_observability()
+    test_unified_pipeline_crypto_and_guardrails()
+    test_unified_pipeline_multi_domain()
+    test_markov_stationary_distribution_and_modes()
+    test_rolling_origin_theils_u_backtest()
+    test_scenario_corridor_integrity_and_probabilistic_honesty()
     print("=======================================================")
-    print("   ALL 12 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
+    print("   ALL 17 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
     print("=======================================================\n")

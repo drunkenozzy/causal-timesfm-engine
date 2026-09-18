@@ -9,7 +9,7 @@ Runs as a lightweight daemon or scheduled cron task to continuously monitor:
 Dispatches urgent plain-English warnings when:
   1. TVTP Markov Filter flips into PONZI_LIQUIDATION_CRUNCH (P > 0.40).
   2. Price breaches the statistical TimesFM P10 downside floor.
-  3. Stablecoin float velocity drops below -1.5 standard deviations.
+  3. Stablecoin net float growth drops below -1.5 standard deviations.
 """
 
 import os
