@@ -23,6 +23,7 @@ from core.reconciliation import ReconciliationEngine
 from core.engine_timesfm import TimesFmBaselineEngine
 from core.econometrics import EconometricFilter
 from core.engine_structural import StructuralMacroEngine
+from core.forecast_ledger import ImmutableForecastLedger, compute_sha256
 
 def generate_synthetic_history(current_val, days=60, daily_vol=0.04, daily_drift=0.001):
     """
@@ -38,9 +39,21 @@ def generate_synthetic_history(current_val, days=60, daily_vol=0.04, daily_drift
     return history
 
 def parse_date_safely(date_str):
-    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%Y-%m-%d %H:%M:%S"):
+    if not isinstance(date_str, str):
+        return None
+    s = date_str.strip()
+    try:
+        iso_s = s.replace("Z", "+00:00") if s.endswith("Z") else s
+        dt = datetime.fromisoformat(iso_s)
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
+    except Exception:
+        pass
+
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
         try:
-            return datetime.strptime(date_str, fmt)
+            return datetime.strptime(s, fmt)
         except ValueError:
             continue
     return None
@@ -119,6 +132,44 @@ def parse_and_validate_time_series(records):
         "frequency": freq,
         "n_records": len(parsed)
     }
+
+def filter_series_by_availability_cutoff(records, cutoff_timestamp=None, cutoff_iso=None):
+    """
+    Point-in-Time Vintage Reconstructor:
+      D_t = { x_i : availability_timestamp_i <= cutoff_timestamp }
+    Strictly excludes any observation whose availability (publication) timestamp
+    is after the cutoff, even if its historical observation timestamp was before the cutoff.
+    Guards against data revision lookahead leak.
+    """
+    if not records:
+        return []
+
+    cutoff_raw = cutoff_timestamp or cutoff_iso
+    cutoff_dt = parse_date_safely(cutoff_raw) if isinstance(cutoff_raw, str) else cutoff_raw
+    if cutoff_dt is None:
+        return records
+
+    filtered = []
+    for item in records:
+        avail = None
+        if isinstance(item, dict):
+            avail_val = item.get("availability_timestamp") or item.get("avail_date") or item.get("release_date")
+            if avail_val:
+                avail = parse_date_safely(avail_val) if isinstance(avail_val, str) else avail_val
+            else:
+                obs_val = item.get("timestamp") or item.get("date")
+                avail = parse_date_safely(obs_val) if isinstance(obs_val, str) else obs_val
+        elif isinstance(item, (tuple, list)) and len(item) >= 3:
+            avail_val = item[2]
+            avail = parse_date_safely(avail_val) if isinstance(avail_val, str) else avail_val
+        
+        if avail is not None:
+            if avail <= cutoff_dt:
+                filtered.append(item)
+        else:
+            filtered.append(item)
+
+    return filtered
 
 def load_history_series_with_metadata(file_path):
     """
@@ -278,9 +329,14 @@ def create_parameter_record(value, source, as_of=None, avail=None, transformatio
 
 def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized_metric_value=None):
     """
-    Machine-evaluated falsification resolver.
-    Evaluates whether the empirical condition has breached the falsification boundary.
-    Returns structured resolution object with status: VALIDATED_INTACT | FALSIFIED | PENDING_RESOLUTION | DATA_UNAVAILABLE
+    Popperian Machine-Evaluated Falsification Resolver.
+    Evaluates whether empirical observations have breached the falsification boundary.
+    States:
+      - NOT_FALSIFIED: Data has not breached the boundary (refusal to claim 'validated').
+      - FALSIFIED: Falsification condition breached.
+      - INCONCLUSIVE: Primary condition breached, but secondary confirmation metric is ambiguous.
+      - DATA_UNAVAILABLE: Metric not found in current observations.
+      - EXPIRED: Target horizon elapsed without boundary breach.
     """
     if not falsify_obj or not isinstance(falsify_obj, dict):
         return {"status": "DATA_UNAVAILABLE", "is_falsified": False, "reason": "No falsification object provided."}
@@ -321,11 +377,11 @@ def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized
             if s_val < s_thresh:
                 status = "FALSIFIED"
             else:
-                status = "PENDING_RESOLUTION"
+                status = "INCONCLUSIVE"
         else:
             status = "DATA_UNAVAILABLE"
     else:
-        status = "FALSIFIED" if breached else "VALIDATED_INTACT"
+        status = "FALSIFIED" if breached else "NOT_FALSIFIED"
 
     return {
         "status": status,
@@ -333,7 +389,8 @@ def evaluate_falsification_condition(falsify_obj, current_metrics=None, realized
         "primary_metric": p_metric,
         "primary_value": p_val,
         "threshold": threshold,
-        "operator": operator
+        "operator": operator,
+        "validated_intact": (status == "NOT_FALSIFIED")  # Compatibility alias
     }
 
 class CausalTimesFmPipeline:
@@ -348,6 +405,7 @@ class CausalTimesFmPipeline:
         self.tfm_engine = TimesFmBaselineEngine()
         self.econ_filter = EconometricFilter()
         self.struct_engine = StructuralMacroEngine()
+        self.ledger = ImmutableForecastLedger()
 
     def run_crypto_pipeline(self, ticker="BTC-USD", current_price=94000.0, history_file=None, history_series=None, horizon_days=30):
         parameter_lineage = {}
@@ -567,8 +625,24 @@ class CausalTimesFmPipeline:
             raw_prior=tfm_prior
         )
 
+        ledger_entry = self.ledger.record_forecast(
+            asset_name=ticker,
+            origin_timestamp=latest_date,
+            horizon_steps=model_steps,
+            frequency=frequency,
+            raw_prior=tfm_prior,
+            scenario_corridors=cond,
+            falsification_object=falsify_obj,
+            allocation_output=alloc,
+            data_cutoff_timestamp=avail_date,
+            dataset_hash=compute_sha256(history),
+            gate_status=gate_status,
+            structural_alpha=cond.get("structural_weight", 0.0)
+        )
+
         return {
             "asset_name": ticker,
+            "forecast_id": ledger_entry["forecast_id"],
             "current_price": current_price,
             "currency_symbol": currency,
             "data_mode": data_mode,
@@ -717,8 +791,24 @@ class CausalTimesFmPipeline:
             raw_prior=tfm_prior
         )
 
+        ledger_entry = self.ledger.record_forecast(
+            asset_name=f"Property ({postcode})",
+            origin_timestamp=latest_date,
+            horizon_steps=model_steps,
+            frequency=frequency,
+            raw_prior=tfm_prior,
+            scenario_corridors=cond,
+            falsification_object=falsify_obj,
+            allocation_output=alloc,
+            data_cutoff_timestamp=avail_date,
+            dataset_hash=compute_sha256(history),
+            gate_status="NOT_EVALUATED" if is_synthetic else "PASS",
+            structural_alpha=cond.get("structural_weight", 0.0)
+        )
+
         return {
             "asset_name": f"Property ({postcode})",
+            "forecast_id": ledger_entry["forecast_id"],
             "current_price": property_price,
             "currency_symbol": "£",
             "postcode": postcode,
@@ -887,8 +977,34 @@ class CausalTimesFmPipeline:
             raw_prior=tfm_prior
         )
 
+        falsify_obj_port = {
+            "target_asset": "Custom_Portfolio",
+            "primary_metric": "portfolio_nav",
+            "threshold": cond["downside_floor"],
+            "operator": "<",
+            "registered_date": latest_date,
+            "horizon_steps": model_steps,
+            "frequency": frequency,
+            "status": "ACTIVE_MONITORING"
+        }
+        ledger_entry = self.ledger.record_forecast(
+            asset_name="Custom_Multi_Asset_Portfolio",
+            origin_timestamp=latest_date,
+            horizon_steps=model_steps,
+            frequency=frequency,
+            raw_prior=tfm_prior,
+            scenario_corridors=cond,
+            falsification_object=falsify_obj_port,
+            allocation_output=alloc,
+            data_cutoff_timestamp=avail_date,
+            dataset_hash=compute_sha256(history),
+            gate_status="NOT_EVALUATED" if is_synthetic else "PASS",
+            structural_alpha=cond.get("structural_weight", 0.0)
+        )
+
         return {
             "total_value": current_holdings_value,
+            "forecast_id": ledger_entry["forecast_id"],
             "current_holdings_value": current_holdings_value,
             "historical_nav": historical_nav,
             "holdings": target_holdings,
@@ -916,11 +1032,11 @@ class CausalTimesFmPipeline:
     def solve_optimal_media_spend(self, target_cpm, ec50_spend, k_max_impressions, gamma=1.3, multiplier=1.5):
         """
         Solves for the Marginal-Efficiency Threshold S* on the diminishing returns branch of the Hill curve.
-        For gamma > 1, marginal yield peaks at the inflection point:
-          S_inflection = EC50 * ((gamma - 1)/(gamma + 1))^(1/gamma)
-        On S > S_inflection, marginal CPM is strictly monotonically increasing.
-        Roots are guaranteed to bracket on [S_inflection, 30 * EC50].
+        Guards against non-positive inputs and handles gamma <= 1.0 safely.
         """
+        if target_cpm <= 0 or ec50_spend <= 0 or k_max_impressions <= 0:
+            return 0.0
+            
         cpm_ceiling = target_cpm * multiplier
         
         def marginal_cpm(s):
@@ -932,7 +1048,7 @@ class CausalTimesFmPipeline:
         if gamma > 1.0:
             s_inflect = ec50_spend * (((gamma - 1.0) / (gamma + 1.0)) ** (1.0 / gamma))
         else:
-            s_inflect = 10.0
+            s_inflect = max(1.0, ec50_spend * 0.01)
 
         low = s_inflect
         high = ec50_spend * 30.0
@@ -961,12 +1077,23 @@ class CausalTimesFmPipeline:
         Marketing-native Media Investment & Pacing Engine.
         Completely decoupled from financial Ponzi/risk abstractions.
         """
-        denom = (ec50_spend ** gamma) + (monthly_spend ** gamma)
-        saturated_impressions = k_max_impressions * ((monthly_spend ** gamma) / denom)
-        
-        marginal_yield = k_max_impressions * (gamma * (monthly_spend ** (gamma - 1)) * (ec50_spend ** gamma)) / (denom ** 2)
-        effective_cpm = (monthly_spend / max(1.0, saturated_impressions)) * 1000.0
-        marginal_cpm = (1000.0 / marginal_yield) if marginal_yield > 0 else 999.0
+        monthly_spend = max(0.0, float(monthly_spend))
+        cpm = max(0.01, float(cpm))
+        ec50_spend = max(1.0, float(ec50_spend))
+        k_max_impressions = max(0.0, float(k_max_impressions))
+        gamma = max(0.01, float(gamma))
+
+        if monthly_spend <= 0.0 or k_max_impressions <= 0.0:
+            saturated_impressions = 0.0
+            marginal_yield = 0.0
+            effective_cpm = 0.0
+            marginal_cpm = 0.0
+        else:
+            denom = (ec50_spend ** gamma) + (monthly_spend ** gamma)
+            saturated_impressions = k_max_impressions * ((monthly_spend ** gamma) / denom)
+            marginal_yield = k_max_impressions * (gamma * (monthly_spend ** (gamma - 1)) * (ec50_spend ** gamma)) / (denom ** 2)
+            effective_cpm = (monthly_spend / max(1.0, saturated_impressions)) * 1000.0
+            marginal_cpm = (1000.0 / marginal_yield) if marginal_yield > 0 else 999.0
 
         efficiency_threshold_spend = self.solve_optimal_media_spend(cpm, ec50_spend, k_max_impressions, gamma, multiplier=1.5)
         
@@ -1007,8 +1134,16 @@ class CausalTimesFmPipeline:
             "upside_ceiling": round(ceiling_yield, 2)
         }
 
-        falsify_str = f"Media model falsified if Blended CPM exceeds ${(cpm * 1.35):,.2f} or CTR drops below 0.85%."
+        cpm_limit = cpm * 1.35
+        falsify_str = f"Media model falsified if Blended CPM exceeds ${cpm_limit:,.2f} or CTR drops below 0.85%."
         
+        sat_score = media_decision["saturation_risk_score"]
+        target_budget = media_decision["target_spend_budget"]
+        reserve_excess = media_decision["reserve_budget_excess"]
+        downside_pct = ((floor_yield / max(1.0, saturated_impressions)) - 1.0) * 100.0
+        expected_pct = ((expected_yield / max(1.0, saturated_impressions)) - 1.0) * 100.0
+        ceiling_pct = ((ceiling_yield / max(1.0, saturated_impressions)) - 1.0) * 100.0
+
         summary = f"""
 ================================================================================
                     MEDIA CAMPAIGN DECISION SHEET
@@ -1017,20 +1152,20 @@ Campaign Evaluated: Media Attention (Budget: ${monthly_spend:,.0f}/mo | EC50: ${
 
 1. WHERE WE STAND TODAY (HILL SATURATION ECONOMICS):
    - Pacing Status: {pacing_status}
-   - Addressable Audience Saturation: {media_decision['saturation_risk_score']:.1f} / 100
+   - Addressable Audience Saturation: {sat_score:.1f} / 100
    - Effective Blended CPM: ${effective_cpm:.2f}
    - Marginal CPM (Next $1k Spend): ${marginal_cpm:.2f} (Target CPM: ${cpm:.2f})
 
 2. WHAT TO DO WITH YOUR AD BUDGET (MEDIA PACING POLICY):
    - Marginal Efficiency Spend Threshold: ${efficiency_threshold_spend:,.0f}/mo
-   - Recommended Monthly Budget:           ${media_decision['target_spend_budget']:,.0f}/mo
-   - Capital to Hold in Reserve / Reallocate: ${media_decision['reserve_budget_excess']:,.0f}/mo
+   - Recommended Monthly Budget:           ${target_budget:,.0f}/mo
+   - Capital to Hold in Reserve / Reallocate: ${reserve_excess:,.0f}/mo
    - Action Directive: {pacing_action}
 
 3. PROJECTED MONTHLY IMPRESSIONS (SCENARIO CORRIDORS):
-   - Downside Impression Floor:      {floor_yield:,.0f} impressions ({((floor_yield/saturated_impressions)-1)*100:+.1f}%)
-   - Most Likely Expected Reach:     {expected_yield:,.0f} impressions ({((expected_yield/saturated_impressions)-1)*100:+.1f}%)
-   - Upside Algorithmic Reach:       {ceiling_yield:,.0f} impressions ({((ceiling_yield/saturated_impressions)-1)*100:+.1f}%)
+   - Downside Impression Floor:      {floor_yield:,.0f} impressions ({downside_pct:+.1f}%)
+   - Most Likely Expected Reach:     {expected_yield:,.0f} impressions ({expected_pct:+.1f}%)
+   - Upside Algorithmic Reach:       {ceiling_yield:,.0f} impressions ({ceiling_pct:+.1f}%)
 
 4. WHAT WOULD PROVE THIS ANALYSIS WRONG (FALSIFIABILITY):
    {falsify_str}

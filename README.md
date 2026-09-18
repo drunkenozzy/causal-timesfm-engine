@@ -1,13 +1,13 @@
-# Causal TimesFM Engine v2.4
+# Causal TimesFM Engine v3.0
 > **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
 > *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, Domain-Specific Causal Constraints, and Fail-Closed Institutional Validation.*
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/drunkenozzy/causal-timesfm-engine/blob/main/quickstart.ipynb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Status: Research Prototype](https://img.shields.io/badge/Status-Research%20Prototype%20v2.4%3A%20Validation%20Integrity%20%26%20Point--in--Time%20Architecture-blue.svg)]()
-[![Tests: 31 Passing](https://img.shields.io/badge/Tests-31%20Passing%20(100%25)-emerald.svg)]()
-[![Epistemology: Falsifiable](https://img.shields.io/badge/Epistemology-Falsifiable%20Framework-purple.svg)]()
+[![Status: Research Core](https://img.shields.io/badge/Status-Release%20v3.0%3A%20Research%20Validation%20Core-blue.svg)]()
+[![Tests: 38 Passing](https://img.shields.io/badge/Tests-38%20Passing%20(100%25)-emerald.svg)]()
+[![Epistemology: Falsifiable](https://img.shields.io/badge/Epistemology-Popperian%20Falsification-purple.svg)]()
 
 ---
 
@@ -35,9 +35,9 @@
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│ 1. RAW DATA & POINT-IN-TIME PROVENANCE LINEAGE         │
-│    Preserves observation timestamps & availability lag │
-│    Fail-closed frequency parser ('D', 'W', 'M', 'Q')   │
+│ 1. RAW DATA & POINT-IN-TIME VINTAGE RECONSTRUCTION     │
+│    D_t = { x_i : availability_timestamp_i <= cutoff } │
+│    Purges post-cutoff revision lookahead leaks         │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
@@ -59,25 +59,26 @@
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 4. FAIL-CLOSED MULTI-HORIZON THEIL'S U RELEASE GATE    │
+│ 4. FAIL-CLOSED DIEBOLD-MARIANO & THEIL'S U RELEASE GATE│
 │    - Rolling-origin validation across h in [1, ..., h] │
+│    - HLN finite-sample correction + Bartlett kernel    │
+│    - 95% Moving Block Bootstrap (MBB) Confidence Int.  │
 │    - Strict 4-State: PASS | FAIL | NOT_EVALUATED | ERR │
-│    - Unproven models suppress high-beta allocation     │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 5. REGIME & FRAGILITY FILTER (TVTP Markov)             │
+│ 5. REGIME & FINANCING FILTER (TVTP Markov + Minsky)    │
+│    Market Volatility Regime != Minsky Financing Regime │
 │    Schmitt Trigger Hysteresis (0.40 entry / 0.20 exit) │
 │    Multi-mode Horizon: Frozen, Covariate Path, Ergodic │
-│    Domain-native z_driver drives transition matrix     │
 └───────────────────────────┬────────────────────────────┘
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 6. MECHANISM-AWARE SCENARIO CORRIDOR ENVELOPE          │
-│    Anchors statistical priors to Structural Engine:    │
-│    S_central = (1 - alpha) * y_hat + alpha * V_struct  │
+│ 6. IN-FOLD STRUCTURAL ALPHA* ENVELOPE CONDITIONING     │
+│    Optimizes alpha* in [0, 1] in-fold; collapses to 0  │
+│    if structural layer fails to outperform statistical │
 │    Downside Floor / Central Target / Upside Ceiling    │
 └───────────────────────────┬────────────────────────────┘
                             │
@@ -91,43 +92,42 @@
                             │
                             ▼
 ┌────────────────────────────────────────────────────────┐
-│ 8. PLAIN-ENGLISH EXECUTIVE DECISION SHEET              │
-│    Executive summary + Machine-testable falsification  │
-│    Automatic resolution: VALIDATED_INTACT | FALSIFIED  │
+│ 8. IMMUTABLE FORECAST LEDGER & POPPERIAN RESOLUTION    │
+│    Append-only JSONL ledger with cryptographic SHA256  │
+│    Tracks forecast ID, priors, alpha*, and actuals     │
+│    States: NOT_FALSIFIED | FALSIFIED | INCONCLUSIVE    │
 └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚡ Key Innovations in Version 2.4 (v2.4)
+## ⚡ Key Innovations in Version 3.0 (v3.0: Research Validation Core)
 
-1. **Strict 4-State Fail-Closed Release Gate**:
-   - Theil's U gate evaluates model accuracy out-of-sample against naive persistence and returns one of four explicit states: `PASS`, `FAIL`, `NOT_EVALUATED`, or `ERROR`.
-   - **Zero Fail-Open Logic**: If sample size is insufficient ($N < N_{\min} + h$) or an exception occurs, status is `NOT_EVALUATED` or `ERROR`, strictly suppressing capital allocation (`allocation_disabled = True`, risk weight 0.0). Capital allocation is never enabled without verified out-of-sample predictive skill.
-2. **Multi-Horizon Rolling-Origin Validation**:
-   - Rather than testing only at step $h=1$, validation sweeps across $h \in [1, \min(7, h_{\text{target}}), h_{\text{target}}]$. A 30-day crypto forecast or 12-month property forecast is evaluated at its actual target horizon $h_{\text{target}}$.
-3. **Elimination of Cross-Domain Empirical Contamination**:
-   - Replaced cross-domain literal sharing with domain-native mechanism variables:
-     - *Crypto*: Uses aggregate on-chain stablecoin net float dynamics ($Z_{\text{liq}}$).
-     - *Housing*: Uses credit availability and mortgage rate constraints ($Z_{\text{credit}}$); stablecoins are strictly excluded.
-     - *Portfolio*: Derives trend, drift, and volatility from the historical NAV series.
-4. **Structural Macro Integration (Stage 3 $\to$ Stage 6 Linkage)**:
-   - Connects the Stage 3 Structural Macro Target $V_{\text{struct}}$ directly into Stage 6 Scenario Corridors via an explicit convex anchor ($S_{\text{central}} = (1-\alpha)\hat{y} + \alpha V_{\text{struct}}$), ensuring that structural constraints actively anchor quantitative scenario envelopes.
-5. **Point-in-Time Lineage & 7-Member Taxonomy**:
-   - Ingests and tags data with explicit point-in-time timestamps (`observation_timestamp`, `availability_timestamp`, `vintage_id`) to guard against data revision lookahead bias.
-   - Enforces a rigorous 7-member parameter lineage taxonomy: `RAW_OBSERVED`, `DERIVED_OBSERVED`, `ESTIMATED`, `CALIBRATED`, `POLICY`, `SCENARIO_ASSUMPTION`, and `DEMO_ONLY`.
-6. **Fail-Closed Time Contract & Frequency Ingestion**:
-   - Ingestion enforces chronological sorting, rejects non-increasing or duplicate timestamps, and fails closed (`'U'`) if step spacing is irregular or unknown. Empirical pipelines reject unverified frequency contracts.
-7. **Decoupled Portfolio Accounting**:
-   - Completely separates `current_holdings_value` from `historical_nav`. NAV series is used exclusively for return and volatility derivation, while portfolio dollar rebalances are computed on actual spot holdings.
-8. **Media Hill Domain Decoupling & Monotonic Bisection**:
-   - Marketing schema is completely decoupled from financial abstractions, using "Marginal-Efficiency Threshold" and `ad_fatigue_risk_score`.
-   - Numerical root-finding for the spending ceiling $S^*$ is strictly bounded to the monotonic diminishing returns branch past the inflection point $S_{\text{inflection}} = EC_{50} \cdot \left(\frac{\gamma - 1}{\gamma + 1}\right)^{1/\gamma}$.
-9. **Machine-Evaluable Falsification Resolution**:
-   - Forecasts emit structured condition objects that can be evaluated automatically via `evaluate_falsification_condition(f_obj, realized_value)` to yield `VALIDATED_INTACT` or `FALSIFIED`.
-10. **Two-Tier Test Suite Architecture**:
-    - **Fast CI Suite** (`pytest tests/`): 31 automated tests executing in < 1 second, verifying algebraic invariants, fail-closed gating, parameter taxonomies, and schema integrity.
-    - **Institutional Research Validation Suite** (`benchmarks/`): Longitudinal walk-forward rolling-origin evaluation across historical crisis regimes (2008 Lehman collapse, 2022 Luna collapse, 2022 UK Gilt crisis).
+1. **Immutable Forecast Ledger** (`core/forecast_ledger.py`):
+   - Every single forecast registration generates a unique cryptographic `forecast_id` and records origin timestamp, target horizon, data availability cutoff, SHA256 checksums of input datasets and git commit SHA, unconditioned TimesFM quantiles, fitted structural $\alpha^*$, scenario corridors, and falsification conditions.
+   - Stored in an append-only JSON Lines format (`data/forecast_ledger.jsonl`).
+   - Post-facto resolution events (`resolve_forecast`) append immutable resolution records containing realized actuals, absolute/percentage forecast errors, and strict Popperian falsification outcomes without altering historical forecast records.
+2. **In-Fold Structural Weight $\alpha^*$ Optimization & Truthful Zero Collapse** (`core/markov_regime.py`):
+   - Blending weight $\alpha^* \in [0, 1]$ is estimated strictly in-fold over training data to minimize forecast loss.
+   - **Zero-Collapse Invariant**: If $\alpha^* \le 0.02$ or if the blended model fails to beat the pure statistical prior ($\alpha=0$), $\alpha^*$ is strictly collapsed to 0.0, and the engine truthfully reports that the economic mechanism added zero value.
+3. **Diebold-Mariano Inference & Moving Block Bootstrap (MBB)** (`core/econometrics.py`):
+   - Implements the formal Diebold-Mariano (1995) test with Harvey-Leybourne-Newbold (1997) finite-sample correction and Bartlett kernel autocovariance weighting for overlapping multi-step forecast horizons $h$.
+   - Implements Moving Block Bootstrap (MBB) to produce robust 95% confidence intervals for Theil's U2, preserving serial correlation across overlapping forecast origins.
+4. **Hierarchical Multi-Model Benchmark Tournament** (`core/calibration.py`):
+   - Eliminates claims of predictive skill without baselines. Implements a rigorous 5-tier tournament:
+     - $M_0$: Naive Persistence ($y_{t+h} = y_t$)
+     - $M_{0b}$: Drift Extrapolation Baseline
+     - $M_1$: TimesFM Target-Only Autoregressive Prior
+     - $M_4$: Fitted Structural Hybrid ($M_1 + \alpha^* V_{\text{struct}}$)
+   - Evaluates Pinball Loss across quantiles $\tau \in \{0.10, 0.50, 0.90\}$, Empirical Quantile Coverage, and Winkler Interval Score (WIS).
+5. **True Point-in-Time Vintage Availability Filtering** (`core/pipeline.py`):
+   - Enforces $D_t = \{x_i : \text{availability}_i \le t\}$. Purges subsequent data revisions published after cutoff date $t$, eliminating revision lookahead bias.
+6. **Popperian Falsification Taxonomy**:
+   - Replaced inductivist terminology (`VALIDATED_INTACT`) with formal Popperian falsification states: `NOT_FALSIFIED`, `FALSIFIED`, `INCONCLUSIVE`, `DATA_UNAVAILABLE`, and `EXPIRED`.
+7. **Regime Taxonomy Disambiguation**:
+   - Formally separated **Market Volatility/Trend Regime** (Gaussian return regimes) from **Minsky Balance-Sheet Financing Regime** (Hedge, Speculative, Ponzi cash-flow structures).
+8. **Media Hill Model Defensiveness**:
+   - Closed corner cases: handles $\gamma \le 1.0$, $K_{\max} \le 0$, and non-positive advertising budgets gracefully without throwing complex number or division errors.
 
 ---
 

@@ -232,12 +232,12 @@ class EconometricFilter:
 
     def compute_theils_u(self, actual, predicted):
         """
-        Computes Theil's U Statistic (U-ratio against naive random walk):
-          U = RMSE(forecast) / RMSE(naive random walk where y_hat_t = y_{t-1})
+        Computes Theil's U2 Statistic (inequality coefficient relative to naive persistence):
+          U2 = RMSE(forecast) / RMSE(naive random walk persistence where y_hat_t = y_{t-1})
         Interpretation:
-          U < 1.0: Model outperforms naive random walk (Hurdle PASSED).
-          U = 1.0: Model equals naive persistence.
-          U > 1.0: Model performs worse than naive guess (Hurdle FAILED).
+          U2 < 1.0: Model outperforms naive random walk (Hurdle PASSED).
+          U2 = 1.0: Model equals naive persistence.
+          U2 > 1.0: Model performs worse than naive guess (Hurdle FAILED).
         """
         if len(actual) != len(predicted) or len(actual) < 2:
             raise ValueError("Actual and predicted series must have matching length >= 2.")
@@ -252,6 +252,105 @@ class EconometricFilter:
         u = math.sqrt(forecast_mse) / math.sqrt(naive_mse)
         return round(float(u), 4)
 
+    def compute_diebold_mariano_test(self, errors_model, errors_benchmark, h=1, loss_power=2):
+        """
+        Computes Diebold-Mariano (1995) test with Harvey-Leybourne-Newbold (1997)
+        finite-sample correction and Bartlett kernel for overlapping multi-step horizons h.
+        Loss differential: d_t = |e_{model, t}|^p - |e_{benchmark, t}|^p (p=2 MSE, p=1 MAE)
+        Negative DM indicates model has lower loss than benchmark.
+        """
+        if len(errors_model) != len(errors_benchmark) or len(errors_model) < 3:
+            return {"dm_statistic": 0.0, "p_value": 1.0, "is_statistically_significant": False, "reason": "Insufficient samples"}
+
+        T = len(errors_model)
+        h = max(1, int(h))
+        if loss_power == 1:
+            d = [abs(em) - abs(eb) for em, eb in zip(errors_model, errors_benchmark)]
+        else:
+            d = [(em ** 2) - (eb ** 2) for em, eb in zip(errors_model, errors_benchmark)]
+        d_mean = sum(d) / T
+
+        # Autocovariances up to lag h - 1 with Bartlett weights
+        gamma_0 = sum((x - d_mean) ** 2 for x in d) / T
+        lr_var = gamma_0
+
+        for k in range(1, min(h, T)):
+            gamma_k = sum((d[t] - d_mean) * (d[t - k] - d_mean) for t in range(k, T)) / T
+            weight = 1.0 - (k / h)
+            lr_var += 2.0 * weight * gamma_k
+
+        se = math.sqrt(max(1e-12, lr_var) / T)
+        dm_stat = d_mean / se
+
+        # Harvey-Leybourne-Newbold (1997) finite-sample correction
+        hln_factor = math.sqrt(max(1e-6, (T + 1.0 - 2.0 * h + (h * (h - 1.0) / T)) / T))
+        dm_hln = dm_stat * hln_factor
+
+        # P-value calculation
+        try:
+            from scipy.stats import t as t_dist
+            p_val = float(2.0 * t_dist.sf(abs(dm_hln), df=max(1, T - 1)))
+        except ImportError:
+            p_val = float(math.erfc(abs(dm_hln) / math.sqrt(2.0)))
+
+        return {
+            "dm_statistic": round(float(dm_hln), 4),
+            "p_value": round(float(p_val), 4),
+            "is_statistically_significant": bool(p_val < 0.05),
+            "model_is_superior": bool(dm_hln < 0 and p_val < 0.05),
+            "horizon": h,
+            "loss_differential_mean": round(float(d_mean), 6)
+        }
+
+    def compute_block_bootstrap_theils_u(self, errors_model, errors_benchmark, h=1, n_boot=200, block_size=None):
+        """
+        Computes Moving Block Bootstrap (MBB) 95% confidence intervals for Theil's U2.
+        Preserves serial dependence in overlapping multi-step forecast errors.
+        """
+        import random
+        T = len(errors_model)
+        if T < 4:
+            return {"theils_u2_point": 1.0, "ci_95_lower": 1.0, "ci_95_upper": 1.0, "superiority_established": False}
+
+        b = block_size if block_size else max(2, min(int(h), T // 3))
+        rmse_m = math.sqrt(sum(e**2 for e in errors_model) / T)
+        rmse_b = math.sqrt(sum(e**2 for e in errors_benchmark) / T)
+        u_point = rmse_m / rmse_b if rmse_b > 1e-12 else 1.0
+
+        boot_u = []
+        n_blocks = max(1, (T + b - 1) // b)
+
+        rng = random.Random(42)  # Deterministic seed for reproducible testing
+        for _ in range(n_boot):
+            sample_m_sq = []
+            sample_b_sq = []
+            for _ in range(n_blocks):
+                start_idx = rng.randint(0, max(0, T - b))
+                for idx in range(start_idx, min(T, start_idx + b)):
+                    sample_m_sq.append(errors_model[idx] ** 2)
+                    sample_b_sq.append(errors_benchmark[idx] ** 2)
+            
+            sample_m_sq = sample_m_sq[:T]
+            sample_b_sq = sample_b_sq[:T]
+            r_m = math.sqrt(sum(sample_m_sq) / len(sample_m_sq))
+            r_b = math.sqrt(sum(sample_b_sq) / len(sample_b_sq))
+            boot_u.append(r_m / r_b if r_b > 1e-12 else 1.0)
+
+        boot_u.sort()
+        idx_low = int(0.025 * len(boot_u))
+        idx_high = int(0.975 * len(boot_u))
+        ci_low = boot_u[idx_low]
+        ci_high = boot_u[min(len(boot_u) - 1, idx_high)]
+
+        return {
+            "theils_u2_point": round(float(u_point), 4),
+            "ci_95_lower": round(float(ci_low), 4),
+            "ci_95_upper": round(float(ci_high), 4),
+            "superiority_established": bool(ci_high < 1.0),
+            "n_bootstraps": n_boot,
+            "block_size": b
+        }
+
     def evaluate_rolling_origin_theils_u(self, series, forecast_fn, min_train_len=30, horizon=1):
         """
         Executes an institutional rolling-origin (walk-forward) backtest evaluation:
@@ -264,11 +363,14 @@ class EconometricFilter:
         Returns:
           {
             "theils_u": float,
+            "theils_u2": float,
             "hurdle_passed": bool,
             "n_evaluations": int,
             "forecast_rmse": float,
             "naive_rmse": float,
-            "horizon": int
+            "horizon": int,
+            "errors_model": list,
+            "errors_naive": list
           }
         """
         series = [float(x) for x in series]
@@ -276,8 +378,8 @@ class EconometricFilter:
         if n < min_train_len + horizon:
             raise ValueError(f"Series length ({n}) insufficient for rolling-origin evaluation with min_train_len={min_train_len} and horizon={horizon}.")
 
-        forecast_errors_sq = []
-        naive_errors_sq = []
+        errors_model = []
+        errors_naive = []
 
         for t in range(min_train_len, n - horizon + 1):
             train_history = series[:t]
@@ -288,11 +390,11 @@ class EconometricFilter:
             if isinstance(pred_val, dict):
                 pred_val = pred_val.get("p50_expected", pred_val.get("expected_target", pred_val.get("reconciled_p50", train_history[-1])))
 
-            forecast_errors_sq.append((float(pred_val) - actual_val) ** 2)
-            naive_errors_sq.append((naive_pred - actual_val) ** 2)
+            errors_model.append(float(pred_val) - actual_val)
+            errors_naive.append(naive_pred - actual_val)
 
-        m_fc = sum(forecast_errors_sq) / len(forecast_errors_sq)
-        m_nv = sum(naive_errors_sq) / len(naive_errors_sq)
+        m_fc = sum(e ** 2 for e in errors_model) / len(errors_model)
+        m_nv = sum(e ** 2 for e in errors_naive) / len(errors_naive)
 
         rmse_fc = math.sqrt(m_fc)
         rmse_nv = math.sqrt(m_nv)
@@ -307,22 +409,27 @@ class EconometricFilter:
 
         return {
             "theils_u": theils_u,
+            "theils_u2": theils_u,
             "hurdle_passed": hurdle_passed,
-            "n_evaluations": len(forecast_errors_sq),
+            "n_evaluations": len(errors_model),
             "forecast_rmse": round(rmse_fc, 4),
             "naive_rmse": round(rmse_nv, 4),
-            "horizon": horizon
+            "horizon": horizon,
+            "errors_model": errors_model,
+            "errors_naive": errors_naive
         }
 
-    def evaluate_multi_horizon_theils_u(self, series, forecast_fn, min_train_len=30, target_horizon=1):
+    def evaluate_multi_horizon_theils_u(self, series, forecast_fn, min_train_len=30, target_horizon=1, min_oos_origins=1):
         """
         Executes an institutional fail-closed multi-horizon rolling-origin backtest.
-        Evaluates U(h) across relevant horizons: h = 1, intermediate, and target_horizon.
+        Evaluates U2(h) across relevant horizons: h = 1, intermediate, and target_horizon.
+        Enforces sample sufficiency based on forecast origins: requires n_origins >= min_oos_origins.
+        Computes Diebold-Mariano test and Moving Block Bootstrap 95% confidence intervals.
         
         Returns strict 4-state release gate:
-          - PASS: Evaluated and U(target_horizon) < 1.0.
-          - FAIL: Evaluated and U(target_horizon) >= 1.0.
-          - NOT_EVALUATED: Insufficient sample length to evaluate target horizon.
+          - PASS: Evaluated and U2(target_horizon) < 1.0.
+          - FAIL: Evaluated and U2(target_horizon) >= 1.0.
+          - NOT_EVALUATED: Insufficient sample length / origins to evaluate target horizon.
           - ERROR: Technical failure during backtest execution.
           
         NEVER FAILS OPEN.
@@ -330,14 +437,16 @@ class EconometricFilter:
         series = [float(x) for x in series]
         n = len(series)
         target_h = max(1, int(target_horizon))
+        n_origins = n - min_train_len - target_h + 1
         
-        if n < min_train_len + target_h:
+        if n < min_train_len + target_h or n_origins < min_oos_origins:
             return {
                 "gate_status": "NOT_EVALUATED",
                 "passed": False,
-                "reason": f"Sample length ({n}) insufficient for rolling-origin evaluation at target horizon h={target_h} (requires at least {min_train_len + target_h} observations).",
+                "reason": f"Insufficient forecast origins ({max(0, n_origins)} < {min_oos_origins} required) for target horizon h={target_h}.",
                 "target_horizon": target_h,
                 "theils_u_target": None,
+                "n_origins": max(0, n_origins),
                 "hurdles": {}
             }
 
@@ -349,11 +458,19 @@ class EconometricFilter:
                 res_h = self.evaluate_rolling_origin_theils_u(
                     series, forecast_fn, min_train_len=min_train_len, horizon=h
                 )
+                
+                # Run Diebold-Mariano test and block bootstrap on target horizon
+                dm_res = self.compute_diebold_mariano_test(res_h["errors_model"], res_h["errors_naive"], h=h)
+                boot_res = self.compute_block_bootstrap_theils_u(res_h["errors_model"], res_h["errors_naive"], h=h)
+
                 hurdles[f"h_{h}"] = {
                     "horizon": h,
                     "theils_u": res_h["theils_u"],
+                    "theils_u2": res_h["theils_u"],
                     "hurdle_passed": res_h["hurdle_passed"],
-                    "n_evaluations": res_h["n_evaluations"]
+                    "n_evaluations": res_h["n_evaluations"],
+                    "dm_test": dm_res,
+                    "bootstrap_ci": boot_res
                 }
             
             target_res = hurdles[f"h_{target_h}"]
@@ -361,13 +478,21 @@ class EconometricFilter:
             passed = target_res["hurdle_passed"]
             gate_status = "PASS" if passed else "FAIL"
 
+            dm_target = target_res["dm_test"]
+            boot_target = target_res["bootstrap_ci"]
+            stat_sig = dm_target.get("is_statistically_significant", False)
+            boot_superior = boot_target.get("superiority_established", False)
+
             return {
                 "gate_status": gate_status,
                 "passed": passed,
                 "target_horizon": target_h,
                 "theils_u_target": u_target,
+                "diebold_mariano": dm_target,
+                "bootstrap_ci": boot_target,
+                "statistical_superiority_established": bool(passed and (stat_sig or boot_superior)),
                 "hurdles": hurdles,
-                "reason": f"U(h={target_h})={u_target:.2f} (< 1.0 hurdle {'PASSED' if passed else 'FAILED'})."
+                "reason": f"U2(h={target_h})={u_target:.2f} (< 1.0 hurdle {'PASSED' if passed else 'FAILED'}). 95% CI: [{boot_target['ci_95_lower']:.2f}, {boot_target['ci_95_upper']:.2f}]."
             }
         except Exception as e:
             return {

@@ -472,7 +472,7 @@ def test_structural_macro_anchor_weighting():
     print("  [PASS] Test 25: Stage 3 Structural Macro Target Anchoring in Scenario Corridors")
 
 def test_machine_falsification_resolver():
-    """Validates automatic machine resolution of falsification conditions."""
+    """Validates automatic machine resolution of falsification conditions with Popperian taxonomy."""
     from core.pipeline import evaluate_falsification_condition
     
     f_obj = {
@@ -487,11 +487,11 @@ def test_machine_falsification_resolver():
     assert res_falsified["status"] == "FALSIFIED"
     assert res_falsified["is_falsified"] is True
     
-    # Realized price above threshold -> VALIDATED_INTACT
+    # Realized price above threshold -> NOT_FALSIFIED (strictly Popperian, never VALIDATED_INTACT)
     res_intact = evaluate_falsification_condition(f_obj, realized_metric_value=85000.0)
-    assert res_intact["status"] == "VALIDATED_INTACT"
+    assert res_intact["status"] == "NOT_FALSIFIED"
     assert res_intact["is_falsified"] is False
-    print("  [PASS] Test 26: Machine Falsification Resolution Evaluator")
+    print("  [PASS] Test 26: Machine Falsification Resolution Evaluator (Popperian NOT_FALSIFIED)")
 
 def test_point_in_time_metadata_and_lineage_taxonomy():
     """Validates point-in-time timestamps and 7-member parameter lineage taxonomy."""
@@ -514,9 +514,192 @@ def test_point_in_time_metadata_and_lineage_taxonomy():
         assert "availability_timestamp" in rec
     print("  [PASS] Test 27: Point-in-Time Availability Timestamps & Lineage Taxonomy")
 
+def test_immutable_forecast_ledger():
+    """Validates append-only forecast ledger recording, hash computation, and post-facto Popperian resolution."""
+    import tempfile
+    from core.forecast_ledger import ImmutableForecastLedger
+    
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        ledger_file = os.path.join(tmp_dir, "test_ledger.jsonl")
+        ledger = ImmutableForecastLedger(ledger_file_path=ledger_file)
+        
+        # 1. Record forecast
+        rec = ledger.record_forecast(
+            asset_name="BTC-USD",
+            origin_timestamp="2026-03-01T00:00:00Z",
+            horizon_steps=30,
+            frequency="D",
+            raw_prior={"p10": 80000.0, "p50": 90000.0, "p90": 105000.0},
+            scenario_corridors={"downside_floor": 78000.0, "expected_target": 92000.0, "upside_ceiling": 108000.0},
+            falsification_object={"primary_metric": "price", "threshold": 78000.0, "operator": "<"},
+            allocation_output={"target_risk_weight": 0.50},
+            data_cutoff_timestamp="2026-03-01T00:00:00Z",
+            structural_alpha=0.25
+        )
+        forecast_id = rec["forecast_id"]
+        assert forecast_id is not None
+        assert rec["sha256_hash"] is not None
+        
+        # 2. Query record
+        fetched = ledger.get_forecast(forecast_id)
+        assert fetched is not None
+        assert fetched["forecast_id"] == forecast_id
+        
+        # 3. Resolve forecast (Popperian NOT_FALSIFIED)
+        res_record = ledger.resolve_forecast(
+            forecast_id=forecast_id,
+            realized_actual=91500.0,
+            falsification_status="NOT_FALSIFIED",
+            notes="Target realized well within scenario corridors."
+        )
+        assert res_record["falsification_status"] == "NOT_FALSIFIED"
+        assert res_record["realized_actual"] == 91500.0
+        
+        # 4. Verify resolution is listed
+        resolutions = ledger.list_resolutions(forecast_id)
+        assert len(resolutions) == 1
+        assert resolutions[0]["forecast_id"] == forecast_id
+    print("  [PASS] Test 28: Immutable Forecast Ledger (Append-Only JSONL & Popperian Resolution)")
+
+def test_diebold_mariano_and_block_bootstrap():
+    """Validates Diebold-Mariano test with HLN finite-sample correction and Moving Block Bootstrap CI."""
+    from core.econometrics import EconometricFilter
+    ef = EconometricFilter()
+    
+    np.random.seed(42)
+    # Model 1 has much lower error than Model 2
+    e1 = [0.1 * np.random.randn() for _ in range(50)]
+    e2 = [5.0 + np.random.randn() for _ in range(50)]
+    
+    dm_res = ef.compute_diebold_mariano_test(e1, e2, h=1, loss_power=2)
+    assert "dm_statistic" in dm_res
+    assert "p_value" in dm_res
+    assert dm_res["model_is_superior"] is True
+    assert dm_res["p_value"] < 0.05
+    
+    # Test Moving Block Bootstrap for Theil's U
+    ci_res = ef.compute_block_bootstrap_theils_u(e1, e2, h=1, n_boot=100)
+    assert "ci_95_lower" in ci_res
+    assert "ci_95_upper" in ci_res
+    assert ci_res["ci_95_lower"] <= ci_res["ci_95_upper"]
+    assert ci_res["theils_u2_point"] < 1.0
+    print("  [PASS] Test 29: Diebold-Mariano Test (HLN Adjusted) & Moving Block Bootstrap 95% CI")
+
+def test_infold_structural_alpha_optimization():
+    """Validates in-fold structural weight alpha* optimization and truthful collapse to zero."""
+    from core.markov_regime import InstitutionalMarkovEngine
+    engine = InstitutionalMarkovEngine()
+    
+    # Case A: Structural targets are inversely correlated/terrible -> alpha* must collapse to 0.0
+    actual_fold = [100.0, 102.0, 105.0, 107.0, 110.0]
+    tfm_fold = [100.5, 102.2, 104.8, 106.9, 109.8]  # Close to actual
+    bad_struct = [50.0, 48.0, 45.0, 42.0, 40.0]     # Massive error
+    
+    res_bad = engine.estimate_optimal_structural_weight(actual_fold, tfm_fold, bad_struct)
+    assert res_bad["alpha_star"] == 0.0
+    assert res_bad["structural_value_added"] is False
+    
+    # Case B: Structural target provides superior signal -> alpha* > 0.0
+    good_struct = [100.0, 102.0, 105.0, 107.0, 110.0]  # Perfect
+    noisy_tfm = [120.0, 125.0, 130.0, 135.0, 140.0]
+    res_good = engine.estimate_optimal_structural_weight(actual_fold, noisy_tfm, good_struct)
+    assert res_good["alpha_star"] > 0.5
+    assert res_good["structural_value_added"] is True
+    print("  [PASS] Test 30: In-Fold Structural Alpha* Estimation & Truthful Zero Collapse")
+
+def test_point_in_time_vintage_revision_leak_defense():
+    """Validates point-in-time filtering strictly purges post-cutoff data and revision leaks."""
+    from core.pipeline import filter_series_by_availability_cutoff
+    
+    records = [
+        {"timestamp": "2026-01-01", "price": 100.0, "availability_timestamp": "2026-01-01T12:00:00Z"},
+        {"timestamp": "2026-01-02", "price": 102.0, "availability_timestamp": "2026-01-02T12:00:00Z"},
+        {"timestamp": "2026-01-03", "price": 105.0, "availability_timestamp": "2026-01-10T12:00:00Z"}
+    ]
+    
+    # Filter as of cutoff 2026-01-05
+    filtered = filter_series_by_availability_cutoff(records, cutoff_iso="2026-01-05T00:00:00Z")
+    assert len(filtered) == 2
+    assert filtered[-1]["timestamp"] == "2026-01-02"
+    print("  [PASS] Test 31: Point-in-Time Vintage Availability Filtering & Revision Leak Defense")
+
+def test_probabilistic_calibration_pinball_and_wis():
+    """Validates Pinball Loss, Empirical Coverage, and Winkler Interval Score (WIS)."""
+    from core.calibration import (
+        compute_pinball_loss,
+        compute_empirical_quantile_coverage,
+        compute_winkler_interval_score
+    )
+    
+    # Pinball loss: if actual == forecast, loss = 0.0
+    assert compute_pinball_loss(100.0, 100.0, tau=0.5) == 0.0
+    
+    # Under-prediction at tau=0.9 -> penalty is tau * (y - q)
+    under_loss = compute_pinball_loss(110.0, 100.0, tau=0.9)
+    assert abs(under_loss - 0.9 * 10.0) < 1e-5
+    
+    # Over-prediction at tau=0.1 -> penalty is (1 - tau) * (q - y)
+    over_loss = compute_pinball_loss(90.0, 100.0, tau=0.1)
+    assert abs(over_loss - 0.9 * 10.0) < 1e-5
+    
+    # Coverage test: 8 of 10 points within interval -> 0.8 coverage
+    y_test = [95.0] * 8 + [85.0, 115.0]
+    p10 = [90.0] * 10
+    p90 = [110.0] * 10
+    cov = compute_empirical_quantile_coverage(y_test, p10_series=p10, p90_series=p90)
+    assert "cov_p10" in cov
+    assert "cov_p90" in cov
+    
+    # Winkler score: width is (110 - 90) = 20; if inside, score is 20
+    wis_inside = compute_winkler_interval_score(100.0, 90.0, 110.0, alpha=0.1)
+    assert abs(wis_inside - 20.0) < 1e-5
+    
+    # If below lower by 5: penalty is 2/0.1 * 5 = 100 -> score = 20 + 100 = 120
+    wis_below = compute_winkler_interval_score(85.0, 90.0, 110.0, alpha=0.1)
+    assert abs(wis_below - 120.0) < 1e-5
+    print("  [PASS] Test 32: Probabilistic Calibration: Pinball Loss, Coverage & Winkler Interval Score")
+
+def test_baseline_tournament():
+    """Validates 5-tier baseline tournament hierarchy (M0, M0b, M1, M4) with delta-skill ranking."""
+    from core.calibration import run_baseline_tournament
+    
+    np.random.seed(42)
+    series = [100.0]
+    for i in range(40):
+        series.append(series[-1] * 1.01 + np.random.normal(0, 0.1))
+        
+    res = run_baseline_tournament(series, h=1, min_train_len=30)
+    assert res["status"] == "EVALUATED"
+    assert "models" in res
+    assert "M0_Persistence" in res["models"]
+    assert "M0b_Drift" in res["models"]
+    assert "M1_TimesFM_Target_Only" in res["models"]
+    assert "M4_Fitted_Structural_Hybrid" in res["models"]
+    assert "incremental_skill" in res
+    assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0
+    print("  [PASS] Test 33: Multi-Model Tournament Hierarchy & Skill Delta Reporting")
+
+def test_media_hill_corner_cases():
+    """Validates defensive handling of invalid Hill model parameters (gamma <= 1, K_max <= 0, spend <= 0)."""
+    from core.pipeline import CausalTimesFmPipeline
+    pipeline = CausalTimesFmPipeline()
+    
+    # gamma <= 1.0: should return a valid positive number safely
+    s_star_gamma = pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=1000000.0, gamma=0.9)
+    assert s_star_gamma > 0.0
+    
+    # K_max <= 0: should return 0.0 spend budget
+    s_star_k = pipeline.solve_optimal_media_spend(target_cpm=10.0, ec50_spend=10000.0, k_max_impressions=0.0, gamma=1.5)
+    assert s_star_k == 0.0
+    
+    # Non-positive spend run: should not crash and should return safe budget
+    res = pipeline.run_media_pipeline(monthly_spend=-500.0, cpm=12.0)
+    assert res["media_decision"]["target_spend_budget"] >= 0.0
+    print("  [PASS] Test 34: Media Hill Model Defensive Guardrails (Corner Cases Gamma <= 1, K_max <= 0)")
+
 if __name__ == "__main__":
     print("\n=======================================================")
-    print("   RUNNING CAUSAL-TIMESFM-ENGINE V2.4 INSTITUTIONAL TESTS")
+    print("   RUNNING CAUSAL-TIMESFM-ENGINE V3.0 INSTITUTIONAL TESTS")
     print("=======================================================")
     test_econometric_stationarity()
     test_schmitt_trigger_hysteresis()
@@ -545,7 +728,14 @@ if __name__ == "__main__":
     test_structural_macro_anchor_weighting()
     test_machine_falsification_resolver()
     test_point_in_time_metadata_and_lineage_taxonomy()
+    test_immutable_forecast_ledger()
+    test_diebold_mariano_and_block_bootstrap()
+    test_infold_structural_alpha_optimization()
+    test_point_in_time_vintage_revision_leak_defense()
+    test_probabilistic_calibration_pinball_and_wis()
+    test_baseline_tournament()
+    test_media_hill_corner_cases()
     print("=======================================================")
-    print("   ALL 27 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
+    print("   ALL 34 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
     print("=======================================================\n")
 

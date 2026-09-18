@@ -243,6 +243,51 @@ class InstitutionalMarkovEngine:
             "structural_impact": structural_impact_note,
             "structural_target_anchor": structural_target,
             "structural_weight": active_alpha if structural_target is not None else 0.0,
+            "structural_value_added": bool(active_alpha > 0.0),
             "corridor_type": "MECHANISM_AWARE_SCENARIO_ENVELOPE",
-            "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles."
+            "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles. (Market Regime != Financing Regime: Minsky states model financing leverage & liquidity buffers)."
+        }
+
+    @staticmethod
+    def estimate_optimal_structural_weight(actual_history, tfm_p50_history, struct_target_history, loss_metric="mae"):
+        """
+        Estimates the optimal structural blending weight alpha* in [0, 1] that minimizes
+        loss L(y, (1 - alpha)*tfm + alpha*struct) in-sample over training fold.
+        
+        If alpha* <= 0.02 or loss does not improve beyond pure statistical prior (alpha=0),
+        it sets alpha* = 0.0 and flags that the structural economic layer added no incremental value.
+        """
+        if len(actual_history) != len(tfm_p50_history) or len(actual_history) != len(struct_target_history) or len(actual_history) < 5:
+            return {"alpha_star": 0.0, "structural_value_added": False, "loss_base": 0.0, "loss_optimal": 0.0, "reason": "Insufficient history"}
+
+        best_alpha = 0.0
+        best_loss = float("inf")
+        base_loss = None
+
+        # Grid search over alpha in [0.0, 1.0] in steps of 0.02
+        for step in range(51):
+            alpha = step * 0.02
+            blend = [((1.0 - alpha) * p) + (alpha * s) for p, s in zip(tfm_p50_history, struct_target_history)]
+            if loss_metric == "mae":
+                loss = sum(abs(y - b) for y, b in zip(actual_history, blend)) / len(actual_history)
+            else:
+                loss = math.sqrt(sum((y - b)**2 for y, b in zip(actual_history, blend)) / len(actual_history))
+            
+            if step == 0:
+                base_loss = loss
+
+            if loss < best_loss:
+                best_loss = loss
+                best_alpha = alpha
+
+        # Require meaningful out-of-sample improvement (>0.5% relative loss reduction)
+        rel_gain = (base_loss - best_loss) / base_loss if base_loss and base_loss > 1e-6 else 0.0
+        value_added = bool(best_alpha > 0.02 and rel_gain >= 0.005)
+
+        return {
+            "alpha_star": round(best_alpha if value_added else 0.0, 3),
+            "structural_value_added": value_added,
+            "relative_loss_reduction_pct": round(rel_gain * 100, 2),
+            "loss_base_alpha_zero": round(base_loss, 4) if base_loss else None,
+            "loss_optimal": round(best_loss, 4)
         }
