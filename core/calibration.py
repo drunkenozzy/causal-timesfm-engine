@@ -72,7 +72,7 @@ def compute_winkler_interval_score(actual: float, lower: float, upper: float, al
         penalty = (2.0 / alpha) * (actual - upper)
     return round(width + penalty, 4)
 
-def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int = 30) -> Dict[str, Any]:
+def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int = 30, **kwargs) -> Dict[str, Any]:
     """
     Executes a multi-model tournament on the provided historical series across rolling origins:
       M0  : Persistence (Naive Random Walk y_{t+h} = y_t)
@@ -197,6 +197,8 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
     
     # Guard against masquerading
     if not timesfm_executed:
+        if kwargs.get("enforce_confirmatory_timesfm", False):
+            return {"status": "NOT_EVALUATED_RUNTIME_FAILURE", "reason": "TimesFM runtime failure"}
         m1_label = "M1_GEOMETRIC_FALLBACK"
         m4_label = "M4_GEOMETRIC_FALLBACK_STRUCTURAL"
     else:
