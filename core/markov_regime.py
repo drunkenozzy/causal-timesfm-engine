@@ -16,17 +16,20 @@ import math
 import numpy as np
 
 class InstitutionalMarkovEngine:
-    def __init__(self, asset_daily_std=None):
+    def __init__(self, period_volatility=None, asset_daily_std=None, observation_frequency="D"):
         self.state_names = ["HEDGE", "SPECULATIVE", "PONZI"]
+        self.observation_frequency = observation_frequency
         
-        # Default baseline daily volatility scale (auto-calibrates if provided)
-        # If asset_daily_std is provided, scale Gaussian densities to the asset
-        if asset_daily_std is None:
-            # Standard moderate equity/crypto blended default (~2.5% daily std)
+        # Period-calibrated volatility scale
+        vol = period_volatility if period_volatility is not None else asset_daily_std
+        if vol is None:
+            # Default baseline scale (~2.5% step std)
             self.means = np.array([0.0020, 0.0005, -0.0050])
             self.stds  = np.array([0.0150, 0.0300,  0.0500])
+            self.period_volatility = 0.025
         else:
-            s = max(1e-4, float(asset_daily_std))
+            s = max(1e-4, float(vol))
+            self.period_volatility = s
             # Hedge: positive drift (+0.15*s), low vol (0.8*s)
             # Speculative: low drift (+0.05*s), elevated vol (1.5*s)
             # Ponzi: sharp negative drift (-0.40*s), high vol (2.5*s)
@@ -48,26 +51,28 @@ class InstitutionalMarkovEngine:
         num = math.exp(-((x - mean) ** 2) / (2 * var))
         return num / denom
 
-    def compute_dynamic_transition_matrix(self, z_liq, z_trend, decoupling_active=False):
+    def compute_dynamic_transition_matrix(self, z_driver=0.0, z_trend=0.0, decoupling_active=False, z_liq=None):
         """
         Dynamically adjusts P_t from rolling standardized Z-scores:
-          z_liq   : Standardized on-chain net float expansion Z-score (t-1).
-          z_trend : Standardized price / 200 SMA momentum ratio Z-score (t-1).
+          z_driver : Domain-specific causal constraint Z-score (crypto: z_liq; housing: z_credit; etc.).
+          z_trend  : Standardized trailing trend / momentum ratio Z-score.
         """
+        driver = z_liq if z_liq is not None else z_driver
+
         p_hedge_to_spec = 0.012
         if z_trend > 1.5:
             p_hedge_to_spec += min(0.06, (z_trend - 1.5) * 0.025)
 
         p_spec_to_ponzi = 0.015
         p_hedge_to_ponzi = 0.003
-        if z_liq < -1.0:
-            stress = abs(z_liq + 1.0)
+        if driver < -1.0:
+            stress = abs(driver + 1.0)
             p_spec_to_ponzi += min(0.12, stress * 0.04)
             p_hedge_to_ponzi += min(0.06, stress * 0.02)
 
-        # Decoupling Switch: on-chain endogenous money expansion overrides macro rate drag
+        # Decoupling Switch: causal expansion overrides macro rate drag
         p_ponzi_to_hedge = 0.010
-        if decoupling_active or z_liq > 0.8:
+        if decoupling_active or driver > 0.8:
             p_ponzi_to_hedge = 0.045
             p_hedge_to_ponzi = 0.002
             p_spec_to_ponzi = min(0.02, p_spec_to_ponzi * 0.3)
@@ -83,18 +88,21 @@ class InstitutionalMarkovEngine:
         ])
         return P_t / P_t.sum(axis=1, keepdims=True)
 
-    def update(self, daily_ret, z_liq=0.0, z_trend=0.0, decoupling_active=False):
+    def update(self, step_ret=0.0, z_driver=0.0, z_trend=0.0, decoupling_active=False, daily_ret=None, z_liq=None):
         """
         Executes one step of the Hamilton Filter with Schmitt Trigger Hysteresis.
+        step_ret: Observation return for current period (daily, weekly, or monthly).
         """
-        P_t = self.compute_dynamic_transition_matrix(z_liq, z_trend, decoupling_active)
-        xi_pred = P_t.T @ self.xi
+        ret = daily_ret if daily_ret is not None else step_ret
+        driver = z_liq if z_liq is not None else z_driver
+        P_t = self.compute_dynamic_transition_matrix(z_driver=driver, z_trend=z_trend, decoupling_active=decoupling_active)
 
         densities = np.array([
-            self._normal_pdf(daily_ret, self.means[0], self.stds[0]),
-            self._normal_pdf(daily_ret, self.means[1], self.stds[1]),
-            self._normal_pdf(daily_ret, self.means[2], self.stds[2])
+            self._normal_pdf(ret, self.means[0], self.stds[0]),
+            self._normal_pdf(ret, self.means[1], self.stds[1]),
+            self._normal_pdf(ret, self.means[2], self.stds[2])
         ])
+        xi_pred = P_t.T @ self.xi
 
         num = xi_pred * densities
         denom = np.sum(num)
@@ -182,9 +190,10 @@ class InstitutionalMarkovEngine:
 
     def condition_timesfm_quantiles(self, tfm_p10, tfm_p50, tfm_p90, forward_xi, asset_vol_scale=0.05, 
                                    horizon_steps=30, transition_matrix=None, horizon_mode="frozen_transition",
-                                   covariate_scenario_path=None):
+                                   covariate_scenario_path=None, structural_target=None, structural_weight=None):
         """
-        Reconciles TimesFM statistical priors against forward structural Markov scenarios.
+        Reconciles TimesFM statistical priors against forward structural Markov scenarios
+        and operational structural valuation anchors.
         Propagates state vector to horizon h if transition_matrix is provided.
         Outputs a mechanism-aware scenario corridor (Downside Floor, Central Target, Upside Ceiling).
         """
@@ -206,6 +215,20 @@ class InstitutionalMarkovEngine:
         reconciled_floor = min(reconciled_p50, tfm_p10 * floor_penalty)
         reconciled_ceiling = max(reconciled_p50, tfm_p90 * (0.85 if p_p > 0.35 else 1.00))
 
+        # Operationally integrate Structural Macro Anchor (Stage 3 -> Stage 6 linkage)
+        structural_impact_note = "None (Pure statistical/Markov conditioning)"
+        active_alpha = 0.0
+        if structural_target is not None and structural_target > 0:
+            if structural_weight is not None:
+                active_alpha = float(structural_weight)
+            else:
+                active_alpha = 0.25 if p_p <= 0.35 else 0.40
+            reconciled_p50 = ((1.0 - active_alpha) * reconciled_p50) + (active_alpha * structural_target)
+            reconciled_floor = min(reconciled_floor, structural_target * 0.85)
+            if p_p > 0.35:
+                reconciled_ceiling = min(reconciled_ceiling, structural_target * 1.15)
+            structural_impact_note = f"Integrated (alpha={active_alpha:.2f}; structural_target={structural_target:.2f})"
+
         return {
             "downside_floor": round(reconciled_floor, 2),
             "expected_target": round(reconciled_p50, 2),
@@ -217,6 +240,9 @@ class InstitutionalMarkovEngine:
             "fragility_score": round(float(p_p) * 100, 1),
             "ponzi_probability": round(float(p_p), 4),
             "horizon_mode": horizon_mode,
+            "structural_impact": structural_impact_note,
+            "structural_target_anchor": structural_target,
+            "structural_weight": active_alpha if structural_target is not None else 0.0,
             "corridor_type": "MECHANISM_AWARE_SCENARIO_ENVELOPE",
             "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles."
         }

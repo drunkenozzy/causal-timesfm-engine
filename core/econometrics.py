@@ -314,6 +314,72 @@ class EconometricFilter:
             "horizon": horizon
         }
 
+    def evaluate_multi_horizon_theils_u(self, series, forecast_fn, min_train_len=30, target_horizon=1):
+        """
+        Executes an institutional fail-closed multi-horizon rolling-origin backtest.
+        Evaluates U(h) across relevant horizons: h = 1, intermediate, and target_horizon.
+        
+        Returns strict 4-state release gate:
+          - PASS: Evaluated and U(target_horizon) < 1.0.
+          - FAIL: Evaluated and U(target_horizon) >= 1.0.
+          - NOT_EVALUATED: Insufficient sample length to evaluate target horizon.
+          - ERROR: Technical failure during backtest execution.
+          
+        NEVER FAILS OPEN.
+        """
+        series = [float(x) for x in series]
+        n = len(series)
+        target_h = max(1, int(target_horizon))
+        
+        if n < min_train_len + target_h:
+            return {
+                "gate_status": "NOT_EVALUATED",
+                "passed": False,
+                "reason": f"Sample length ({n}) insufficient for rolling-origin evaluation at target horizon h={target_h} (requires at least {min_train_len + target_h} observations).",
+                "target_horizon": target_h,
+                "theils_u_target": None,
+                "hurdles": {}
+            }
+
+        horizons_to_test = sorted(list(set([1, min(7, target_h), target_h])))
+        hurdles = {}
+
+        try:
+            for h in horizons_to_test:
+                res_h = self.evaluate_rolling_origin_theils_u(
+                    series, forecast_fn, min_train_len=min_train_len, horizon=h
+                )
+                hurdles[f"h_{h}"] = {
+                    "horizon": h,
+                    "theils_u": res_h["theils_u"],
+                    "hurdle_passed": res_h["hurdle_passed"],
+                    "n_evaluations": res_h["n_evaluations"]
+                }
+            
+            target_res = hurdles[f"h_{target_h}"]
+            u_target = target_res["theils_u"]
+            passed = target_res["hurdle_passed"]
+            gate_status = "PASS" if passed else "FAIL"
+
+            return {
+                "gate_status": gate_status,
+                "passed": passed,
+                "target_horizon": target_h,
+                "theils_u_target": u_target,
+                "hurdles": hurdles,
+                "reason": f"U(h={target_h})={u_target:.2f} (< 1.0 hurdle {'PASSED' if passed else 'FAILED'})."
+            }
+        except Exception as e:
+            return {
+                "gate_status": "ERROR",
+                "passed": False,
+                "reason": f"Evaluation crashed: {str(e)}",
+                "target_horizon": target_h,
+                "theils_u_target": None,
+                "hurdles": hurdles
+            }
+
     # Method alias for institutional testing API
     test_granger_causality = granger_causality_test
+
 
