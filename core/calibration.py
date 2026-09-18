@@ -191,21 +191,27 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
     from core.engine_timesfm import TimesFmBaselineEngine
     tfm = TimesFmBaselineEngine()
     tfm_res = tfm.forecast(series[:min_train_len], horizon_days=h)
+    
+    timesfm_executed = tfm_res.get("timesfm_executed", False)
     m1_label = tfm_res.get("engine", "M1_GEOMETRIC_FALLBACK")
     
     # Guard against masquerading
-    if not tfm_res.get("timesfm_executed", False):
+    if not timesfm_executed:
         m1_label = "M1_GEOMETRIC_FALLBACK"
+        m4_label = "M4_GEOMETRIC_FALLBACK_STRUCTURAL"
+    else:
+        m4_label = "M4_TIMESFM_STRUCTURAL"
 
     tourney_results = {
         "status": "EVALUATED",
         "n_origins": len(actuals),
         "horizon": h,
+        "TIMESFM_COMPARISON_VALID": timesfm_executed,
         "models": {
             "M0_Persistence": {"rmse": round(r0, 4), "theils_u2": u0},
             "M0b_Drift": {"rmse": round(r0b, 4), "theils_u2": u0b},
             m1_label: {"rmse": round(r1, 4), "theils_u2": u1},
-            "M4_Fitted_Structural_Hybrid": {"rmse": round(r4, 4), "theils_u2": u4}
+            m4_label: {"rmse": round(r4, 4), "theils_u2": u4}
         },
         "incremental_skill": {
             "delta_skill_m1_vs_m0_pct": delta_m1_m0,
@@ -213,6 +219,8 @@ def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int 
             "structural_layer_adds_value": bool(delta_m4_m1 > 0.0),
             "clark_west_stat": cw_stat,
             "clark_west_p_value": cw_pval,
+            "hac_kernel": cw_res.get("hac_kernel", "Bartlett"),
+            "hac_max_lag": cw_res.get("hac_max_lag", max(0, h-1)),
             "structural_inference_status": inference_status
         }
     }

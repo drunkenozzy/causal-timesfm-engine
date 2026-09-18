@@ -104,6 +104,23 @@ class ImmutableForecastLedger:
                 return hashlib.sha256(f.read()).hexdigest()
         return "UNKNOWN_DEPENDENCIES"
 
+    def _get_execution_environment(self) -> dict:
+        import sys
+        import platform
+        env = {
+            "python_version": sys.version.split(' ')[0],
+            "platform": platform.platform(),
+            "machine": platform.machine(),
+            "project_lock_hash": self._get_dependency_lock_hash()
+        }
+        for pkg in ["numpy", "scipy", "timesfm", "torch"]:
+            try:
+                import importlib.metadata
+                env[f"{pkg}_version"] = importlib.metadata.version(pkg)
+            except Exception:
+                env[f"{pkg}_version"] = "NOT_INSTALLED"
+        return env
+
     def record_forecast(self,
                         asset_name: str,
                         origin_timestamp: str,
@@ -133,8 +150,7 @@ class ImmutableForecastLedger:
         forecast_id = f"fc_{compute_sha256(id_material)[:16]}"
         
         git_sha, git_dirty = self._get_git_status()
-        dep_hash = self._get_dependency_lock_hash()
-        py_version = sys.version.split(' ')[0]
+        exec_env = self._get_execution_environment()
 
         record = {
             "record_type": "FORECAST_REGISTRATION",
@@ -148,8 +164,7 @@ class ImmutableForecastLedger:
             "dataset_hash": dataset_hash or "NOT_HASHED",
             "commit_sha": commit_sha or git_sha,
             "git_dirty": git_dirty,
-            "dependency_lock_hash": dep_hash,
-            "python_runtime_version": py_version,
+            "execution_environment": exec_env,
             "raw_prior": {
                 "p10": raw_prior.get("p10_downside") or raw_prior.get("p10"),
                 "p50": raw_prior.get("p50_expected") or raw_prior.get("p50"),

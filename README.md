@@ -1,4 +1,4 @@
-# CTE R3.2: Research Protocol Freeze & Inference Rigor
+# CTE R3.3: Final Research Protocol Seal
 > **Hybrid Time-Series Forecasting & Asymmetric Capital Allocation Engine**  
 > *Combining Google TimesFM Foundation Models with Post-Keynesian Structural Econometrics, Domain-Specific Causal Constraints, and Fail-Closed Institutional Validation.*
 

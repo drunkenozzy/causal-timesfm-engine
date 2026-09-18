@@ -575,13 +575,17 @@ def test_diebold_mariano_and_block_bootstrap():
     assert dm_res["model_is_superior"] is True
     assert dm_res["p_value"] < 0.05
     
-    # Test Moving Block Bootstrap for Theil's U
-    ci_res = ef.compute_block_bootstrap_theils_u(e1, e2, h=1, n_boot=100)
+    # Test Moving Block Bootstrap for Theil's U (Effect CI)
+    ci_res = ef.block_bootstrap_effect_ci(e1, e2, h=1, n_boot=100)
     assert "ci_95_lower" in ci_res
     assert "ci_95_upper" in ci_res
     assert ci_res["ci_95_lower"] <= ci_res["ci_95_upper"]
     assert ci_res["theils_u2_point"] < 1.0
-    print("  [PASS] Test 29: Diebold-Mariano Test (HLN Adjusted) & Moving Block Bootstrap 95% CI")
+    
+    # Test Null Test
+    null_res = ef.block_bootstrap_null_test(e1, e2, h=1, n_boot=100)
+    assert "bootstrap_p_value" in null_res
+    print("  [PASS] Test 29: Diebold-Mariano Test (HLN Adjusted) & Split MBB APIs")
 
 def test_infold_structural_alpha_optimization():
     """Validates in-fold structural weight alpha* optimization and truthful collapse to zero."""
@@ -657,6 +661,25 @@ def test_probabilistic_calibration_pinball_and_wis():
     assert abs(wis_below - 120.0) < 1e-5
     print("  [PASS] Test 32: Probabilistic Calibration: Pinball Loss, Coverage & Winkler Interval Score")
 
+def test_strong_kleene_3_valued_logic():
+    from core.pipeline import evaluate_falsification_condition
+    ast1 = {"logic": {"condition": "AND", "rules": [
+        {"metric": "unknown_metric", "operator": "<", "threshold": 10},
+        {"metric": "price", "operator": ">", "threshold": 100}
+    ]}}
+    assert evaluate_falsification_condition(ast1, {"price": 50})["is_falsified"] is False
+    ast2 = {"logic": {"condition": "OR", "rules": [
+        {"metric": "unknown_metric", "operator": "<", "threshold": 10},
+        {"metric": "price", "operator": "<", "threshold": 100}
+    ]}}
+    assert evaluate_falsification_condition(ast2, {"price": 50})["is_falsified"] is True
+    ast3 = {"logic": {"condition": "AND", "rules": [
+        {"metric": "unknown_metric", "operator": "<", "threshold": 10},
+        {"metric": "price", "operator": "<", "threshold": 100}
+    ]}}
+    assert evaluate_falsification_condition(ast3, {"price": 50})["status"] == "DATA_UNAVAILABLE"
+    print("  [PASS] Test 34: Strong Kleene 3-Valued AST Logic")
+
 def test_baseline_tournament():
     """Validates 5-tier baseline tournament hierarchy (M0, M0b, M1, M4) with delta-skill ranking."""
     from core.calibration import run_baseline_tournament
@@ -672,7 +695,7 @@ def test_baseline_tournament():
     assert "M0_Persistence" in res["models"]
     assert "M0b_Drift" in res["models"]
     assert "M1_GEOMETRIC_FALLBACK" in res["models"]
-    assert "M4_Fitted_Structural_Hybrid" in res["models"]
+    assert "M4_GEOMETRIC_FALLBACK_STRUCTURAL" in res["models"]
     assert "incremental_skill" in res
     assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0
     print("  [PASS] Test 33: Multi-Model Tournament Hierarchy & Skill Delta Reporting")
@@ -732,9 +755,10 @@ if __name__ == "__main__":
     test_infold_structural_alpha_optimization()
     test_point_in_time_vintage_revision_leak_defense()
     test_probabilistic_calibration_pinball_and_wis()
+    test_strong_kleene_3_valued_logic()
     test_baseline_tournament()
     test_media_hill_corner_cases()
     print("=======================================================")
-    print("   ALL 34 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
+    print("   ALL 35 INSTITUTIONAL TEST SUITES PASSED (100% SUCCESS)")
     print("=======================================================\n")
 

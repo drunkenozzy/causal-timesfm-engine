@@ -1,5 +1,5 @@
 """
-CTE R3.2: Research Protocol Freeze & Inference Rigor CLI
+CTE R3.3: Final Research Protocol Seal CLI
 =========================================================
 Supported Modes:
   1. --mode crypto      : Ingests on-chain stablecoins, empirical series, runs TVTP filter & Theil's U gate.
@@ -24,7 +24,7 @@ from core.monitor_service import ContinuousMonitorService
 from core.calibration import run_baseline_tournament
 
 def main():
-    parser = argparse.ArgumentParser(description="CTE R3.2: Research Protocol Freeze & Inference Rigor")
+    parser = argparse.ArgumentParser(description="CTE R3.3: Final Research Protocol Seal")
     parser.add_argument("--mode", choices=["crypto", "housing", "macro", "monitor", "portfolio", "media"], default="crypto")
     parser.add_argument("--ticker", default="BTC-USD")
     parser.add_argument("--price", type=float, default=None)
@@ -45,14 +45,14 @@ def main():
     if args.tournament and args.history_file:
         from core.pipeline import load_history_series_with_metadata
         data = load_history_series_with_metadata(args.history_file)
-        print(f"\n[CTE R3.2: Research Protocol Freeze & Inference Rigor] Running 5-Tier Baseline Tournament on {args.history_file} ({len(data['values'])} points)...")
+        print(f"\n[CTE R3.3: Final Research Protocol Seal] Running 5-Tier Baseline Tournament on {args.history_file} ({len(data['values'])} points)...")
         tourney = run_baseline_tournament(data["values"], h=1, min_train_len=30)
         print(json.dumps(tourney, indent=2))
         return
 
     if args.mode == "crypto":
         price = args.price if args.price else 94000.0
-        print(f"\n[CTE R3.2: Research Protocol Freeze & Inference Rigor] Analyzing Crypto Asset: {args.ticker}...")
+        print(f"\n[CTE R3.3: Final Research Protocol Seal] Analyzing Crypto Asset: {args.ticker}...")
         res = pipeline.run_crypto_pipeline(ticker=args.ticker, current_price=price, history_file=args.history_file)
         print("\n" + res["summary"])
         if "forecast_id" in res:
@@ -60,21 +60,21 @@ def main():
 
     elif args.mode == "housing":
         price = args.price if args.price else 450000.0
-        print(f"\n[CTE R3.2: Research Protocol Freeze & Inference Rigor] Analyzing Real Estate: {args.postcode} (£{price:,.2f})...")
+        print(f"\n[CTE R3.3: Final Research Protocol Seal] Analyzing Real Estate: {args.postcode} (£{price:,.2f})...")
         res = pipeline.run_housing_pipeline(property_price=price, postcode=args.postcode, history_file=args.history_file)
         print("\n" + res["summary"])
         if "forecast_id" in res:
             print(f"\n[LEDGER] Immutable forecast record registered: ID={res['forecast_id']}")
 
     elif args.mode == "portfolio":
-        print("\n[CTE R3.2: Research Protocol Freeze & Inference Rigor] Analyzing Multi-Asset Portfolio...")
+        print("\n[CTE R3.3: Final Research Protocol Seal] Analyzing Multi-Asset Portfolio...")
         res = pipeline.run_portfolio_pipeline(holdings_str=args.holdings, file_path=args.file, history_file=args.history_file)
         print("\n" + res["summary"])
         if "forecast_id" in res:
             print(f"\n[LEDGER] Immutable forecast record registered: ID={res['forecast_id']}")
 
     elif args.mode == "media":
-        print(f"\n[CTE R3.2: Research Protocol Freeze & Inference Rigor] Analyzing Media Investment & Audience Attention...")
+        print(f"\n[CTE R3.3: Final Research Protocol Seal] Analyzing Media Investment & Audience Attention...")
         res = pipeline.run_media_pipeline(monthly_spend=args.spend, cpm=args.cpm, ec50_spend=args.ec50, k_max_impressions=args.kmax)
         print("\n" + res["summary"])
 
