@@ -15,7 +15,7 @@
     "significance_level": 0.05,
     "git_dirty": false,
     "nested_cv_design": "Rolling origin",
-    "commit_sha": "d3dbd5dddd6c5dc5b2122446da5827503433daa1",
+    "commit_sha": "TO_BE_ANCHORED_EXTERNALLY",
     "missing_data_policy": "AST 3-valued logic (DATA_UNAVAILABLE)",
     "bootstrap": {
         "null_recentering": true,
@@ -26,7 +26,7 @@
         "block_length_rule": "max(2, min(h, T // 3))"
     },
     "primary_confirmatory_hypothesis": "H1: MSPE(M4_TIMESFM_STRUCTURAL) < MSPE(M1_TIMESFM) for BTC-USD at h=1",
-    "engine_version": "CTE R3.3",
+    "engine_version": "CTE R3.4",
     "secondary_analyses": "EXPLORATORY",
     "fallback_policy": "If TimesFM fails to load, result is NOT_EVALUATED_RUNTIME_FAILURE",
     "protocol_version": "1.0.0",

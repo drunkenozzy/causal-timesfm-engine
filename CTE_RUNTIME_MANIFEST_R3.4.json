@@ -1,0 +1,28 @@
+{
+    "engine_version": "R3.4",
+    "git_commit": "TO_BE_ANCHORED_EXTERNALLY",
+    "git_dirty": false,
+    "environment": {
+        "python_version": "3.12.14",
+        "platform": "Windows-10-10.0.19045-SP0",
+        "os": "Windows"
+    },
+    "packages": {
+        "timesfm": "1.3.0",
+        "torch": "2.14.0",
+        "numpy": "2.5.3",
+        "scipy": "1.18.1",
+        "yfinance": "1.7.0"
+    },
+    "timesfm_model_spec": {
+        "checkpoint_repository": "google/timesfm-2.0-500m-pytorch",
+        "hparams": {
+            "backend": "cpu",
+            "per_core_batch_size": 1,
+            "horizon_len": 90,
+            "num_layers": 50,
+            "context_len": 2048,
+            "use_positional_embedding": false
+        }
+    }
+}
