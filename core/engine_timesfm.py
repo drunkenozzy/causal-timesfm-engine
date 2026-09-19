@@ -25,7 +25,10 @@ class TimesFmBaselineEngine:
                 hparams=timesfm.TimesFmHparams(
                     backend=self.backend,
                     per_core_batch_size=1,
-                    horizon_len=max(90, required_horizon)
+                    horizon_len=max(90, required_horizon),
+                    num_layers=50,
+                    context_len=2048,
+                    use_positional_embedding=False
                 ),
                 checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=self.repo_id)
             )

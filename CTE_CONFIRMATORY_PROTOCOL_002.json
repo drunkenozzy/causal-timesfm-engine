@@ -1,0 +1,52 @@
+{
+    "models": {
+        "M0": "Persistence",
+        "M1": "M1_TIMESFM",
+        "M4": "M4_TIMESFM_STRUCTURAL",
+        "M0b": "Drift"
+    },
+    "clark_west": {
+        "kernel": "Bartlett",
+        "lag_rule": "h - 1",
+        "alternative": "greater"
+    },
+    "primary_horizon": 1,
+    "minimum_oos_origins": 30,
+    "significance_level": 0.05,
+    "git_dirty": false,
+    "nested_cv_design": "Rolling origin",
+    "commit_sha": "d3dbd5dddd6c5dc5b2122446da5827503433daa1",
+    "missing_data_policy": "AST 3-valued logic (DATA_UNAVAILABLE)",
+    "bootstrap": {
+        "null_recentering": true,
+        "replications": 1000,
+        "effect_ci_recentering": false,
+        "method": "moving_block",
+        "random_seed": 42,
+        "block_length_rule": "max(2, min(h, T // 3))"
+    },
+    "primary_confirmatory_hypothesis": "H1: MSPE(M4_TIMESFM_STRUCTURAL) < MSPE(M1_TIMESFM) for BTC-USD at h=1",
+    "engine_version": "CTE R3.3",
+    "secondary_analyses": "EXPLORATORY",
+    "fallback_policy": "If TimesFM fails to load, result is NOT_EVALUATED_RUNTIME_FAILURE",
+    "protocol_version": "1.0.0",
+    "alpha_search_procedure": "Nested CV (h-step alignment, inner train=5)",
+    "primary_metric": "MSPE",
+    "primary_market": "BTC-USD",
+    "protocol_id": "CTE_CONFIRMATORY_PROTOCOL_002",
+    "version": "002",
+    "engine_configuration": {
+        "engine_version": "R3.4",
+        "m1_baseline": "TimesFM",
+        "timesfm_configuration": {
+            "checkpoint": "google/timesfm-2.0-500m-pytorch",
+            "backend": "cpu",
+            "per_core_batch_size": 1,
+            "horizon_len": 90,
+            "num_layers": 50,
+            "context_len": 2048,
+            "use_positional_embedding": false
+        }
+    },
+    "reason_for_fork": "Implementation correction only: canonical TimesFM 2.0 runtime configuration. No outcome-driven model or hypothesis change."
+}

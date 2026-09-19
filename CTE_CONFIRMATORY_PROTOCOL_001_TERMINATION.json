@@ -1,0 +1,7 @@
+﻿{
+    "protocol_id": "CTE_CONFIRMATORY_PROTOCOL_001",
+    "terminal_status": "NOT_EVALUATED_PRE_OUTCOME_IMPLEMENTATION_DEFECT",
+    "termination_date_utc": "2026-09-19T00:46:00Z",
+    "defect_description": "The frozen core/engine_timesfm.py omitted num_layers=50, context_len=2048, and use_positional_embedding=False required for TimesFM 2.0 500M checkpoints. The frozen engine instantiated an incompatible architecture and could not execute the intended M1 TimesFM baseline.",
+    "resolution": "Protocol 001 terminated pre-outcome. No registered BTC holdout outcomes were inspected. Protocol 001's BTC holdout will remain unopened permanently to prevent leakage into future protocols."
+}

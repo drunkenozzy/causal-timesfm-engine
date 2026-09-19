@@ -694,7 +694,7 @@ def test_baseline_tournament():
     assert "models" in res
     assert "M0_Persistence" in res["models"]
     assert "M0b_Drift" in res["models"]
-    assert "M1_GEOMETRIC_FALLBACK" in res["models"]
+    assert "TimesFM-Neural" in res["models"]
     assert "M4_GEOMETRIC_FALLBACK_STRUCTURAL" in res["models"]
     assert "incremental_skill" in res
     assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0

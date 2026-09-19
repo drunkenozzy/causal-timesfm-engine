@@ -1,0 +1,14 @@
+﻿{
+    "holdout_id": "CTE_CONFIRMATORY_HOLDOUT_002",
+    "asset": "BTC-USD",
+    "provider": "Yahoo Finance (yfinance)",
+    "granularity": "1d (daily close UTC)",
+    "observations_range_inclusive": ["2026-09-20", "2026-10-20"],
+    "total_daily_closes": 31,
+    "confirmatory_origins": ["2026-09-20", "2026-10-19"],
+    "total_origins": 30,
+    "target_dates": ["2026-09-21", "2026-10-20"],
+    "earliest_permitted_execution_utc": "2026-10-21T00:05:00Z",
+    "status": "PROSPECTIVE_SEALED",
+    "associated_protocol": "CTE_CONFIRMATORY_PROTOCOL_002"
+}
