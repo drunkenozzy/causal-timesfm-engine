@@ -8,7 +8,8 @@ def get_git_info():
         git_exe = r"C:\Users\Ozgur\AppData\Local\GitHubDesktop\app-3.6.4\resources\app\git\cmd\git.exe"
         sha = subprocess.check_output([git_exe, "rev-parse", "HEAD"]).decode("utf-8").strip()
         status = subprocess.check_output([git_exe, "status", "--porcelain"]).decode("utf-8").strip()
-        is_dirty = len(status) > 0
+        lines = [line for line in status.split('\n') if line and not ('CTE_RUNTIME_MANIFEST' in line or 'SHADOW_LEDGER' in line or 'shadow_eth_history' in line)]
+        is_dirty = len(lines) > 0
         return sha, is_dirty
     except Exception as e:
         return "UNKNOWN_COMMIT", True
@@ -53,5 +54,3 @@ manifest = {
 
 with open("CTE_RUNTIME_MANIFEST_R3.4.json", "w", encoding="utf-8") as f:
     json.dump(manifest, f, indent=4)
-
-print(json.dumps(manifest, indent=4))

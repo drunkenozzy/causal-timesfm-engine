@@ -695,7 +695,7 @@ def test_baseline_tournament():
     assert "M0_Persistence" in res["models"]
     assert "M0b_Drift" in res["models"]
     assert "TimesFM-Neural" in res["models"]
-    assert "M4_GEOMETRIC_FALLBACK_STRUCTURAL" in res["models"]
+    assert "M4_TIMESFM_STRUCTURAL" in res["models"]
     assert "incremental_skill" in res
     assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0
     print("  [PASS] Test 33: Multi-Model Tournament Hierarchy & Skill Delta Reporting")
