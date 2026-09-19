@@ -1,0 +1,35 @@
+﻿{
+    "report_id": "CTE_PROTOCOL_002_VALIDATION_REPORT",
+    "timestamp_utc": "2026-09-19T01:08:00Z",
+    "environment": {
+        "python_version": "3.12.14",
+        "packages": {
+            "timesfm": "1.3.0",
+            "torch": "2.14.0",
+            "pytest": "9.1.1"
+        }
+    },
+    "canonical_smoke_test": {
+        "command": "uv run --with 'timesfm==1.3.0' python -c 'import timesfm; tfm = timesfm.TimesFm(hparams=..., checkpoint=...); tfm.forecast(...)'",
+        "result": "SUCCESS",
+        "timesfm_executed": true,
+        "degraded_mode": false,
+        "engine_identity": "M1_TIMESFM",
+        "checkpoint_identity": "google/timesfm-2.0-500m-pytorch",
+        "extraction_result": {
+            "p10": 7.8064,
+            "p50": 7.9205,
+            "p90": 8.3133
+        }
+    },
+    "pytest_execution": {
+        "command": "pytest tests/",
+        "result": "39 passed in 55.61s",
+        "status": "PASS"
+    },
+    "bindings": {
+        "protocol_sha256": "4229e368a8b927d704c63c612320196fd3fc85dd584451467dd4e6c0e2ae2831",
+        "runtime_manifest_sha256": "256c70631c8da39c683a90985bfe412516a7445cb0a481fdb891d2c14686dcaf",
+        "external_anchor_parent": "2b94f234f1af0c6b6e64f5180954811aa5dc4682"
+    }
+}

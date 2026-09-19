@@ -10,5 +10,13 @@
     "target_dates": ["2026-09-21", "2026-10-20"],
     "earliest_permitted_execution_utc": "2026-10-21T00:05:00Z",
     "status": "PROSPECTIVE_SEALED",
-    "associated_protocol": "CTE_CONFIRMATORY_PROTOCOL_002"
+    "associated_protocol": "CTE_CONFIRMATORY_PROTOCOL_002",
+    "bindings": {
+        "protocol_id": "CTE_CONFIRMATORY_PROTOCOL_002",
+        "protocol_sha256": "4229e368a8b927d704c63c612320196fd3fc85dd584451467dd4e6c0e2ae2831",
+        "runtime_manifest_sha256": "256c70631c8da39c683a90985bfe412516a7445cb0a481fdb891d2c14686dcaf",
+        "protocol_001_termination_sha256": "0b01b101e2a7abc6fda50994765ecb354f93390707bcb60b991ac3dad072faaf",
+        "external_anchor_parent": "2b94f234f1af0c6b6e64f5180954811aa5dc4682",
+        "registration_utc_timestamp": "2026-09-19T01:07:00Z"
+    }
 }

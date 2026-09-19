@@ -1,4 +1,4 @@
-__pycache__/
+﻿__pycache__/
 *.py[cod]
 *.class
 .venv/
@@ -8,3 +8,5 @@ venv/
 .DS_Store
 Thumbs.db
 .pytest_cache/
+*_SHADOW_LEDGER.json
+shadow_eth_history.csv
