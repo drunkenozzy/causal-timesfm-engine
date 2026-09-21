@@ -36,14 +36,14 @@ def get_last_trading_day(target_dt):
         return target_dt - timedelta(days=1)
 
 def apply_fx_mechanism(df_hist, m1_p50):
-    \"\"\"
+    """
     Data-driven exploratory M4-FX mechanism (USD/TRY).
     We run a trailing regression on recent data to find the relationship between:
     - delta DXY (Dollar Index)
     - delta US10Y Yield
     - delta Brent Oil (Turkey is a net energy importer)
     and the next-day USD/TRY return.
-    \"\"\"
+    """
     df = df_hist.copy()
     
     # Calculate daily differences (deltas)
