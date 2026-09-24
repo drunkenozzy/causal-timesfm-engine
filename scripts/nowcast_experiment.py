@@ -56,6 +56,24 @@ def run_nowcast(ticker="ETH-USD", interval="5m"):
     print(f"  Bearish (p10) : {p10:.4f}")
     print(f"  Bullish (p90) : {p90:.4f}")
     print("="*50 + "\n")
+    
+    result = {
+        "ticker": ticker,
+        "interval": interval,
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "last_bar_time": str(last_time),
+        "current_price": current_price,
+        "p50": p50,
+        "p10": p10,
+        "p90": p90,
+        "pct_change": pct_change
+    }
+    
+    import json
+    with open("NOWCAST_LEDGER.json", "w") as f:
+        json.dump(result, f, indent=4)
+        
+    return result
 
 if __name__ == "__main__":
     run_nowcast(ticker="ETH-USD", interval="5m")
