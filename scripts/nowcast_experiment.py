@@ -4,38 +4,40 @@ import pandas as pd
 from datetime import datetime, timezone
 sys.path.append(os.path.abspath('.'))
 
-import yfinance as yf
+import ccxt
 from core.engine_timesfm import TimesFmBaselineEngine
 
 def run_nowcast(ticker="ETH-USD", interval="5m"):
-    print(f"\n[Nowcast] Fetching {interval} data for {ticker} from Yahoo Finance...")
+    print(f"\n[Nowcast] Fetching {interval} data for {ticker} from Binance via CCXT...")
     
-    period = "7d" if interval in ["1m", "5m"] else "1mo"
-    df = yf.download(ticker, period=period, interval=interval, progress=False)
+    exchange = ccxt.binance()
+    ccxt_symbol = 'ETH/USDT'
+    limit = 500
+    ohlcv = exchange.fetch_ohlcv(ccxt_symbol, timeframe=interval, limit=limit)
     
-    if df.empty:
-        print("[Nowcast] Failed to fetch data. Market might be closed or ticker invalid.")
+    if not ohlcv:
+        print("[Nowcast] Failed to fetch data.")
         return
         
+    df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    df['datetime'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('datetime', inplace=True)
+    df.index = df.index.tz_localize('UTC').tz_localize(None)
+    df.rename(columns={'close': 'Close'}, inplace=True)
+    
     print(f"[Nowcast] Fetched {len(df)} historical {interval} bars.")
     last_time = df.index[-1]
     
     # Safely extract the float value
     close_col = df['Close']
-    if isinstance(close_col, pd.DataFrame):
-        current_price = float(close_col.iloc[-1].iloc[0])
-    else:
-        current_price = float(close_col.iloc[-1])
+    current_price = float(close_col.iloc[-1])
         
     print(f"[Nowcast] Last recorded bar time: {last_time} | Close: {current_price:.4f}")
     
     print("[Nowcast] Initializing TimesFM Neural Network...")
     tfm = TimesFmBaselineEngine()
     
-    if isinstance(close_col, pd.DataFrame):
-        hist = close_col.iloc[:, 0].tolist()
-    else:
-        hist = close_col.tolist()
+    hist = close_col.tolist()
     
     res = tfm.forecast(hist, horizon_days=1)
     

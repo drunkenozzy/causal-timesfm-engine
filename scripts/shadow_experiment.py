@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --------------------------------------------------
 
-import yfinance as yf
+import ccxt
 import pandas as pd
 import json
 from datetime import datetime, timezone, timedelta
@@ -17,15 +17,19 @@ from core.forecast_ledger import ImmutableForecastLedger
 
 LEDGER_FILE = 'ETH_SHADOW_LEDGER.json'
 
+def fetch_eth_data():
+    exchange = ccxt.binance()
+    ohlcv = exchange.fetch_ohlcv('ETH/USDT', timeframe='1d', limit=365)
+    df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    df['datetime'] = pd.to_datetime(df['timestamp'], unit='ms')
+    df.set_index('datetime', inplace=True)
+    df.index = df.index.tz_localize('UTC').tz_localize(None)
+    df.rename(columns={'close': 'Close'}, inplace=True)
+    return df[['Close']].copy()
+
 def run_shadow():
-    print("[Shadow] Fetching ETH-USD history from Yahoo Finance...")
-    ticker = yf.Ticker("ETH-USD")
-    df = ticker.history(period="1y", interval="1d")
-    df = df[['Close']].copy()
-    
-    if df.index.tz is not None:
-        df.index = df.index.tz_convert('UTC')
-    df.index = df.index.tz_localize(None)
+    print("[Shadow] Fetching ETH-USD history from Binance via CCXT...")
+    df = fetch_eth_data()
     
     now_utc = datetime.now(timezone.utc)
     today_date_str = now_utc.strftime('%Y-%m-%d')
@@ -119,10 +123,7 @@ def run_shadow():
         ledger[target_date]["forecast"] = forecast_entry
         print(f"[Shadow] Recorded forecast for {target_date}: M1={m1_pred:.2f}, M4={m4_pred:.2f}")
 
-    df_all = ticker.history(period="1y", interval="1d")
-    if df_all.index.tz is not None:
-        df_all.index = df_all.index.tz_convert('UTC')
-    df_all.index = df_all.index.tz_localize(None)
+    df_all = fetch_eth_data()
     
     ledger_obj = ImmutableForecastLedger()
     

@@ -1,6 +1,6 @@
 import os
 import sys
-import yfinance as yf
+from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import json
 import numpy as np
@@ -9,21 +9,20 @@ from sklearn.linear_model import LinearRegression
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
 from core.engine_timesfm import TimesFmBaselineEngine
 from core.forecast_ledger import ImmutableForecastLedger
 
 LEDGER_FILE = 'OIL_SHADOW_LEDGER.json'
 
 def get_oil_data(ticker_symbol):
-    ticker = yf.Ticker(ticker_symbol)
-    df = ticker.history(period="2y", interval="1d")
-    df = df[['Close']].copy()
-    if df.index.tz is not None:
-        df.index = df.index.tz_convert('UTC')
-    df.index = df.index.tz_localize(None).normalize()
-    df = df[~df.index.duplicated(keep='last')]
-    return df
+    tv = TvDatafeed()
+    df = tv.get_hist(symbol='BRENTCMDUSD', exchange='TVC', interval=Interval.in_daily, n_bars=500)
+    if df is not None:
+        df.index = df.index.tz_localize(None).normalize()
+        df.rename(columns={'close': 'Close'}, inplace=True)
+        df = df[~df.index.duplicated(keep='last')]
+        return df[['Close']].copy()
+    return pd.DataFrame()
 
 def get_last_trading_day(target_dt):
     if target_dt.weekday() == 0: 

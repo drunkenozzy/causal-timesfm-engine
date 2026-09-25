@@ -10,3 +10,6 @@ streamlit>=1.28.0
 # Optional: Heavy Foundation Model Weights (Only needed if running local 200M/500M inference)
 # torch>=2.1.0
 # timesfm>=2.0.0
+
+ccxt>=4.0.0
+tvdatafeed>=2.1.0
