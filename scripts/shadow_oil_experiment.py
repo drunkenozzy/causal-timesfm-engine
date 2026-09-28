@@ -1,6 +1,5 @@
 import os
 import sys
-from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import json
 import numpy as np
@@ -10,19 +9,13 @@ from sklearn.linear_model import LinearRegression
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.engine_timesfm import TimesFmBaselineEngine
-from core.forecast_ledger import ImmutableForecastLedger
+from scripts.shadow_data import (ROOT, ETH_SOURCE, tv_source, fetch_eth_close,
+    fetch_tv_close, snapshot_hash, event_ledger, registration_still_open)
 
-LEDGER_FILE = 'OIL_SHADOW_LEDGER.json'
+LEDGER_FILE = str(ROOT / 'OIL_V2_SHADOW_LEDGER.json')
 
 def get_oil_data(ticker_symbol, exchange='TVC'):
-    tv = TvDatafeed()
-    df = tv.get_hist(symbol=ticker_symbol, exchange=exchange, interval=Interval.in_daily, n_bars=500)
-    if df is not None:
-        df.index = df.index.tz_localize(None).normalize()
-        df.rename(columns={'close': 'Close'}, inplace=True)
-        df = df[~df.index.duplicated(keep='last')]
-        return df[['Close']].copy()
-    return pd.DataFrame()
+    return fetch_tv_close(ticker_symbol, exchange)
 
 def get_last_trading_day(target_dt):
     if target_dt.weekday() == 0: 
@@ -87,10 +80,13 @@ def apply_oil_mechanism(df_hist, m1_p50):
 
 def run_shadow():
     print("[Shadow] Fetching OIL history from TvDatafeed...")
-    df_brent = get_oil_data("BRENTCMDUSD", "TVC")
-    df_wti = get_oil_data("WTICMDUSD", "TVC")
+    df_brent = get_oil_data("UKOIL", "TVC")
+    df_wti = get_oil_data("USOIL", "TVC")
     df_dxy = get_oil_data("DXY", "TVC")
     
+    if any(frame.empty for frame in (df_brent, df_wti, df_dxy)):
+        print('[Shadow] DATA_NOT_READY - missing oil input')
+        return
     df = pd.concat([df_brent['Close'], df_wti['Close'], df_dxy['Close']], axis=1, join='inner')
     df.columns = ['Brent', 'WTI', 'DXY']
     
@@ -116,7 +112,7 @@ def run_shadow():
     target_date = today_date_str
     
     if training_end != expected_training_end:
-        print(f"[Shadow] DATA_NOT_READY - Yahoo returned last bar {training_end}, but expected {expected_training_end}")
+        print(f"[Shadow] DATA_NOT_READY - Provider returned last bar {training_end}, but expected {expected_training_end}")
         return
         
     print(f"[Shadow] Generating prospective forecast for target date: {target_date}")
@@ -142,18 +138,27 @@ def run_shadow():
         
         m4_pred, economic_return_adjustment = apply_oil_mechanism(df_cut, m1_pred)
         
-        ledger_obj = ImmutableForecastLedger()
+        ledger_obj = event_ledger("OIL")
+        if not registration_still_open(target_date):
+            return
+        input_sources = {name: tv_source(name) for name in ('Brent', 'WTI', 'DXY')}
+        input_hash = snapshot_hash(df_cut, input_sources)
         registered = ledger_obj.record_forecast(
-            asset_name="Brent Crude (BZ=F)",
+            dataset_hash=input_hash,
+            data_cutoff_timestamp=training_end,
+            asset_name="Brent Crude (TVC:UKOIL)",
             origin_timestamp=training_end,
             horizon_steps=1,
             frequency="D",
             raw_prior=m1_res,
             scenario_corridors={"expected_target": m4_pred, "economic_return_adjustment": economic_return_adjustment},
-            falsification_object={"contract_roll": "Yahoo continuous/front-month-derived futures series"},
+            falsification_object={"instrument": "TVC:UKOIL provider series; not Yahoo BZ=F"},
             allocation_output={},
             metadata={
-                "experiment_id": "M4_OIL_SPREAD_V1",
+                "input_sources": input_sources,
+                "data_snapshot_sha256": input_hash,
+                "series_version": 2,
+                "experiment_id": "M4_OIL_SPREAD_V2",
                 "m1_forecast": m1_pred,
                 "m4_forecast": m4_pred,
                 "economic_return_adjustment": economic_return_adjustment,
@@ -167,7 +172,10 @@ def run_shadow():
         print(f"[Shadow] Registered to immutable ledger: {registered['forecast_id']}")
         
         forecast_entry = {
-            "generated_at_utc": now_utc.isoformat(),
+            "generated_at_utc": registered["registered_at_utc"],
+            "input_sources": input_sources,
+            "data_snapshot_sha256": input_hash,
+            "series_version": 2,
             "training_end_date": training_end,
             "target_date": target_date,
             "m1_forecast": m1_pred,
@@ -175,7 +183,7 @@ def run_shadow():
             "actual_close": None,
             "m1_error": None,
             "m4_error": None,
-            "experiment_status": "EXPLORATORY" if timesfm_executed else "EXPLORATORY_RUNTIME_FAILURE",
+            "experiment_status": "EXPLORATORY" if timesfm_executed and not degraded else "EXPLORATORY_RUNTIME_FAILURE",
             "forecast_id": registered["forecast_id"]
         }
         
@@ -184,8 +192,8 @@ def run_shadow():
         ledger[target_date]["forecast"] = forecast_entry
         print(f"[Shadow] Recorded forecast for {target_date}: M1={m1_pred:.2f}, M4={m4_pred:.2f}")
 
-    df_all = get_oil_data("BZ=F")
-    ledger_obj = ImmutableForecastLedger()
+    df_all = df_brent
+    ledger_obj = event_ledger("OIL")
     
     for t_date, data in ledger.items():
         if t_date < target_date:
@@ -209,7 +217,7 @@ def run_shadow():
                                 forecast_id=fcst["forecast_id"],
                                 realized_actual=float(actual),
                                 secondary_metrics={"m1_error": fcst.get("m1_error"), "m4_error": fcst.get("m4_error")},
-                                notes="M4_OIL_SPREAD_V1 daily resolution"
+                                notes="M4_OIL_SPREAD_V2 daily resolution"
                             )
                             print(f"[Shadow] Successfully resolved {fcst['forecast_id']} in immutable ledger.")
                         except Exception as e:

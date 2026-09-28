@@ -1,6 +1,5 @@
 import os
 import sys
-from tvDatafeed import TvDatafeed, Interval
 import pandas as pd
 import json
 import numpy as np
@@ -10,19 +9,13 @@ from sklearn.linear_model import LinearRegression
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.engine_timesfm import TimesFmBaselineEngine
-from core.forecast_ledger import ImmutableForecastLedger
+from scripts.shadow_data import (ROOT, ETH_SOURCE, tv_source, fetch_eth_close,
+    fetch_tv_close, snapshot_hash, event_ledger, registration_still_open)
 
-LEDGER_FILE = 'FX_SHADOW_LEDGER.json'
+LEDGER_FILE = str(ROOT / 'FX_V2_SHADOW_LEDGER.json')
 
 def get_fx_data(ticker_symbol, exchange='TVC'):
-    tv = TvDatafeed()
-    df = tv.get_hist(symbol=ticker_symbol, exchange=exchange, interval=Interval.in_daily, n_bars=500)
-    if df is not None:
-        df.index = df.index.tz_localize(None).normalize()
-        df.rename(columns={'close': 'Close'}, inplace=True)
-        df = df[~df.index.duplicated(keep='last')]
-        return df[['Close']].copy()
-    return pd.DataFrame()
+    return fetch_tv_close(ticker_symbol, exchange)
 
 def get_last_trading_day(target_dt):
     if target_dt.weekday() == 0: 
@@ -92,8 +85,11 @@ def run_shadow():
     df_try = get_fx_data("USDTRY", "FX_IDC")
     df_dxy = get_fx_data("DXY", "TVC")
     df_tnx = get_fx_data("US10Y", "TVC")
-    df_oil = get_fx_data("BRENTCMDUSD", "TVC")
+    df_oil = get_fx_data("UKOIL", "TVC")
     
+    if any(frame.empty for frame in (df_try, df_dxy, df_tnx, df_oil)):
+        print('[Shadow] DATA_NOT_READY - missing FX input')
+        return
     df = pd.concat([df_try['Close'], df_dxy['Close'], df_tnx['Close'], df_oil['Close']], axis=1, join='inner')
     df.columns = ['TRY', 'DXY', 'TNX', 'Brent']
     
@@ -119,7 +115,7 @@ def run_shadow():
     target_date = today_date_str
     
     if training_end != expected_training_end:
-        print(f"[Shadow] DATA_NOT_READY - Yahoo returned last bar {training_end}, but expected {expected_training_end}")
+        print(f"[Shadow] DATA_NOT_READY - Provider returned last bar {training_end}, but expected {expected_training_end}")
         return
         
     print(f"[Shadow] Generating prospective forecast for target date: {target_date}")
@@ -145,18 +141,27 @@ def run_shadow():
         
         m4_pred, economic_return_adjustment = apply_fx_mechanism(df_cut, m1_pred)
         
-        ledger_obj = ImmutableForecastLedger()
+        ledger_obj = event_ledger("FX")
+        if not registration_still_open(target_date):
+            return
+        input_sources = {name: tv_source(name) for name in ('TRY', 'DXY', 'TNX', 'Brent')}
+        input_hash = snapshot_hash(df_cut, input_sources)
         registered = ledger_obj.record_forecast(
-            asset_name="USD/TRY (TRY=X)",
+            dataset_hash=input_hash,
+            data_cutoff_timestamp=training_end,
+            asset_name="USD/TRY (FX_IDC:USDTRY)",
             origin_timestamp=training_end,
             horizon_steps=1,
             frequency="D",
             raw_prior=m1_res,
             scenario_corridors={"expected_target": m4_pred, "economic_return_adjustment": economic_return_adjustment},
-            falsification_object={"fx_convention": "NY close / Yahoo standard"},
+            falsification_object={"fx_convention": "TradingView provider daily session label"},
             allocation_output={},
             metadata={
-                "experiment_id": "M4_FX_MARKET_MACRO_V1",
+                "input_sources": input_sources,
+                "data_snapshot_sha256": input_hash,
+                "series_version": 2,
+                "experiment_id": "M4_FX_MARKET_MACRO_V2",
                 "m1_forecast": m1_pred,
                 "m4_forecast": m4_pred,
                 "economic_return_adjustment": economic_return_adjustment,
@@ -170,7 +175,10 @@ def run_shadow():
         print(f"[Shadow] Registered to immutable ledger: {registered['forecast_id']}")
         
         forecast_entry = {
-            "generated_at_utc": now_utc.isoformat(),
+            "generated_at_utc": registered["registered_at_utc"],
+            "input_sources": input_sources,
+            "data_snapshot_sha256": input_hash,
+            "series_version": 2,
             "training_end_date": training_end,
             "target_date": target_date,
             "m1_forecast": m1_pred,
@@ -178,7 +186,7 @@ def run_shadow():
             "actual_close": None,
             "m1_error": None,
             "m4_error": None,
-            "experiment_status": "EXPLORATORY" if timesfm_executed else "EXPLORATORY_RUNTIME_FAILURE",
+            "experiment_status": "EXPLORATORY" if timesfm_executed and not degraded else "EXPLORATORY_RUNTIME_FAILURE",
             "forecast_id": registered["forecast_id"]
         }
         
@@ -187,8 +195,8 @@ def run_shadow():
         ledger[target_date]["forecast"] = forecast_entry
         print(f"[Shadow] Recorded forecast for {target_date}: M1={m1_pred:.2f}, M4={m4_pred:.2f}")
 
-    df_all = get_fx_data("TRY=X")
-    ledger_obj = ImmutableForecastLedger()
+    df_all = df_try
+    ledger_obj = event_ledger("FX")
     
     for t_date, data in ledger.items():
         if t_date < target_date:
@@ -212,7 +220,7 @@ def run_shadow():
                                 forecast_id=fcst["forecast_id"],
                                 realized_actual=float(actual),
                                 secondary_metrics={"m1_error": fcst.get("m1_error"), "m4_error": fcst.get("m4_error")},
-                                notes="M4_FX_MARKET_MACRO_V1 daily resolution"
+                                notes="M4_FX_MARKET_MACRO_V2 daily resolution"
                             )
                             print(f"[Shadow] Successfully resolved {fcst['forecast_id']} in immutable ledger.")
                         except Exception as e:

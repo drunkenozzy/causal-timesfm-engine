@@ -10,3 +10,8 @@ Thumbs.db
 .pytest_cache/
 *_SHADOW_LEDGER.json
 shadow_eth_history.csv
+
+# Exploratory V2 outputs; frozen BTC artifacts remain tracked
+data/shadow_v2/
+shadow_eth_v2_history.csv
+network_outputs/

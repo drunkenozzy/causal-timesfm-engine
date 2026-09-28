@@ -7,23 +7,18 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --------------------------------------------------
 
-import yfinance as yf
 import pandas as pd
 import json
 from datetime import datetime, timezone, timedelta
 
 from core.pipeline import CausalTimesFmPipeline
-from core.forecast_ledger import ImmutableForecastLedger
+from scripts.shadow_data import (ROOT, ETH_SOURCE, tv_source, fetch_eth_close,
+    fetch_tv_close, snapshot_hash, event_ledger, registration_still_open)
 
-LEDGER_FILE = 'ETH_SHADOW_LEDGER.json'
+LEDGER_FILE = str(ROOT / 'ETH_V2_SHADOW_LEDGER.json')
 
 def fetch_eth_data():
-    df = yf.download('ETH-USD', period='1y', interval='1d', progress=False)
-    if not df.empty:
-        df.index = df.index.tz_localize(None).normalize()
-        df.rename(columns={'close': 'Close'}, inplace=True)
-        return df[['Close']].copy()
-    return pd.DataFrame()
+    return fetch_eth_close()
 
 def run_shadow():
     print("[Shadow] Fetching ETH-USD history from Yahoo Finance...")
@@ -33,6 +28,9 @@ def run_shadow():
     today_date_str = now_utc.strftime('%Y-%m-%d')
     
     df = df[df.index.strftime('%Y-%m-%d') < today_date_str]
+    if df.empty:
+        print('[Shadow] DATA_NOT_READY - no closed ETH bars')
+        return
     training_end = df.index[-1].strftime('%Y-%m-%d')
     
     print(f"[Shadow] Fetched {len(df)} historical daily closed bars. Last closed bar: {training_end}")
@@ -45,7 +43,7 @@ def run_shadow():
         print(f"         Yahoo returned last bar {training_end}, but expected {expected_training_end} for target {target_date}")
         return
         
-    csv_file = "shadow_eth_history.csv"
+    csv_file = str(ROOT / "shadow_eth_v2_history.csv")
     df.to_csv(csv_file, index_label="Date")
     
     print(f"[Shadow] Generating prospective forecast for target date: {target_date}")
@@ -60,6 +58,9 @@ def run_shadow():
         print(f"[Shadow] Forecast for {target_date} already exists in ledger. Skipping generation.")
     else:
         pipeline = CausalTimesFmPipeline()
+        # The shadow harness registers once, after checking its deadline.
+        from types import SimpleNamespace
+        pipeline.ledger = SimpleNamespace(record_forecast=lambda **kwargs: {"forecast_id": None})
         res = pipeline.run_crypto_pipeline(ticker="ETH-USD", history_file=csv_file, horizon_days=1)
         
         raw_prior = res.get("raw_prior", {})
@@ -79,8 +80,14 @@ def run_shadow():
         m1_engine = "M1_TIMESFM" if timesfm_executed else "M1_GEOMETRIC_FALLBACK"
         timesfm_version = raw_prior.get("provenance_note", "Unknown")
         
-        ledger_obj = ImmutableForecastLedger()
+        ledger_obj = event_ledger("ETH")
+        if not registration_still_open(target_date):
+            return
+        input_sources = {'ETH': ETH_SOURCE}
+        input_hash = snapshot_hash(df, input_sources)
         registered = ledger_obj.record_forecast(
+            dataset_hash=input_hash,
+            data_cutoff_timestamp=training_end,
             asset_name="ETH-USD",
             origin_timestamp=training_end,
             horizon_steps=1,
@@ -90,7 +97,10 @@ def run_shadow():
             falsification_object=res.get("falsifiability_object", {}),
             allocation_output=res.get("allocation", {}),
             metadata={
-                "experiment_id": "EXPLORATORY_SHADOW_CRYPTO_001",
+                "input_sources": input_sources,
+                "data_snapshot_sha256": input_hash,
+                "series_version": 2,
+                "experiment_id": "EXPLORATORY_SHADOW_CRYPTO_002",
                 "m1_forecast": m1_pred,
                 "m4_forecast": m4_pred,
                 "structural_alpha": alpha,
@@ -104,7 +114,10 @@ def run_shadow():
         print(f"[Shadow] Registered to immutable ledger: {registered['forecast_id']}")
         
         forecast_entry = {
-            "generated_at_utc": now_utc.isoformat(),
+            "generated_at_utc": registered["registered_at_utc"],
+            "input_sources": input_sources,
+            "data_snapshot_sha256": input_hash,
+            "series_version": 2,
             "training_end_date": training_end,
             "target_date": target_date,
             "m1_forecast": m1_pred,
@@ -112,7 +125,7 @@ def run_shadow():
             "actual_close": None,
             "m1_error": None,
             "m4_error": None,
-            "experiment_status": "EXPLORATORY" if timesfm_executed else "EXPLORATORY_RUNTIME_FAILURE",
+            "experiment_status": "EXPLORATORY" if timesfm_executed and not degraded else "EXPLORATORY_RUNTIME_FAILURE",
             "forecast_id": registered["forecast_id"]
         }
         
@@ -121,9 +134,9 @@ def run_shadow():
         ledger[target_date]["forecast"] = forecast_entry
         print(f"[Shadow] Recorded forecast for {target_date}: M1={m1_pred:.2f}, M4={m4_pred:.2f}")
 
-    df_all = fetch_eth_data()
+    df_all = df  # Resolve against the same provider snapshot used above.
     
-    ledger_obj = ImmutableForecastLedger()
+    ledger_obj = event_ledger("ETH")
     
     for t_date, data in ledger.items():
         if t_date < target_date:
@@ -150,7 +163,7 @@ def run_shadow():
                                     "m1_error": fcst.get("m1_error"),
                                     "m4_error": fcst.get("m4_error")
                                 },
-                                notes="EXPLORATORY_SHADOW_CRYPTO_001 daily resolution"
+                                notes="EXPLORATORY_SHADOW_CRYPTO_002 daily resolution"
                             )
                             print(f"[Shadow] Successfully resolved {fcst['forecast_id']} in immutable ledger.")
                         except Exception as e:
@@ -182,16 +195,17 @@ def run_shadow():
         m1_mspe = sum(m1_sq_errs) / len(m1_sq_errs)
         m4_mspe = sum(m4_sq_errs) / len(m4_sq_errs)
         print(f"\n--- ETH-USD - Day {valid_origins} ---")
-        fcst = ledger[list(ledger.keys())[-1]].get("forecast", {})
+        scored_dates = sorted(d for d, row in ledger.items() if row.get("forecast", {}).get("actual_close") is not None and row["forecast"].get("experiment_status") == "EXPLORATORY")
+        fcst = ledger[scored_dates[-1]]["forecast"]
         print(f"M1 forecast: {fcst.get('m1_forecast')}")
         print(f"M4 forecast: {fcst.get('m4_forecast')}")
         print(f"actual: {fcst.get('actual_close')}")
         print(f"M1 absolute error: {abs(fcst.get('m1_error')) if fcst.get('m1_error') is not None else None}")
         print(f"M4 absolute error: {abs(fcst.get('m4_error')) if fcst.get('m4_error') is not None else None}")
-        print(f"today's winner: {'M4' if fcst.get('m4_error') is not None and abs(fcst.get('m4_error')) < abs(fcst.get('m1_error')) else 'M1'}")
+        print(f"today's winner: {'M4' if fcst.get('m4_error') is not None and abs(fcst.get('m4_error')) < abs(fcst.get('m1_error')) else ('M1' if abs(fcst['m1_error']) < abs(fcst['m4_error']) else 'TIE')}")
         print(f"cumulative M1 MSPE: {m1_mspe:.4f}")
         print(f"cumulative M4 MSPE: {m4_mspe:.4f}")
-        delta_skill = 100 * (1 - m4_mspe / m1_mspe)
+        delta_skill = 100 * (1 - m4_mspe / m1_mspe) if m1_mspe > 0 else float("nan")
         print(f"cumulative Delta Skill: {delta_skill:+.2f}%")
         print(f"TimesFM executed: {'yes' if fcst.get('experiment_status') == 'EXPLORATORY' else 'no'}")
         print(f"economic weight / alpha: {alpha if 'alpha' in locals() else 'unknown'}")
