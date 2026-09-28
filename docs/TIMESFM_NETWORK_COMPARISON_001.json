@@ -1,0 +1,228 @@
+{
+  "manifest": {
+    "config": {
+      "experiment": "TIMESFM_NETWORK_COMPARISON_001",
+      "targets": [
+        "ETH",
+        "Brent",
+        "TRY"
+      ],
+      "window": 60,
+      "short_window": 20,
+      "min_train": 60,
+      "train_window": 252,
+      "ridge_penalty": 10.0,
+      "bootstrap_replications": 1000,
+      "bootstrap_block_length": 5,
+      "seed": 42,
+      "primary_metric": "next_joint_session_log_return_MSPE",
+      "secondary_metric": "price_MSPE",
+      "arms": [
+        "timesfm",
+        "timesfm_raw",
+        "timesfm_raw_network"
+      ],
+      "horizon": "next joint observed session; irregular calendar spacing",
+      "evaluation_type": "RETROSPECTIVE_EXPLORATORY"
+    },
+    "started_at_utc": "2026-09-28T22:53:17.386634+00:00",
+    "input_sha256": "2f686f69db53280971fe882c918ab4eb9e5cd2a308410dd20a0db09e9e60b66e",
+    "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+    "source_sha256": "a83e038b11fbcf66f97167f60fae5b4bda8271636827da0d98c5a148d6b68936",
+    "features_source_sha256": "07e70f758a03b9dab074595624c7217b46a27e8bc80cafa12e12c7c7042919d7",
+    "git_commit": "7d717c26b0b4bf14a9eb41516ba497a42a6f0800",
+    "git_dirty": false,
+    "runtime": {
+      "engine": "M1_TIMESFM",
+      "timesfm_executed": true,
+      "degraded_mode": false,
+      "checkpoint_repository": "google/timesfm-2.0-500m-pytorch",
+      "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+      "hparams": {
+        "context_len": 2048,
+        "horizon_len": 90,
+        "input_patch_len": 32,
+        "output_patch_len": 128,
+        "num_layers": 50,
+        "num_heads": 16,
+        "model_dims": 1280,
+        "per_core_batch_size": 1,
+        "backend": "cpu",
+        "quantiles": [
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9
+        ],
+        "use_positional_embedding": false,
+        "point_forecast_mode": "median"
+      },
+      "torch_threads": 4,
+      "python": "3.12.14",
+      "packages": {
+        "timesfm": "1.3.0",
+        "torch": "2.14.0",
+        "numpy": "2.5.3",
+        "pandas": "3.0.6"
+      }
+    },
+    "synthetic_smoke_prediction": 110.1006088256836
+  },
+  "completion": {
+    "elapsed_seconds": 53.11000000000058
+  },
+  "results": {
+    "ETH": {
+      "experiment": "TIMESFM_NETWORK_COMPARISON_001",
+      "evaluation_type": "RETROSPECTIVE_EXPLORATORY",
+      "status": "EXPLORATORY",
+      "target_asset": "ETH",
+      "origins": 32,
+      "primary_metric": "next_joint_session_log_return_MSPE",
+      "mspe": {
+        "timesfm": 0.0019324237852415818,
+        "timesfm_raw": 0.0017931078020511316,
+        "timesfm_raw_network": 0.0019421675276774198
+      },
+      "price_mspe": {
+        "timesfm": 9940.271337410444,
+        "timesfm_raw": 9199.70309378301,
+        "timesfm_raw_network": 9794.929475407956
+      },
+      "comparisons": {
+        "timesfm_raw_vs_timesfm": {
+          "skill_pct": 7.209390831061091,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -36.539486803140896,
+            16.557306834872247
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm": {
+          "skill_pct": -0.5042238928258724,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -51.7945240642038,
+            18.093647223072175
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm_raw": {
+          "skill_pct": -8.31292605250946,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -21.24598352971963,
+            6.182602342332834
+          ]
+        }
+      },
+      "limitations": [
+        "Only 32 evaluation origins in the original snapshot; uncertainty is large.",
+        "Uses the already-inspected historical snapshot; no untouched holdout claim.",
+        "Joint-session spacing is irregular and source close times differ.",
+        "Bootstrap intervals are descriptive, not adjusted for multiple experiments."
+      ],
+      "timesfm_executed": true,
+      "degraded_mode": false
+    },
+    "Brent": {
+      "experiment": "TIMESFM_NETWORK_COMPARISON_001",
+      "evaluation_type": "RETROSPECTIVE_EXPLORATORY",
+      "status": "EXPLORATORY",
+      "target_asset": "Brent",
+      "origins": 32,
+      "primary_metric": "next_joint_session_log_return_MSPE",
+      "mspe": {
+        "timesfm": 0.0033650401566259654,
+        "timesfm_raw": 0.003336427185247872,
+        "timesfm_raw_network": 0.0033216148454215224
+      },
+      "price_mspe": {
+        "timesfm": 28.41370311203035,
+        "timesfm_raw": 27.232347284290412,
+        "timesfm_raw_network": 27.52957416410488
+      },
+      "comparisons": {
+        "timesfm_raw_vs_timesfm": {
+          "skill_pct": 0.8503010379163678,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -24.082703659916902,
+            15.409718989458536
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm": {
+          "skill_pct": 1.290484189882135,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -23.209350529609534,
+            24.758628331901434
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm_raw": {
+          "skill_pct": 0.44395813257496197,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -10.64635660764013,
+            16.627079283273172
+          ]
+        }
+      },
+      "limitations": [
+        "Only 32 evaluation origins in the original snapshot; uncertainty is large.",
+        "Uses the already-inspected historical snapshot; no untouched holdout claim.",
+        "Joint-session spacing is irregular and source close times differ.",
+        "Bootstrap intervals are descriptive, not adjusted for multiple experiments."
+      ],
+      "timesfm_executed": true,
+      "degraded_mode": false
+    },
+    "TRY": {
+      "experiment": "TIMESFM_NETWORK_COMPARISON_001",
+      "evaluation_type": "RETROSPECTIVE_EXPLORATORY",
+      "status": "EXPLORATORY",
+      "target_asset": "TRY",
+      "origins": 32,
+      "primary_metric": "next_joint_session_log_return_MSPE",
+      "mspe": {
+        "timesfm": 1.2178596968572614e-06,
+        "timesfm_raw": 1.7043428199337659e-06,
+        "timesfm_raw_network": 1.4271444721474297e-06
+      },
+      "price_mspe": {
+        "timesfm": 0.0028260741171378355,
+        "timesfm_raw": 0.003939978409240845,
+        "timesfm_raw_network": 0.0032953995267931023
+      },
+      "comparisons": {
+        "timesfm_raw_vs_timesfm": {
+          "skill_pct": -39.94574451653954,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -93.70032905364725,
+            10.713671079283785
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm": {
+          "skill_pct": -17.184637592510565,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -58.320894996774854,
+            21.590547295199315
+          ]
+        },
+        "timesfm_raw_network_vs_timesfm_raw": {
+          "skill_pct": 16.26423654585576,
+          "descriptive_95pct_block_bootstrap_interval": [
+            -8.287034041811866,
+            27.654515491928134
+          ]
+        }
+      },
+      "limitations": [
+        "Only 32 evaluation origins in the original snapshot; uncertainty is large.",
+        "Uses the already-inspected historical snapshot; no untouched holdout claim.",
+        "Joint-session spacing is irregular and source close times differ.",
+        "Bootstrap intervals are descriptive, not adjusted for multiple experiments."
+      ],
+      "timesfm_executed": true,
+      "degraded_mode": false
+    }
+  }
+}

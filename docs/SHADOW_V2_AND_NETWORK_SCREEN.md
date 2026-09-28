@@ -1,5 +1,7 @@
 # Exploratory data fixes and network experiment
 
+Follow-up: the real three-way TimesFM comparison has now also been executed. See [feature rationale and neural results](NETWORK_FEATURES_AND_TIMESFM_RESULTS.md). The initial screening and validation record below is retained as historical evidence.
+
 ## Antigravity review
 
 Reviewed commit `8d9f88a9187b59471dd66cf849186e098374dc37` (28 September 2026). It fixes the hardcoded input ticker bug, but leaves the outcome-resolution calls using Yahoo tickers through TradingView (`BZ=F`, `TRY=X`). Its ETH download can also return multi-level columns or no rows, and the requirements omit yfinance while requesting tvDatafeed from PyPI rather than its documented Git source.
