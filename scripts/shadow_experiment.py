@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # --------------------------------------------------
 
-import ccxt
+import yfinance as yf
 import pandas as pd
 import json
 from datetime import datetime, timezone, timedelta
@@ -18,17 +18,15 @@ from core.forecast_ledger import ImmutableForecastLedger
 LEDGER_FILE = 'ETH_SHADOW_LEDGER.json'
 
 def fetch_eth_data():
-    exchange = ccxt.binance()
-    ohlcv = exchange.fetch_ohlcv('ETH/USDT', timeframe='1d', limit=365)
-    df = pd.DataFrame(ohlcv, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
-    df['datetime'] = pd.to_datetime(df['timestamp'], unit='ms')
-    df.set_index('datetime', inplace=True)
-    df.index = df.index.tz_localize('UTC').tz_localize(None)
-    df.rename(columns={'close': 'Close'}, inplace=True)
-    return df[['Close']].copy()
+    df = yf.download('ETH-USD', period='1y', interval='1d', progress=False)
+    if not df.empty:
+        df.index = df.index.tz_localize(None).normalize()
+        df.rename(columns={'close': 'Close'}, inplace=True)
+        return df[['Close']].copy()
+    return pd.DataFrame()
 
 def run_shadow():
-    print("[Shadow] Fetching ETH-USD history from Binance via CCXT...")
+    print("[Shadow] Fetching ETH-USD history from Yahoo Finance...")
     df = fetch_eth_data()
     
     now_utc = datetime.now(timezone.utc)

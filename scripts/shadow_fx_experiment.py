@@ -14,9 +14,9 @@ from core.forecast_ledger import ImmutableForecastLedger
 
 LEDGER_FILE = 'FX_SHADOW_LEDGER.json'
 
-def get_fx_data(ticker_symbol):
+def get_fx_data(ticker_symbol, exchange='TVC'):
     tv = TvDatafeed()
-    df = tv.get_hist(symbol='USDTRY', exchange='FX_IDC', interval=Interval.in_daily, n_bars=500)
+    df = tv.get_hist(symbol=ticker_symbol, exchange=exchange, interval=Interval.in_daily, n_bars=500)
     if df is not None:
         df.index = df.index.tz_localize(None).normalize()
         df.rename(columns={'close': 'Close'}, inplace=True)
@@ -88,11 +88,11 @@ def apply_fx_mechanism(df_hist, m1_p50):
     return m4_pred, expected_ret_adj
 
 def run_shadow():
-    print("[Shadow] Fetching FX history from Yahoo Finance...")
-    df_try = get_fx_data("TRY=X")
-    df_dxy = get_fx_data("DX-Y.NYB")
-    df_tnx = get_fx_data("^TNX")
-    df_oil = get_fx_data("BZ=F")
+    print("[Shadow] Fetching FX history from TvDatafeed...")
+    df_try = get_fx_data("USDTRY", "FX_IDC")
+    df_dxy = get_fx_data("DXY", "TVC")
+    df_tnx = get_fx_data("US10Y", "TVC")
+    df_oil = get_fx_data("BRENTCMDUSD", "TVC")
     
     df = pd.concat([df_try['Close'], df_dxy['Close'], df_tnx['Close'], df_oil['Close']], axis=1, join='inner')
     df.columns = ['TRY', 'DXY', 'TNX', 'Brent']

@@ -14,9 +14,9 @@ from core.forecast_ledger import ImmutableForecastLedger
 
 LEDGER_FILE = 'OIL_SHADOW_LEDGER.json'
 
-def get_oil_data(ticker_symbol):
+def get_oil_data(ticker_symbol, exchange='TVC'):
     tv = TvDatafeed()
-    df = tv.get_hist(symbol='BRENTCMDUSD', exchange='TVC', interval=Interval.in_daily, n_bars=500)
+    df = tv.get_hist(symbol=ticker_symbol, exchange=exchange, interval=Interval.in_daily, n_bars=500)
     if df is not None:
         df.index = df.index.tz_localize(None).normalize()
         df.rename(columns={'close': 'Close'}, inplace=True)
@@ -86,10 +86,10 @@ def apply_oil_mechanism(df_hist, m1_p50):
     return m4_pred, expected_ret_adj
 
 def run_shadow():
-    print("[Shadow] Fetching OIL history from Yahoo Finance...")
-    df_brent = get_oil_data("BZ=F")
-    df_wti = get_oil_data("CL=F")
-    df_dxy = get_oil_data("DX-Y.NYB")
+    print("[Shadow] Fetching OIL history from TvDatafeed...")
+    df_brent = get_oil_data("BRENTCMDUSD", "TVC")
+    df_wti = get_oil_data("WTICMDUSD", "TVC")
+    df_dxy = get_oil_data("DXY", "TVC")
     
     df = pd.concat([df_brent['Close'], df_wti['Close'], df_dxy['Close']], axis=1, join='inner')
     df.columns = ['Brent', 'WTI', 'DXY']
