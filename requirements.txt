@@ -12,4 +12,3 @@ streamlit>=1.28.0
 # timesfm>=2.0.0
 
 ccxt>=4.0.0
-tvdatafeed>=2.1.0
