@@ -1,0 +1,670 @@
+{
+  "manifest": {
+    "config": {
+      "experiment": "TRUST_SCREEN_001",
+      "evaluation_start": "2025-01-01",
+      "graph_calendar_days": 126,
+      "short_calendar_days": 42,
+      "min_pair_observations": 30,
+      "min_short_pair_observations": 12,
+      "max_source_age_days": 4,
+      "availability_hour_utc": 6,
+      "min_residual_train": 252,
+      "residual_train_window": 504,
+      "ridge_penalty": 10.0,
+      "context_observations": 512,
+      "bootstrap_replications": 1000,
+      "bootstrap_block_length": 10,
+      "seed": 42,
+      "primary_metric": "native_next_session_log_return_MSPE",
+      "secondary_metric": "price_MSPE",
+      "arms": [
+        "timesfm",
+        "raw_controls",
+        "raw_signed",
+        "raw_trust",
+        "raw_signed_trust"
+      ],
+      "promotion_policy": "RESEARCH_ONLY_NO_AUTOMATIC_DEPLOYMENT"
+    },
+    "created_at_utc": "2026-09-29T09:34:24.832471+00:00",
+    "input_manifest": {
+      "collection_started_utc": "2026-09-29T09:25:28.691385+00:00",
+      "requested_start": "2021-01-01",
+      "requested_tv_bars": 5000,
+      "sources": {
+        "ETH": {
+          "provider": "Yahoo Finance",
+          "symbol": "ETH-USD",
+          "quote": "USD",
+          "bar_convention": "UTC daily label",
+          "auto_adjust": false
+        },
+        "TRY": {
+          "provider": "TradingView/tvDatafeed",
+          "symbol": "USDTRY",
+          "exchange": "FX_IDC",
+          "bar_convention": "provider daily session label"
+        },
+        "DXY": {
+          "provider": "TradingView/tvDatafeed",
+          "symbol": "DXY",
+          "exchange": "TVC",
+          "bar_convention": "provider daily session label"
+        },
+        "TNX": {
+          "provider": "TradingView/tvDatafeed",
+          "symbol": "US10Y",
+          "exchange": "TVC",
+          "bar_convention": "provider daily session label"
+        },
+        "Brent": {
+          "provider": "TradingView/tvDatafeed",
+          "symbol": "UKOIL",
+          "exchange": "TVC",
+          "bar_convention": "provider daily session label"
+        },
+        "WTI": {
+          "provider": "TradingView/tvDatafeed",
+          "symbol": "USOIL",
+          "exchange": "TVC",
+          "bar_convention": "provider daily session label"
+        }
+      },
+      "series": {
+        "ETH": {
+          "rows": 2097,
+          "first": "2021-01-01",
+          "last": "2026-09-28",
+          "sha256": "5883b22a18964bb1944736da144ad98aefed8b446eb85d82c986fabd85c27513"
+        },
+        "TRY": {
+          "rows": 1497,
+          "first": "2021-01-01",
+          "last": "2026-09-28",
+          "sha256": "d6cb212acbd1438967577f40248049804e79107b7e4d9050fdd40f384562f983"
+        },
+        "DXY": {
+          "rows": 1470,
+          "first": "2021-01-04",
+          "last": "2026-09-28",
+          "sha256": "c54a1ca56483e4798a3acbb4f4c8a7d7c55131cddac35187eacfa30f9a80524c"
+        },
+        "TNX": {
+          "rows": 1460,
+          "first": "2021-01-01",
+          "last": "2026-09-28",
+          "sha256": "b9dfd351a31388a0008ab6f63992b3ccc684955579fd45dd0fcbfeeffe5d8e6e"
+        },
+        "Brent": {
+          "rows": 1481,
+          "first": "2021-01-04",
+          "last": "2026-09-28",
+          "sha256": "f7dc33415634b47b87b448f05896e7daf5406991d036f220240d3fe8438af798"
+        },
+        "WTI": {
+          "rows": 1439,
+          "first": "2021-01-04",
+          "last": "2026-09-28",
+          "sha256": "6950b8ca857de1d24309a6b817c70a9b37e11cb10c689882a85a3b3322944cea"
+        }
+      },
+      "status": "READY",
+      "availability_rule": "session label + 1 calendar day at 06:00 UTC",
+      "availability_status": "CONSERVATIVE_ASSUMPTION_NOT_OBSERVED_PUBLICATION_TIMESTAMPS",
+      "tv_host_timezone": "Europe/London",
+      "tv_session_rule": "recover UTC opening timestamp, then 17:00 America/New_York session roll",
+      "data_vintage": "current retrospective snapshot; not a historical vintage archive"
+    },
+    "source_hashes": {
+      "trust_screen.py": "c59e7a92d5fe970807a101dfe2d6b51179d1d44f385aab47c7e8dddac48cfc59",
+      "trust_features.py": "62f89f1cb1825bcfa272dd0ce4c8f7be0ef1f6aaa7d494f6668c1eb404e9ed7b",
+      "collect_trust_history.py": "06644271cd402899065c6cae3173ea93f357787c6e5ab0e2816821b872e8f504",
+      "shadow_data.py": "8f5f33ae91524505e90f0b1767482517d86452a5c20ae861b834cae9ca733fdc",
+      "timesfm_network_experiment.py": "a83e038b11fbcf66f97167f60fae5b4bda8271636827da0d98c5a148d6b68936",
+      "network_experiment.py": "07e70f758a03b9dab074595624c7217b46a27e8bc80cafa12e12c7c7042919d7"
+    },
+    "code_commit": "a3e25ada9ed912b6036155ba94479888112392ba",
+    "git_dirty": false,
+    "limitations": [
+      "Historical availability is a declared conservative assumption, not provider publication evidence.",
+      "Current provider vintage may contain revisions; past data are not an untouched holdout.",
+      "Risk/safety price proxies do not identify investor trust or observed capital flows.",
+      "Multiple asset/feature comparisons are exploratory; intervals are descriptive."
+    ]
+  },
+  "runtime": {
+    "runtime": {
+      "engine": "M1_TIMESFM",
+      "timesfm_executed": true,
+      "degraded_mode": false,
+      "checkpoint_repository": "google/timesfm-2.0-500m-pytorch",
+      "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+      "hparams": {
+        "context_len": 2048,
+        "horizon_len": 90,
+        "input_patch_len": 32,
+        "output_patch_len": 128,
+        "num_layers": 50,
+        "num_heads": 16,
+        "model_dims": 1280,
+        "per_core_batch_size": 1,
+        "backend": "cpu",
+        "quantiles": [
+          0.1,
+          0.2,
+          0.3,
+          0.4,
+          0.5,
+          0.6,
+          0.7,
+          0.8,
+          0.9
+        ],
+        "use_positional_embedding": false,
+        "point_forecast_mode": "median"
+      },
+      "torch_threads": 4,
+      "python": "3.12.14",
+      "packages": {
+        "timesfm": "1.3.0",
+        "torch": "2.14.0",
+        "numpy": "2.5.3",
+        "pandas": "3.0.6"
+      }
+    },
+    "synthetic_smoke": 110.1006088256836
+  },
+  "completion": {
+    "elapsed_seconds": 436.9060000000027
+  },
+  "targets": {
+    "ETH": {
+      "result": {
+        "status": "EXPLORATORY",
+        "evaluation_origins": 611,
+        "raw_features": [
+          "new_change_ETH",
+          "age_ETH",
+          "fresh_ETH",
+          "new_change_TRY",
+          "age_TRY",
+          "fresh_TRY",
+          "new_change_DXY",
+          "age_DXY",
+          "fresh_DXY",
+          "new_change_TNX",
+          "age_TNX",
+          "fresh_TNX",
+          "new_change_Brent",
+          "age_Brent",
+          "fresh_Brent",
+          "new_change_WTI",
+          "age_WTI",
+          "fresh_WTI",
+          "momentum5",
+          "momentum20",
+          "momentum_change",
+          "target_volatility20",
+          "spread_z90",
+          "spread_change",
+          "aligned_shock_ETH",
+          "aligned_shock_Brent",
+          "aligned_shock_TRY",
+          "aligned_shock_DXY",
+          "aligned_shock_TNX",
+          "safety_pressure",
+          "risk_downside_intensity",
+          "stress_observation_age"
+        ],
+        "signed_features": [
+          "strength_x_target_shock",
+          "instability_x_target_shock"
+        ],
+        "trust_features": [
+          "downside_excess_connection",
+          "co_crash_intensity",
+          "risk_safety_interaction"
+        ],
+        "mspe": {
+          "timesfm": 0.0015067493728961791,
+          "raw_controls": 0.001591318261347086,
+          "raw_signed": 0.0016028319969503722,
+          "raw_trust": 0.0016073790015292797,
+          "raw_signed_trust": 0.0016183593760357412
+        },
+        "price_mspe": {
+          "timesfm": 11880.99256564887,
+          "raw_controls": 12284.240754501297,
+          "raw_signed": 12350.178826607334,
+          "raw_trust": 12459.744324980302,
+          "raw_signed_trust": 12516.222554042104
+        },
+        "comparisons": {
+          "raw_controls_vs_timesfm": {
+            "skill_pct": -5.612671222709986,
+            "descriptive_95pct_interval": [
+              -11.034141800076998,
+              -0.3274810574013733
+            ]
+          },
+          "raw_signed_vs_timesfm": {
+            "skill_pct": -6.376815267525804,
+            "descriptive_95pct_interval": [
+              -11.578580913471198,
+              -1.2768844998188609
+            ]
+          },
+          "raw_signed_vs_raw_controls": {
+            "skill_pct": -0.7235344357538809,
+            "descriptive_95pct_interval": [
+              -2.3489338553449595,
+              0.7126222825449384
+            ]
+          },
+          "raw_trust_vs_timesfm": {
+            "skill_pct": -6.678591041300819,
+            "descriptive_95pct_interval": [
+              -12.467043582449861,
+              -0.6327534406890605
+            ]
+          },
+          "raw_trust_vs_raw_controls": {
+            "skill_pct": -1.009272662314431,
+            "descriptive_95pct_interval": [
+              -3.147673902739594,
+              1.0564622222688544
+            ]
+          },
+          "raw_signed_trust_vs_timesfm": {
+            "skill_pct": -7.407336956446331,
+            "descriptive_95pct_interval": [
+              -13.064794104746197,
+              -1.7076035743761215
+            ]
+          },
+          "raw_signed_trust_vs_raw_controls": {
+            "skill_pct": -1.699290163726519,
+            "descriptive_95pct_interval": [
+              -4.211899011406186,
+              0.6199804726174948
+            ]
+          }
+        },
+        "calendar_year_results": {
+          "2025": {
+            "origins": 349,
+            "mspe": {
+              "timesfm": 0.0016971184370781663,
+              "raw_controls": 0.0018029334287531797,
+              "raw_signed": 0.0018093991298698043,
+              "raw_trust": 0.0018059128031095244,
+              "raw_signed_trust": 0.0018156428313692928
+            }
+          },
+          "2026": {
+            "origins": 262,
+            "mspe": {
+              "timesfm": 0.0012531661538140667,
+              "raw_controls": 0.001309433935298511,
+              "raw_signed": 0.001327671961114945,
+              "raw_trust": 0.0013429198536227705,
+              "raw_signed_trust": 0.0013555657656868496
+            }
+          }
+        },
+        "promotion": "NOT_PROMOTED_RESEARCH_ONLY",
+        "timesfm_executed": true,
+        "degraded_mode": false
+      },
+      "coverage": {
+        "target": "ETH",
+        "warmup_origins": 252,
+        "evaluation_origins": 611,
+        "first_evaluation": "2025-01-01",
+        "last_evaluation": "2026-09-28",
+        "excluded_counts": {
+          "NO_RECENT_ALIGNED_STRESS_OBSERVATION": 40
+        }
+      },
+      "evaluation_exclusions": 25,
+      "neural_forecasts_including_warmup": 863,
+      "context_rows_range": [
+        512,
+        512
+      ],
+      "local_evidence_hashes": {
+        "neural_ETH.jsonl": "242ca81ce6200bb078cd26428b6a73e12dcbd5c7a840abd70948992cbf1170ea",
+        "result_ETH.json": "d0151b5c9e97af666cd65321baa1c61ba10ac2bc509de1d909e8d8c0a37239b9",
+        "coverage_ETH.json": "04b3bf12497ae5757c4f7e3bdf632b3b313179a7ce44c4a95448c3506b95156d"
+      }
+    },
+    "Brent": {
+      "result": {
+        "status": "EXPLORATORY",
+        "evaluation_origins": 423,
+        "raw_features": [
+          "new_change_ETH",
+          "age_ETH",
+          "fresh_ETH",
+          "new_change_TRY",
+          "age_TRY",
+          "fresh_TRY",
+          "new_change_DXY",
+          "age_DXY",
+          "fresh_DXY",
+          "new_change_TNX",
+          "age_TNX",
+          "fresh_TNX",
+          "new_change_Brent",
+          "age_Brent",
+          "fresh_Brent",
+          "new_change_WTI",
+          "age_WTI",
+          "fresh_WTI",
+          "momentum5",
+          "momentum20",
+          "momentum_change",
+          "target_volatility20",
+          "spread_z90",
+          "spread_change",
+          "aligned_shock_ETH",
+          "aligned_shock_Brent",
+          "aligned_shock_TRY",
+          "aligned_shock_DXY",
+          "aligned_shock_TNX",
+          "safety_pressure",
+          "risk_downside_intensity",
+          "stress_observation_age"
+        ],
+        "signed_features": [
+          "strength_x_target_shock",
+          "instability_x_target_shock"
+        ],
+        "trust_features": [
+          "downside_excess_connection",
+          "co_crash_intensity",
+          "risk_safety_interaction"
+        ],
+        "mspe": {
+          "timesfm": 0.0008473190083476546,
+          "raw_controls": 0.0008983962875983305,
+          "raw_signed": 0.0008974107849110557,
+          "raw_trust": 0.0009055203315062927,
+          "raw_signed_trust": 0.0009049274426005704
+        },
+        "price_mspe": {
+          "timesfm": 6.624419222587531,
+          "raw_controls": 7.017716197239924,
+          "raw_signed": 6.997425559514735,
+          "raw_trust": 7.0668009589674945,
+          "raw_signed_trust": 7.049657617395648
+        },
+        "comparisons": {
+          "raw_controls_vs_timesfm": {
+            "skill_pct": -6.028104969612458,
+            "descriptive_95pct_interval": [
+              -11.327542926475966,
+              -0.10982193983226672
+            ]
+          },
+          "raw_signed_vs_timesfm": {
+            "skill_pct": -5.911796627941146,
+            "descriptive_95pct_interval": [
+              -11.806033588328948,
+              -0.04108847031515332
+            ]
+          },
+          "raw_signed_vs_raw_controls": {
+            "skill_pct": 0.10969576576382867,
+            "descriptive_95pct_interval": [
+              -1.237478640479656,
+              1.2861269518634528
+            ]
+          },
+          "raw_trust_vs_timesfm": {
+            "skill_pct": -6.868879676396711,
+            "descriptive_95pct_interval": [
+              -12.28128275756076,
+              -0.8715618896850049
+            ]
+          },
+          "raw_trust_vs_raw_controls": {
+            "skill_pct": -0.7929734356991514,
+            "descriptive_95pct_interval": [
+              -1.6014755977833433,
+              0.021893498634963912
+            ]
+          },
+          "raw_signed_trust_vs_timesfm": {
+            "skill_pct": -6.798907340135951,
+            "descriptive_95pct_interval": [
+              -12.563421958587268,
+              -0.6376936447244362
+            ]
+          },
+          "raw_signed_trust_vs_raw_controls": {
+            "skill_pct": -0.7269792954843313,
+            "descriptive_95pct_interval": [
+              -2.3546479502025015,
+              0.7414373328963086
+            ]
+          }
+        },
+        "calendar_year_results": {
+          "2025": {
+            "origins": 241,
+            "mspe": {
+              "timesfm": 0.00037310470568085096,
+              "raw_controls": 0.00040224039140011013,
+              "raw_signed": 0.0004054811136510395,
+              "raw_trust": 0.0004085126951856923,
+              "raw_signed_trust": 0.0004118465428237124
+            }
+          },
+          "2026": {
+            "origins": 182,
+            "mspe": {
+              "timesfm": 0.0014752621234174336,
+              "raw_controls": 0.0015553939303663037,
+              "raw_signed": 0.00154881216278833,
+              "raw_trust": 0.0015636458279528018,
+              "raw_signed_trust": 0.0015578532494479487
+            }
+          }
+        },
+        "promotion": "NOT_PROMOTED_RESEARCH_ONLY",
+        "timesfm_executed": true,
+        "degraded_mode": false
+      },
+      "coverage": {
+        "target": "Brent",
+        "warmup_origins": 252,
+        "evaluation_origins": 423,
+        "first_evaluation": "2025-01-02",
+        "last_evaluation": "2026-09-28",
+        "excluded_counts": {
+          "NO_RECENT_ALIGNED_STRESS_OBSERVATION": 40
+        }
+      },
+      "evaluation_exclusions": 25,
+      "neural_forecasts_including_warmup": 675,
+      "context_rows_range": [
+        512,
+        512
+      ],
+      "local_evidence_hashes": {
+        "neural_Brent.jsonl": "f82a37088e64450baa00d30e23e79a364f293bad8ab6c2b96b39d839e43dfd81",
+        "result_Brent.json": "107a61a5b1886f388a4c19d23d59e33325096f36ea3b2ebaade8882911ccd954",
+        "coverage_Brent.json": "916fd33b1d78a652d9d9aa876498f59ef2549e8e238b83db4cefd4b8c12de400"
+      }
+    },
+    "TRY": {
+      "result": {
+        "status": "EXPLORATORY",
+        "evaluation_origins": 429,
+        "raw_features": [
+          "new_change_ETH",
+          "age_ETH",
+          "fresh_ETH",
+          "new_change_TRY",
+          "age_TRY",
+          "fresh_TRY",
+          "new_change_DXY",
+          "age_DXY",
+          "fresh_DXY",
+          "new_change_TNX",
+          "age_TNX",
+          "fresh_TNX",
+          "new_change_Brent",
+          "age_Brent",
+          "fresh_Brent",
+          "new_change_WTI",
+          "age_WTI",
+          "fresh_WTI",
+          "momentum5",
+          "momentum20",
+          "momentum_change",
+          "target_volatility20",
+          "spread_z90",
+          "spread_change",
+          "aligned_shock_ETH",
+          "aligned_shock_Brent",
+          "aligned_shock_TRY",
+          "aligned_shock_DXY",
+          "aligned_shock_TNX",
+          "safety_pressure",
+          "risk_downside_intensity",
+          "stress_observation_age"
+        ],
+        "signed_features": [
+          "strength_x_target_shock",
+          "instability_x_target_shock"
+        ],
+        "trust_features": [
+          "downside_excess_connection",
+          "co_crash_intensity",
+          "risk_safety_interaction"
+        ],
+        "mspe": {
+          "timesfm": 1.4988544563589366e-05,
+          "raw_controls": 1.2960737744281709e-05,
+          "raw_signed": 1.3321772841542665e-05,
+          "raw_trust": 1.3455537228817743e-05,
+          "raw_signed_trust": 1.3751322521459425e-05
+        },
+        "price_mspe": {
+          "timesfm": 0.023195558333259127,
+          "raw_controls": 0.01956817229637839,
+          "raw_signed": 0.020110789922335448,
+          "raw_trust": 0.02041386917252902,
+          "raw_signed_trust": 0.020864564077881908
+        },
+        "comparisons": {
+          "raw_controls_vs_timesfm": {
+            "skill_pct": 13.529044202421547,
+            "descriptive_95pct_interval": [
+              -5.262905685045105,
+              35.28325142958653
+            ]
+          },
+          "raw_signed_vs_timesfm": {
+            "skill_pct": 11.120304009341076,
+            "descriptive_95pct_interval": [
+              -10.119599751336297,
+              34.216430952925535
+            ]
+          },
+          "raw_signed_vs_raw_controls": {
+            "skill_pct": -2.785606069532931,
+            "descriptive_95pct_interval": [
+              -6.695163978134544,
+              1.2181053961621684
+            ]
+          },
+          "raw_trust_vs_timesfm": {
+            "skill_pct": 10.227859871702638,
+            "descriptive_95pct_interval": [
+              -8.921922855614433,
+              30.451599892240715
+            ]
+          },
+          "raw_trust_vs_raw_controls": {
+            "skill_pct": -3.817679936887397,
+            "descriptive_95pct_interval": [
+              -16.602162107412852,
+              1.8865870368951672
+            ]
+          },
+          "raw_signed_trust_vs_timesfm": {
+            "skill_pct": 8.254450836643867,
+            "descriptive_95pct_interval": [
+              -13.095508180422978,
+              29.883234233230663
+            ]
+          },
+          "raw_signed_trust_vs_raw_controls": {
+            "skill_pct": -6.0998439500600465,
+            "descriptive_95pct_interval": [
+              -17.697344988250034,
+              0.3440052031522632
+            ]
+          }
+        },
+        "calendar_year_results": {
+          "2025": {
+            "origins": 245,
+            "mspe": {
+              "timesfm": 2.3061429788973e-05,
+              "raw_controls": 2.0681085068972856e-05,
+              "raw_signed": 2.121654157314764e-05,
+              "raw_trust": 2.1096105722462258e-05,
+              "raw_signed_trust": 2.15244135652304e-05
+            }
+          },
+          "2026": {
+            "origins": 184,
+            "mspe": {
+              "timesfm": 4.239322388486155e-06,
+              "raw_controls": 2.680927447817952e-06,
+              "raw_signed": 2.8097166500034305e-06,
+              "raw_trust": 3.281954180214992e-06,
+              "raw_signed_trust": 3.401282816438292e-06
+            }
+          }
+        },
+        "promotion": "NOT_PROMOTED_RESEARCH_ONLY",
+        "timesfm_executed": true,
+        "degraded_mode": false
+      },
+      "coverage": {
+        "target": "TRY",
+        "warmup_origins": 252,
+        "evaluation_origins": 429,
+        "first_evaluation": "2025-01-01",
+        "last_evaluation": "2026-09-28",
+        "excluded_counts": {
+          "NO_RECENT_ALIGNED_STRESS_OBSERVATION": 40
+        }
+      },
+      "evaluation_exclusions": 25,
+      "neural_forecasts_including_warmup": 681,
+      "context_rows_range": [
+        512,
+        512
+      ],
+      "local_evidence_hashes": {
+        "neural_TRY.jsonl": "5ae49026d855d0d57bf70958225ad71aa187afb85061fe9cc8df8e556548416a",
+        "result_TRY.json": "93c34ebe69576832697a3f9098e7ed103a8bc3e5818242a4abc958980d51d792",
+        "coverage_TRY.json": "167d701a3a4cf5b8b468e258d04a3d1017dcae1323dee63d0b6ec21771d3cd42"
+      }
+    }
+  },
+  "verification": {
+    "focused_tests_passed": 62,
+    "verified_contexts_and_timestamp_audits": 2219,
+    "all_five_arms_have_identical_origins": true,
+    "no_daily_pipeline_or_btc_files_changed": true,
+    "raw_prices_and_per_origin_predictions": "Retained locally under ignored network_outputs; not published."
+  }
+}
