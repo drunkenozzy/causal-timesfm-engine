@@ -1,0 +1,1066 @@
+{
+  "manifest": {
+    "experiment": "ETH_SPOT_PAPER_001",
+    "created_at": "2026-09-29T14:34:13.273290+00:00",
+    "initial_usd": 1000,
+    "code_commit": "a1a873eadd6ba07c49f6d7e3c4ec5d21f3a5a0df",
+    "git_dirty": false,
+    "sources": {
+      "eth_spot_calibration.py": "33705bbeecf1af0c069aa882c90bf9ac910605c350a3d8e740622edc0e72004e",
+      "eth_spot_execution.py": "57c7b6f2400389365ac14fe5a8babaabfa530957ee842d38b3723b715576508e",
+      "run_eth_spot_study.py": "0d8e9652bae3955f71396b1fa6b78470cab6172b0a01d58161cd879c534e1375",
+      "collect_eth_spot_study.py": "400a0a34bcc9c2b295981fc6a5984453e73847acc42e2b344ff4dabf91709916",
+      "timesfm_network_experiment.py": "a83e038b11fbcf66f97167f60fae5b4bda8271636827da0d98c5a148d6b68936"
+    },
+    "protocol_sha256": "270b8baa03ba67cb3f600cf818dc431f4717d2b9e9ddb01424d49d0dfc10d87e",
+    "data_manifest": {
+      "collection_utc": "2026-09-29T13:47:34.367199+00:00",
+      "sources": [
+        {
+          "file": "binance_daily_0.json",
+          "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&startTime=1609459200000&endTime=1788479999999&limit=1000",
+          "sha256": "03537448de00d974cd817ed03bf7e8b629f10b21f338bc3c30935531c53a0da6"
+        },
+        {
+          "file": "binance_daily_1.json",
+          "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&startTime=1695859200000&endTime=1788479999999&limit=1000",
+          "sha256": "9dbd29b45393f342c60859dc21aedfee624beb687bec8674914f8d4cfd1b23ed"
+        },
+        {
+          "file": "binance_daily_2.json",
+          "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&startTime=1782259200000&endTime=1788479999999&limit=1000",
+          "sha256": "4b1f6ac8d957e45a61d0d404169fd8fc45ab5ce524d579c6cf4cb5c942b95a15"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-01.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-01.zip",
+          "sha256": "04ab6131e9f8ad979676b72115a8cfaf7e4f827b06f44cdf80c840d95016766d"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-01.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-01.zip.CHECKSUM",
+          "sha256": "d16c907948d22684d7c4d526f2f8eba8d881355eb5e4e0b68f727a499790b498"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-02.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-02.zip",
+          "sha256": "5ec2fb4e87e29241745ee7e9449fb86f4f44bad96508a80a1af0e308d73c6f5a"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-02.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-02.zip.CHECKSUM",
+          "sha256": "052bb4b9a8414bd3130a18438a87fe0a8bdeefe1f5a6b5c9679d9ddcd190f448"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-03.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-03.zip",
+          "sha256": "609346fc0dc8f8f1cf283c5cb373d1bb25f26f1716fc67c3883d2176ce9cf40b"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-03.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-03.zip.CHECKSUM",
+          "sha256": "e7419b58bfec86499ddf65eea69f7f29baaefac09f93010bd3dc6001ef878fb7"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-04.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-04.zip",
+          "sha256": "32505b36565f7c446a3946dc6ea2f511e71d0f72c13cca2b09bb83307f198f8e"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-04.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-04.zip.CHECKSUM",
+          "sha256": "6896f91784f2d2e78a6572c9973cb9a38a008ff979e2c0acd9dc8b9c1aa01a1e"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-05.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-05.zip",
+          "sha256": "743268912388656e3c53d21e6e4b6c2b155c1b1f67c7bcbdae5e14cc3d9c633c"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-05.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-05.zip.CHECKSUM",
+          "sha256": "1914b8c60119630d43e46034d976309bf5ea29e0bbdaa0163352a283c035f480"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-06.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-06.zip",
+          "sha256": "eb7641c42f642697524ce45f64c92bcc33a751b6ade791f91f70e3ec52880a70"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-06.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-06.zip.CHECKSUM",
+          "sha256": "27942b765f795a1c8e930d5052ff2e44538c5da14b450dc1d532b52296cae1f7"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-07.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-07.zip",
+          "sha256": "b95c721b528260d865585f0723d287c836f2f22bb681ac45e0c56eaaf0047bd9"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-07.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-07.zip.CHECKSUM",
+          "sha256": "3483549cc89f51e8275382557c8340906e9c652e178a7588bec77367ed9749d7"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-08.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-08.zip",
+          "sha256": "aaebc0e2baa7d7dcfcf6eb3eeb681b55a2e746dad86e758be0af7fca4391c480"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-08.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-08.zip.CHECKSUM",
+          "sha256": "bed01e8174c79435a434c27cf223769ff0d663e984ae133120c8102e6d34400a"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-09.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-09.zip",
+          "sha256": "2912831352b3e194ac38f7a66a373ea78f138dfd4fe5a3ac25acb80c5ccaa0ec"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-09.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-09.zip.CHECKSUM",
+          "sha256": "c502d390a7e090dff72fd26917fef5919c45a630c62f67e540c650a2cd2adb71"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-10.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-10.zip",
+          "sha256": "a384d1bea37e4f59f7cae491a6f3f2dffe262259a4a0bc9324310a9aef16a843"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-10.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-10.zip.CHECKSUM",
+          "sha256": "b02fda53aa3fd4e508e576cf03e80ba6ea6bdad69a64d64736ad9295d3ce8db8"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-11.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-11.zip",
+          "sha256": "30b80de8cbbd68edf2b2bf76154f60e6edb0f8365e08e6d5afc63657e26e0f7c"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-11.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-11.zip.CHECKSUM",
+          "sha256": "9438ece74f0e2abaaa4c0e03d78d0427a8016bdaa01e85c2ec54ccdf0b9213ff"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-12.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-12.zip",
+          "sha256": "57b653e4ff3558fae8d2e6da616c40e6cfad4002f131584f82ae7a80bd228293"
+        },
+        {
+          "file": "ETHUSDT-1m-2025-12.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2025-12.zip.CHECKSUM",
+          "sha256": "2aaa879181b7b2eb5f1e3bcd324bf890966e5e28fb00e207802345ef33387d40"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-01.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-01.zip",
+          "sha256": "cadd060ab73bd03fee94708b78738144da76d007fc2170d8ad2cec678de7a654"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-01.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-01.zip.CHECKSUM",
+          "sha256": "97549274ed2c36d4185e8131dc9530792177bf74f0af3484e8960a29b3b01f2a"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-02.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-02.zip",
+          "sha256": "1ddb64d08739a40b7f66a37bccf5ca5fec58339c7f01e83311086116f41b445f"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-02.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-02.zip.CHECKSUM",
+          "sha256": "78a7fc485a2e17240c0462e7bf9af6320e341aed1c693c432aed3fc7a27d4af7"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-03.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-03.zip",
+          "sha256": "5747c9f1f76be7afbf9513d50ea65ff6e979fa9684c75a775b6974e64c751844"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-03.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-03.zip.CHECKSUM",
+          "sha256": "837990685ac78838431e6eb93cb2574b74f86412d23f24e168cfde7cf155fd5a"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-04.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-04.zip",
+          "sha256": "8a2f0a2907764827ca3c52416bd9357c5d6213f3816fadbd0515bf504ea75ffd"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-04.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-04.zip.CHECKSUM",
+          "sha256": "b4a1e837e0c09a81c227b7c6105d3807fc13435ce531783f82485b06dd37ddc4"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-05.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-05.zip",
+          "sha256": "bc0e625d18c0fa5378cecd0119aa20721b8830c24c3a55094f4c4c966ff8f710"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-05.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-05.zip.CHECKSUM",
+          "sha256": "a18e879a464de3460ef5ebf2887cec050193d36f659183e0bcf7581d195d5b7b"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-06.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-06.zip",
+          "sha256": "770fdf44aac01dbe136e5b37a10501e57069af4048e76fbb3a3a2de2e9662934"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-06.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-06.zip.CHECKSUM",
+          "sha256": "1bbfbfe9c06c57e6b74f4bfe329984ea1b2ce6601b068d4f018b831885c4ed92"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-07.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-07.zip",
+          "sha256": "1ad273218d6c33fd62515198276f00c0656ae002c0d1d9ab10cca0f5d0f7adc2"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-07.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-07.zip.CHECKSUM",
+          "sha256": "8ac6ab8a1ea1382dcf6fb4e2a4cd8e5235291a018e91f7a64ac09fc01d5537e7"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-08.zip",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-08.zip",
+          "sha256": "f2f2fe8da85467fb8ec8185e07f16f3af9f4ebcb266633ba494e76ac73c40c0c"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-08.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/monthly/klines/ETHUSDT/1m/ETHUSDT-1m-2026-08.zip.CHECKSUM",
+          "sha256": "96b91c6370bd2cd75e4f4f9587880cf813a73ac9fa70555622f819d443c2768d"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-01.zip",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-01.zip",
+          "sha256": "679b07b6cce5dd1ba1fa2fbfddfb9b1bca9dc74748e9373703644fb5a401aea4"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-01.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-01.zip.CHECKSUM",
+          "sha256": "91472cf41f11a585f3058bfec979ba6a04b9e01d12e7996f8b35339c62bbe303"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-02.zip",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-02.zip",
+          "sha256": "20f9cd0e6ea2950765af2b775f7ef34a05020c8a9680fdd68332d740be7165d9"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-02.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-02.zip.CHECKSUM",
+          "sha256": "c8cc1ea55c91fe87d53d2c0fb48b373b73f46c4d8504ea44a529e83c344fa003"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-03.zip",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-03.zip",
+          "sha256": "b88e3e86da4ba8cdaf5f8ef0b044bd246289214d8724366ce8f9eeb7f452ad13"
+        },
+        {
+          "file": "ETHUSDT-1m-2026-09-03.zip.CHECKSUM",
+          "url": "https://data.binance.vision/data/spot/daily/klines/ETHUSDT/1m/ETHUSDT-1m-2026-09-03.zip.CHECKSUM",
+          "sha256": "f2f46a8b6fe841bedbcb4bbea95856b7b3c72a3161d57fd34be9a1a93f92a382"
+        },
+        {
+          "file": "coinbase_fx_000.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2024-12-31T00%3A00%3A00%2B00%3A00&end=2025-01-10T00%3A00%3A00%2B00%3A00",
+          "sha256": "ae3c29e6cf5b4567582f45e70916b0d1e6ddd26436852672a16e223157690126"
+        },
+        {
+          "file": "coinbase_fx_001.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-01-10T00%3A00%3A00%2B00%3A00&end=2025-01-20T00%3A00%3A00%2B00%3A00",
+          "sha256": "3d2583aeed45dc165d47bc874b1c61495e4751975ffdfa9e9c11877057ef7ac7"
+        },
+        {
+          "file": "coinbase_fx_002.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-01-20T00%3A00%3A00%2B00%3A00&end=2025-01-30T00%3A00%3A00%2B00%3A00",
+          "sha256": "1340fc63e45f6d802911556c0aac91f808d8d81144f37f5106ddbd964566cbb2"
+        },
+        {
+          "file": "coinbase_fx_003.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-01-30T00%3A00%3A00%2B00%3A00&end=2025-02-09T00%3A00%3A00%2B00%3A00",
+          "sha256": "b7d6869559aa3cd5eb61446c2b748102054f5cc6eb45db1f6bbe9080c1597d8f"
+        },
+        {
+          "file": "coinbase_fx_004.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-02-09T00%3A00%3A00%2B00%3A00&end=2025-02-19T00%3A00%3A00%2B00%3A00",
+          "sha256": "c1004c8113121ac51a7d9a7f7ca2fb7ad8711c35ee57255ee5023c07800ee039"
+        },
+        {
+          "file": "coinbase_fx_005.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-02-19T00%3A00%3A00%2B00%3A00&end=2025-03-01T00%3A00%3A00%2B00%3A00",
+          "sha256": "1e8c7c159f46299ffebeb0cf6510fe35f3e8614b0fb8fc1bc04349e85f7a9863"
+        },
+        {
+          "file": "coinbase_fx_006.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-03-01T00%3A00%3A00%2B00%3A00&end=2025-03-11T00%3A00%3A00%2B00%3A00",
+          "sha256": "ac00c1daca31d86bb9f6dd94cfd724b89c98b3a4eb108f93b8b46b9eedc40023"
+        },
+        {
+          "file": "coinbase_fx_007.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-03-11T00%3A00%3A00%2B00%3A00&end=2025-03-21T00%3A00%3A00%2B00%3A00",
+          "sha256": "73d60d21c710d5664552d6392c39b25ecd7f2be6087df0c54126bf7a72a368cf"
+        },
+        {
+          "file": "coinbase_fx_008.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-03-21T00%3A00%3A00%2B00%3A00&end=2025-03-31T00%3A00%3A00%2B00%3A00",
+          "sha256": "2ba53cbae90c1ff5372ad5304430ef5268a7fac057c55939b384bd8279e6b0e8"
+        },
+        {
+          "file": "coinbase_fx_009.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-03-31T00%3A00%3A00%2B00%3A00&end=2025-04-10T00%3A00%3A00%2B00%3A00",
+          "sha256": "c8cb50a2ab750fc2646925de17e23d8858b712b3a279ce2b8f66504f293715a6"
+        },
+        {
+          "file": "coinbase_fx_010.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-04-10T00%3A00%3A00%2B00%3A00&end=2025-04-20T00%3A00%3A00%2B00%3A00",
+          "sha256": "ba4c416b38b7a318cf94baf2526f3f043fd8b8aaffb411d97b704fa234faed9c"
+        },
+        {
+          "file": "coinbase_fx_011.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-04-20T00%3A00%3A00%2B00%3A00&end=2025-04-30T00%3A00%3A00%2B00%3A00",
+          "sha256": "31daa84c6131f623600dbbc34462b9f7838ece7e261634d88e98ae188db6bb50"
+        },
+        {
+          "file": "coinbase_fx_012.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-04-30T00%3A00%3A00%2B00%3A00&end=2025-05-10T00%3A00%3A00%2B00%3A00",
+          "sha256": "17ba6886ba1f011f6b28d412f5846d74ebb2a5eec0a5760731916e519667d9f0"
+        },
+        {
+          "file": "coinbase_fx_013.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-05-10T00%3A00%3A00%2B00%3A00&end=2025-05-20T00%3A00%3A00%2B00%3A00",
+          "sha256": "4e8fdec4a021440cd0088b78b32a42d04b9f0850f2c42ebcb6fffe0742c0accf"
+        },
+        {
+          "file": "coinbase_fx_014.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-05-20T00%3A00%3A00%2B00%3A00&end=2025-05-30T00%3A00%3A00%2B00%3A00",
+          "sha256": "abe56fd74e828297f1a8bffaf90e746349ce9fd14b0afe5d6479eb0cba2341aa"
+        },
+        {
+          "file": "coinbase_fx_015.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-05-30T00%3A00%3A00%2B00%3A00&end=2025-06-09T00%3A00%3A00%2B00%3A00",
+          "sha256": "3dfa7d3a425294eef56bec201ebcd5f399bab440a46a82d3b9ee27b891a8ce2f"
+        },
+        {
+          "file": "coinbase_fx_016.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-06-09T00%3A00%3A00%2B00%3A00&end=2025-06-19T00%3A00%3A00%2B00%3A00",
+          "sha256": "b86ee8841d3e2573a1888c1f3552875a08208f12307341d0c14822538f5536e2"
+        },
+        {
+          "file": "coinbase_fx_017.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-06-19T00%3A00%3A00%2B00%3A00&end=2025-06-29T00%3A00%3A00%2B00%3A00",
+          "sha256": "3eade1b444929c2a01ac4e0895613da8f228327e055189a77ed698119fc7ff9a"
+        },
+        {
+          "file": "coinbase_fx_018.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-06-29T00%3A00%3A00%2B00%3A00&end=2025-07-09T00%3A00%3A00%2B00%3A00",
+          "sha256": "900f9a23ec488cbcf75a5248721fe4f836c49aafd275fa4dc89bd7ac3adbcfff"
+        },
+        {
+          "file": "coinbase_fx_019.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-07-09T00%3A00%3A00%2B00%3A00&end=2025-07-19T00%3A00%3A00%2B00%3A00",
+          "sha256": "debb2369910f024710860d530079daf285364a3382647dfdaeb33dd730e32b12"
+        },
+        {
+          "file": "coinbase_fx_020.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-07-19T00%3A00%3A00%2B00%3A00&end=2025-07-29T00%3A00%3A00%2B00%3A00",
+          "sha256": "17e40517b4ab8800cfa7e5496ee227e4ecea00d9c7ef019196c3442d99204adb"
+        },
+        {
+          "file": "coinbase_fx_021.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-07-29T00%3A00%3A00%2B00%3A00&end=2025-08-08T00%3A00%3A00%2B00%3A00",
+          "sha256": "acf77b767eb52c3de47fff4c93c32a6bee944abdb4dcd79df4c25b1e3d88fe0f"
+        },
+        {
+          "file": "coinbase_fx_022.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-08-08T00%3A00%3A00%2B00%3A00&end=2025-08-18T00%3A00%3A00%2B00%3A00",
+          "sha256": "9e1c95983dba87cbad58f985dc191dd967c35ac2c668d3af52eb5b2c5f41e13e"
+        },
+        {
+          "file": "coinbase_fx_023.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-08-18T00%3A00%3A00%2B00%3A00&end=2025-08-28T00%3A00%3A00%2B00%3A00",
+          "sha256": "c8beec2fd1d96f9b0c434bc0dea7c1af1a101eb1a4464e1fdc3dbd0ca06b2af0"
+        },
+        {
+          "file": "coinbase_fx_024.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-08-28T00%3A00%3A00%2B00%3A00&end=2025-09-07T00%3A00%3A00%2B00%3A00",
+          "sha256": "3d924c80fc5f7f3c40e21f8ffbc2d0401c6c80d587d811c0ad8edb7279d2bdd4"
+        },
+        {
+          "file": "coinbase_fx_025.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-09-07T00%3A00%3A00%2B00%3A00&end=2025-09-17T00%3A00%3A00%2B00%3A00",
+          "sha256": "78b78541458b80341bd3c8cc0ed078a19368060fdd76ce834e03b77c465f1939"
+        },
+        {
+          "file": "coinbase_fx_026.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-09-17T00%3A00%3A00%2B00%3A00&end=2025-09-27T00%3A00%3A00%2B00%3A00",
+          "sha256": "fd5c9f1dd434d6a0981c10d9fa49712667ec3c6dff57225c4d2c854b78ddec94"
+        },
+        {
+          "file": "coinbase_fx_027.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-09-27T00%3A00%3A00%2B00%3A00&end=2025-10-07T00%3A00%3A00%2B00%3A00",
+          "sha256": "856fdd85024973c08d725a0e8a4c9fbaa212f01156afb4742dbb0178dcec2af4"
+        },
+        {
+          "file": "coinbase_fx_028.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-10-07T00%3A00%3A00%2B00%3A00&end=2025-10-17T00%3A00%3A00%2B00%3A00",
+          "sha256": "5446a899a0eb9a7a16f6f3571c6bb5c5b8f2906242a29c61d52ec88c5930f8a9"
+        },
+        {
+          "file": "coinbase_fx_029.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-10-17T00%3A00%3A00%2B00%3A00&end=2025-10-27T00%3A00%3A00%2B00%3A00",
+          "sha256": "79f30c35582b98c416ca982957bace800e3d49d9f0be20f3eb65fa1000cce03e"
+        },
+        {
+          "file": "coinbase_fx_030.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-10-27T00%3A00%3A00%2B00%3A00&end=2025-11-06T00%3A00%3A00%2B00%3A00",
+          "sha256": "0ea7d6fa28216556f208f06d87f813df74e848a3f1ba91d56ad27703ee753b2a"
+        },
+        {
+          "file": "coinbase_fx_031.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-11-06T00%3A00%3A00%2B00%3A00&end=2025-11-16T00%3A00%3A00%2B00%3A00",
+          "sha256": "c9d2c86ab8d607769c058c1e5c01ce14df93ecbb130e52edc5fb0a7fcaf71c46"
+        },
+        {
+          "file": "coinbase_fx_032.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-11-16T00%3A00%3A00%2B00%3A00&end=2025-11-26T00%3A00%3A00%2B00%3A00",
+          "sha256": "45d284df6e7a616999334fb31972386c694484554f43e2e5e25543c37795920f"
+        },
+        {
+          "file": "coinbase_fx_033.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-11-26T00%3A00%3A00%2B00%3A00&end=2025-12-06T00%3A00%3A00%2B00%3A00",
+          "sha256": "6b76f6a0e85b73c3b910687024cafd1f92ad0dc0821e95464e430edebd42b1bd"
+        },
+        {
+          "file": "coinbase_fx_034.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-12-06T00%3A00%3A00%2B00%3A00&end=2025-12-16T00%3A00%3A00%2B00%3A00",
+          "sha256": "5b4200822044d41d489264e8b2dfe97c1e770e1d8f8b5f817d8b87afd1d7a2c0"
+        },
+        {
+          "file": "coinbase_fx_035.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-12-16T00%3A00%3A00%2B00%3A00&end=2025-12-26T00%3A00%3A00%2B00%3A00",
+          "sha256": "065a4e702c9e265ca660211b37c04b7881654c4157b07a7929eb54c3e9ed45cd"
+        },
+        {
+          "file": "coinbase_fx_036.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2025-12-26T00%3A00%3A00%2B00%3A00&end=2026-01-05T00%3A00%3A00%2B00%3A00",
+          "sha256": "21eaa5ba6ff79cb653d6796e866dff3d89e03617e6272d36c040d9b762ad6c57"
+        },
+        {
+          "file": "coinbase_fx_037.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-01-05T00%3A00%3A00%2B00%3A00&end=2026-01-15T00%3A00%3A00%2B00%3A00",
+          "sha256": "8e29ec6101f0e3ea877577aa788ac522c0f3ed4f2738eeb2c563a360d4b4b998"
+        },
+        {
+          "file": "coinbase_fx_038.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-01-15T00%3A00%3A00%2B00%3A00&end=2026-01-25T00%3A00%3A00%2B00%3A00",
+          "sha256": "589efb992e1151a4598aa46439c74a4292d729c1707606da966a76b49aa5b904"
+        },
+        {
+          "file": "coinbase_fx_039.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-01-25T00%3A00%3A00%2B00%3A00&end=2026-02-04T00%3A00%3A00%2B00%3A00",
+          "sha256": "9a0b7acb9d854149b76b3c17b6348fc28431ace0ae5fd739ddbc7bb144cc557e"
+        },
+        {
+          "file": "coinbase_fx_040.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-02-04T00%3A00%3A00%2B00%3A00&end=2026-02-14T00%3A00%3A00%2B00%3A00",
+          "sha256": "9a0b18994c3abb1178576300e9e457aed3a429969b7fd5f66f349cd3b32e2e68"
+        },
+        {
+          "file": "coinbase_fx_041.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-02-14T00%3A00%3A00%2B00%3A00&end=2026-02-24T00%3A00%3A00%2B00%3A00",
+          "sha256": "45f5d38d0477c7a961c8d3a894394d32e63bbad7be6e9c59810ef5fbe317595d"
+        },
+        {
+          "file": "coinbase_fx_042.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-02-24T00%3A00%3A00%2B00%3A00&end=2026-03-06T00%3A00%3A00%2B00%3A00",
+          "sha256": "9aa44af1eb1c474622d41eb55f14690e89b3ffdf2e0e24222acccc99733233f0"
+        },
+        {
+          "file": "coinbase_fx_043.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-03-06T00%3A00%3A00%2B00%3A00&end=2026-03-16T00%3A00%3A00%2B00%3A00",
+          "sha256": "dc057b827d310f760424c51666125848f687e525b1fc42778a70961a47d413f0"
+        },
+        {
+          "file": "coinbase_fx_044.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-03-16T00%3A00%3A00%2B00%3A00&end=2026-03-26T00%3A00%3A00%2B00%3A00",
+          "sha256": "bd793e6bc3bcf566d59d84beaff11b98682761ff78b2b4643125eb3adea20df8"
+        },
+        {
+          "file": "coinbase_fx_045.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-03-26T00%3A00%3A00%2B00%3A00&end=2026-04-05T00%3A00%3A00%2B00%3A00",
+          "sha256": "fd76809588f27bfb0e0034ac65de2b7b54b85fb3ad168579c497abac6d68a80c"
+        },
+        {
+          "file": "coinbase_fx_046.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-04-05T00%3A00%3A00%2B00%3A00&end=2026-04-15T00%3A00%3A00%2B00%3A00",
+          "sha256": "db026e149272803e29817c64f6dff0858af29b6b0164ecb74ca7efa1269add34"
+        },
+        {
+          "file": "coinbase_fx_047.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-04-15T00%3A00%3A00%2B00%3A00&end=2026-04-25T00%3A00%3A00%2B00%3A00",
+          "sha256": "c77406baa58f643ea51a38e9b8b87a6cdaaefdefc0338004ca89a761cedf28b8"
+        },
+        {
+          "file": "coinbase_fx_048.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-04-25T00%3A00%3A00%2B00%3A00&end=2026-05-05T00%3A00%3A00%2B00%3A00",
+          "sha256": "a1770af2832229cc2d2e124318336d8a141efacb46b69697eaaf4e564eb677a2"
+        },
+        {
+          "file": "coinbase_fx_049.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-05-05T00%3A00%3A00%2B00%3A00&end=2026-05-15T00%3A00%3A00%2B00%3A00",
+          "sha256": "4d8a998c1d0ec18e09468968cdee84f584ba0e91eb2d33672523e768fa21e1e2"
+        },
+        {
+          "file": "coinbase_fx_050.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-05-15T00%3A00%3A00%2B00%3A00&end=2026-05-25T00%3A00%3A00%2B00%3A00",
+          "sha256": "6bbcace46b36efd8a977f71703aeaee840452324e05b2e5ce0da2e7c2fec72c5"
+        },
+        {
+          "file": "coinbase_fx_051.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-05-25T00%3A00%3A00%2B00%3A00&end=2026-06-04T00%3A00%3A00%2B00%3A00",
+          "sha256": "7e497e40add62445fbdf09e74196b42441d03c41431a70e5be0b64eabbd624a1"
+        },
+        {
+          "file": "coinbase_fx_052.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-06-04T00%3A00%3A00%2B00%3A00&end=2026-06-14T00%3A00%3A00%2B00%3A00",
+          "sha256": "165eff3af79437b5cfd3e74b462646297a9da1f8214ebef3f9985763c8f85d9c"
+        },
+        {
+          "file": "coinbase_fx_053.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-06-14T00%3A00%3A00%2B00%3A00&end=2026-06-24T00%3A00%3A00%2B00%3A00",
+          "sha256": "1f203a382b09efc6a090f12790add2e582fe17b83fa8a1201f276da94041f5b7"
+        },
+        {
+          "file": "coinbase_fx_054.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-06-24T00%3A00%3A00%2B00%3A00&end=2026-07-04T00%3A00%3A00%2B00%3A00",
+          "sha256": "c54ec1e3bfbc1007c40bda69f325f4cdec39c811deffe390fd0ad6b9fa6e097e"
+        },
+        {
+          "file": "coinbase_fx_055.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-07-04T00%3A00%3A00%2B00%3A00&end=2026-07-14T00%3A00%3A00%2B00%3A00",
+          "sha256": "602adf89b5ac16a8f8cab521679150cfed2fc7a999b5be21aa1360e7e295cd45"
+        },
+        {
+          "file": "coinbase_fx_056.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-07-14T00%3A00%3A00%2B00%3A00&end=2026-07-24T00%3A00%3A00%2B00%3A00",
+          "sha256": "3ad404af0711b69ac918d5d4b5232eaf72afec400ef8cde89eaa6908abb00f38"
+        },
+        {
+          "file": "coinbase_fx_057.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-07-24T00%3A00%3A00%2B00%3A00&end=2026-08-03T00%3A00%3A00%2B00%3A00",
+          "sha256": "d2821d9b0fdf58ddd02f9d964ed4fd1706255c59e5b6fd77c16bc7aee64d88a4"
+        },
+        {
+          "file": "coinbase_fx_058.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-08-03T00%3A00%3A00%2B00%3A00&end=2026-08-13T00%3A00%3A00%2B00%3A00",
+          "sha256": "c7f647781f778776d43f286acb72729069ea9278a44efdf7cc3ee02f8152b600"
+        },
+        {
+          "file": "coinbase_fx_059.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-08-13T00%3A00%3A00%2B00%3A00&end=2026-08-23T00%3A00%3A00%2B00%3A00",
+          "sha256": "257854220c824bbda8e1d0c910f1cabcb80d7fc5513a3fa96c4bd2d1db20ae30"
+        },
+        {
+          "file": "coinbase_fx_060.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-08-23T00%3A00%3A00%2B00%3A00&end=2026-09-02T00%3A00%3A00%2B00%3A00",
+          "sha256": "a8967c9afa9d8535ee479f2d433bfd9fa00bf4980e5269a9081018213d568f0b"
+        },
+        {
+          "file": "coinbase_fx_061.json",
+          "url": "https://api.exchange.coinbase.com/products/USDT-USD/candles?granularity=3600&start=2026-09-02T00%3A00%3A00%2B00%3A00&end=2026-09-04T00%3A00%3A00%2B00%3A00",
+          "sha256": "91c1c428a735d0a76eee80270173886c37bbaa48f1e294fd0565d36e9f6048ab"
+        },
+        {
+          "file": "exchange_info_current.json",
+          "url": "https://api.binance.com/api/v3/exchangeInfo?symbol=ETHUSDT",
+          "sha256": "e7bac0374794992f116b6244d4df4f495ad581ebfacd78fcb789c73043dc6bea"
+        }
+      ],
+      "status": "READY",
+      "files": {
+        "daily.csv": "20dab2b63196f62bb9fff27c5e68f0fdbc506bd4255d2053cba5a507f3079a61",
+        "minutes.pkl": "a6d47c206711f35a4e96c9bd5165212a5ce7479bb4aa47f43d3e8e25dcc0f528",
+        "usdt_usd_hourly.csv": "af778733b85de1c22c1e08171c1efd55537f60246f62ae53339744238725b65d"
+      },
+      "counts": {
+        "daily": 2072,
+        "minutes": 879840,
+        "fx_hours": 14678
+      }
+    },
+    "execution_status": "OHLC_APPROXIMATION_NOT_VERIFIED_FILL_HISTORY",
+    "fee_schedule_status": "ASSUMED_NOT_ACCOUNT_VERIFIED",
+    "fx_marking": "LATEST_COMPLETED_HOURLY_USDT_USD_CLOSE",
+    "entry_start": "2025-01-01",
+    "entry_end_exclusive": "2026-09-01",
+    "calibration_window": 252,
+    "evaluation_is_retrospective": true
+  },
+  "runtime": {
+    "engine": "M1_TIMESFM",
+    "timesfm_executed": true,
+    "degraded_mode": false,
+    "checkpoint_repository": "google/timesfm-2.0-500m-pytorch",
+    "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+    "hparams": {
+      "context_len": 2048,
+      "horizon_len": 90,
+      "input_patch_len": 32,
+      "output_patch_len": 128,
+      "num_layers": 50,
+      "num_heads": 16,
+      "model_dims": 1280,
+      "per_core_batch_size": 1,
+      "backend": "cpu",
+      "quantiles": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9
+      ],
+      "use_positional_embedding": false,
+      "point_forecast_mode": "median"
+    },
+    "torch_threads": 4,
+    "python": "3.12.14",
+    "packages": {
+      "timesfm": "1.3.0",
+      "torch": "2.14.0",
+      "numpy": "2.5.3",
+      "pandas": "3.0.6"
+    }
+  },
+  "summary": {
+    "coverage": {
+      "1": {
+        "raw": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.12171052631578948,
+            0.5822368421052632,
+            0.9276315789473685
+          ],
+          "terminal_p10_p90_coverage": 0.805921052631579,
+          "mean_bracket_width_pct": 9.614091942364283,
+          "pinball_loss": [
+            19.018734924316384,
+            38.68694036383382,
+            19.82602013999534
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.7835616438356164,
+            "2026": 0.8395061728395061
+          }
+        },
+        "calibrated": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.09539473684210527,
+            0.49835526315789475,
+            0.9029605263157895
+          ],
+          "terminal_p10_p90_coverage": 0.8075657894736842,
+          "mean_bracket_width_pct": 9.499197277604884,
+          "pinball_loss": [
+            19.166817006366692,
+            38.11249994394142,
+            19.557584811695193
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.7808219178082192,
+            "2026": 0.8477366255144033
+          }
+        }
+      },
+      "2": {
+        "raw": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.12335526315789473,
+            0.5542763157894737,
+            0.9292763157894737
+          ],
+          "terminal_p10_p90_coverage": 0.805921052631579,
+          "mean_bracket_width_pct": 13.15686202222992,
+          "pinball_loss": [
+            26.488178550318686,
+            53.97556932951278,
+            27.514449021188817
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.8,
+            "2026": 0.8148148148148148
+          }
+        },
+        "calibrated": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.10197368421052631,
+            0.5148026315789473,
+            0.9046052631578947
+          ],
+          "terminal_p10_p90_coverage": 0.8026315789473685,
+          "mean_bracket_width_pct": 12.89638500111121,
+          "pinball_loss": [
+            26.75087657243044,
+            53.682613370596805,
+            27.238367378684572
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.7890410958904109,
+            "2026": 0.823045267489712
+          }
+        }
+      },
+      "3": {
+        "raw": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.12006578947368421,
+            0.537828947368421,
+            0.9358552631578947
+          ],
+          "terminal_p10_p90_coverage": 0.8157894736842105,
+          "mean_bracket_width_pct": 16.34880372543883,
+          "pinball_loss": [
+            31.632616950587213,
+            65.29173610486491,
+            32.914414102654696
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.7835616438356164,
+            "2026": 0.8641975308641975
+          }
+        },
+        "calibrated": {
+          "origins": 608,
+          "below_p10_p50_p90": [
+            0.09703947368421052,
+            0.5082236842105263,
+            0.9046052631578947
+          ],
+          "terminal_p10_p90_coverage": 0.8075657894736842,
+          "mean_bracket_width_pct": 16.20851662168939,
+          "pinball_loss": [
+            31.865266588209835,
+            65.68379375499997,
+            32.824289922085484
+          ],
+          "descriptive_coverage_check": true,
+          "years": {
+            "2025": 0.7863013698630137,
+            "2026": 0.8395061728395061
+          }
+        }
+      }
+    },
+    "policies": {
+      "base_one_day": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 1,
+        "tighten": false,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0005,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 921.332437931374,
+        "total_return_pct": -7.866756206862602,
+        "trade_count": 38,
+        "average_net_trade_return_pct": -0.7127891245359566,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -1.3516231544214399,
+          0.1147500379697572
+        ],
+        "average_trade_pnl_usd": -2.1247909736314305,
+        "sum_trade_pnl_usd": -80.74205699799435,
+        "win_rate_pct": 36.84210526315789,
+        "profit_factor": 0.5862252813093874,
+        "worst_trade_return_pct": -4.956800321996692,
+        "maximum_observed_drawdown_pct": 10.155818422000717,
+        "halt_time": "2025-03-04T01:10:00+00:00",
+        "fees_usd": 27.95794231927622,
+        "exposure_pct_of_minutes": 4.483428805237316,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 25
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 18,
+          "would_be_net_profitable_at_original_deadline": 2,
+          "stopped_then_deadline_net_loser": 16,
+          "paired_stop_minus_deadline_pnl_usd": 50.95893975887054
+        }
+      },
+      "base_three_day_tightening": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 3,
+        "tighten": true,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0005,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 936.4691032361892,
+        "total_return_pct": -6.353089676381085,
+        "trade_count": 95,
+        "average_net_trade_return_pct": -0.4640368716152182,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -1.3138756740026092,
+          0.5591433133141953
+        ],
+        "average_trade_pnl_usd": -0.6970070961695569,
+        "sum_trade_pnl_usd": -66.2156741361079,
+        "win_rate_pct": 43.15789473684211,
+        "profit_factor": 0.809864335846521,
+        "worst_trade_return_pct": -8.582804914550797,
+        "maximum_observed_drawdown_pct": 8.922082204031323,
+        "halt_time": null,
+        "fees_usd": 31.131745378817776,
+        "exposure_pct_of_minutes": 35.20492362247681,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 369
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 47,
+          "would_be_net_profitable_at_original_deadline": 10,
+          "stopped_then_deadline_net_loser": 37,
+          "paired_stop_minus_deadline_pnl_usd": 53.45137192726351
+        }
+      },
+      "base_three_day_fixed": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 3,
+        "tighten": false,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0005,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 975.196800622812,
+        "total_return_pct": -2.4803199377188,
+        "trade_count": 92,
+        "average_net_trade_return_pct": -0.36027335358610374,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -1.3870825506302698,
+          0.8779369452431738
+        ],
+        "average_trade_pnl_usd": -0.29702402211515155,
+        "sum_trade_pnl_usd": -27.32621003459394,
+        "win_rate_pct": 48.91304347826087,
+        "profit_factor": 0.9218880684746057,
+        "worst_trade_return_pct": -8.582804914550787,
+        "maximum_observed_drawdown_pct": 9.360812609347969,
+        "halt_time": null,
+        "fees_usd": 31.185404571767847,
+        "exposure_pct_of_minutes": 37.529209856337516,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 366
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 27,
+          "would_be_net_profitable_at_original_deadline": 0,
+          "stopped_then_deadline_net_loser": 27,
+          "paired_stop_minus_deadline_pnl_usd": 112.5280928604084
+        }
+      },
+      "stress_one_day": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 1,
+        "tighten": false,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0015,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 924.0537801232803,
+        "total_return_pct": -7.594621987671979,
+        "trade_count": 34,
+        "average_net_trade_return_pct": -0.7873357072022775,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -1.510110924017355,
+          0.4927031162178321
+        ],
+        "average_trade_pnl_usd": -2.2869861523492188,
+        "sum_trade_pnl_usd": -77.75752917987344,
+        "win_rate_pct": 26.47058823529412,
+        "profit_factor": 0.5615768154344681,
+        "worst_trade_return_pct": -3.6548042326053958,
+        "maximum_observed_drawdown_pct": 10.251921904209704,
+        "halt_time": "2025-05-18T19:52:00+00:00",
+        "fees_usd": 22.967888967764033,
+        "exposure_pct_of_minutes": 4.219744498999818,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 104
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 14,
+          "would_be_net_profitable_at_original_deadline": 2,
+          "stopped_then_deadline_net_loser": 12,
+          "paired_stop_minus_deadline_pnl_usd": 41.24384854084602
+        }
+      },
+      "stress_three_day_tightening": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 3,
+        "tighten": true,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0015,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 931.3598149109772,
+        "total_return_pct": -6.864018508902281,
+        "trade_count": 65,
+        "average_net_trade_return_pct": -0.7642015492780657,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -2.1180602499418644,
+          0.5885311907819414
+        ],
+        "average_trade_pnl_usd": -1.1005373172603983,
+        "sum_trade_pnl_usd": -71.5349256219259,
+        "win_rate_pct": 43.07692307692308,
+        "profit_factor": 0.7175064819406529,
+        "worst_trade_return_pct": -8.914995159213602,
+        "maximum_observed_drawdown_pct": 9.728742801864964,
+        "halt_time": null,
+        "fees_usd": 21.372304227784134,
+        "exposure_pct_of_minutes": 23.957196763047826,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 445
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 33,
+          "would_be_net_profitable_at_original_deadline": 8,
+          "stopped_then_deadline_net_loser": 25,
+          "paired_stop_minus_deadline_pnl_usd": -20.838029210979514
+        }
+      },
+      "stress_three_day_fixed": {
+        "status": "SIMULATED_NOT_VERIFIED_FILLS",
+        "horizon": 3,
+        "tighten": false,
+        "fee_per_side": 0.001,
+        "adverse_fill_per_side": 0.0015,
+        "initial_usd": 1000.0,
+        "final_equity_usd": 976.2246534361219,
+        "total_return_pct": -2.377534656387814,
+        "trade_count": 63,
+        "average_net_trade_return_pct": -0.5032529745518911,
+        "mean_trade_return_descriptive_95pct_interval": [
+          -2.0563686096146974,
+          1.2342364964520987
+        ],
+        "average_trade_pnl_usd": -0.42254999649634417,
+        "sum_trade_pnl_usd": -26.620649779269684,
+        "win_rate_pct": 47.61904761904761,
+        "profit_factor": 0.8900886387232501,
+        "worst_trade_return_pct": -8.914995159213591,
+        "maximum_observed_drawdown_pct": 9.58178549150811,
+        "halt_time": null,
+        "fees_usd": 21.57457948769393,
+        "exposure_pct_of_minutes": 25.396776686670304,
+        "stale_fx_minutes_with_position": 0,
+        "entry_rejections": {
+          "COST_FILTER": 444
+        },
+        "stop_diagnostic": {
+          "stopped_trades": 19,
+          "would_be_net_profitable_at_original_deadline": 0,
+          "stopped_then_deadline_net_loser": 19,
+          "paired_stop_minus_deadline_pnl_usd": 45.31704261621745
+        }
+      }
+    },
+    "benchmarks": {
+      "base": {
+        "constant_USD_cash_final": 1000.0,
+        "USDT_cash_final_usd": 1002.2046076299466,
+        "buy_hold_ETH_final_usd": 750.089889752699,
+        "buy_hold_ETH_return_pct": -24.991011024730092,
+        "note": "Buy-and-hold uses full cash, fractional ETH and both-side costs; risk exposure differs."
+      },
+      "stress": {
+        "constant_USD_cash_final": 1000.0,
+        "USDT_cash_final_usd": 1002.2046076299466,
+        "buy_hold_ETH_final_usd": 748.5912075314031,
+        "buy_hold_ETH_return_pct": -25.140879246859683,
+        "note": "Buy-and-hold uses full cash, fractional ETH and both-side costs; risk exposure differs."
+      }
+    },
+    "elapsed_seconds": 276.5939999999973,
+    "prediction_count": 1341,
+    "minute_rows": 879840,
+    "limitations": [
+      "No historical order book or actual account fill reconstruction.",
+      "Fee/spread/slippage/latency/order filters are declared assumptions.",
+      "USD marks use lagged hourly Coinbase USDT/USD; intrahour FX jumps are unobserved.",
+      "Retrospective selected-history study; no positive future EV guarantee.",
+      "Minute-resolution drawdown and stops cannot cap losses through gaps/outages."
+    ]
+  },
+  "verification": {
+    "focused_tests_passed": 81,
+    "context_hashes_verified": 1341,
+    "trade_risk_and_stop_invariants_verified": 387,
+    "all_models_and_policies_preserved": true
+  },
+  "entry_subset_coverage": {
+    "base_one_day": {
+      "trades": 38,
+      "terminal_coverage_on_entry_subset": 0.6578947368421053,
+      "below_entry_p10": 0.3157894736842105
+    },
+    "base_three_day_tightening": {
+      "trades": 95,
+      "terminal_coverage_on_entry_subset": 0.7263157894736842,
+      "below_entry_p10": 0.21052631578947367
+    },
+    "base_three_day_fixed": {
+      "trades": 92,
+      "terminal_coverage_on_entry_subset": 0.75,
+      "below_entry_p10": 0.1956521739130435
+    },
+    "stress_one_day": {
+      "trades": 34,
+      "terminal_coverage_on_entry_subset": 0.6764705882352942,
+      "below_entry_p10": 0.29411764705882354
+    },
+    "stress_three_day_tightening": {
+      "trades": 65,
+      "terminal_coverage_on_entry_subset": 0.7692307692307693,
+      "below_entry_p10": 0.18461538461538463
+    },
+    "stress_three_day_fixed": {
+      "trades": 63,
+      "terminal_coverage_on_entry_subset": 0.7936507936507936,
+      "below_entry_p10": 0.1746031746031746
+    }
+  },
+  "path_diagnostic": {
+    "origins": 608,
+    "intraday_touch_calibrated_one_day_p10_rate": 0.20559210526315788,
+    "terminal_below_calibrated_one_day_p10_rate": 0.09539473684210527,
+    "note": "Post-hoc descriptive path diagnostic on all origins, not used for decisions."
+  },
+  "local_output_hashes": {
+    "base_one_day.json": "23a3322b26199acf87af5280487f152b57f6d8871be45895527407dff131b36a",
+    "base_three_day_fixed.json": "17a610bf11fd0ae5d54d3e41670deaddd4a6ad747c41a5d86698f04785cf2843",
+    "base_three_day_tightening.json": "14b849243f4de629e25fa58602b9db6c6692f7eb0f7bec32ed237010ca6b807f",
+    "calibrated_quantiles.json": "b2c8673bb2c588d69d732b357224e9454c8d5014b85a52f0f961e63536b02efc",
+    "COMPLETED.json": "75b7b495f063a4aa4cf07e3b4865f0ac33e3c9a8d04bb6f26c4f4386fc35d560",
+    "coverage.json": "55770f9fe8cf7df609e5d17ce1a25d3a77d8b5d96fe54c4a17b8e34ff7c72f2f",
+    "manifest.json": "d49bffb7bd64dc98ef6b8cc9a9f6dbc7e615d44ff24a42f3a6b51b373e71cafc",
+    "runtime.json": "78b67fbcbbfd9750f25d93038649929a8ee786dd19f903be536e1c01cd63edd8",
+    "stress_one_day.json": "1489e590d6ffbe8f5b954fd330d1d4714e8d47f1c13e60b0a73d92cddcfaa1f4",
+    "stress_three_day_fixed.json": "63ba4836bfb54a66902e694e641784cde882a834b7d1c4cfef6fe19752d7d2d8",
+    "stress_three_day_tightening.json": "5cd5e35fd7c6b7ac1a2d97522d8efe8392b80d5f00058a2f5aafa557fc83a3f8",
+    "SUMMARY.json": "1a1a567e6a40e0b0c75d3d1ffa6cffeff015b1bbb3002cf81297bc273fe257d4"
+  },
+  "raw_quantile_file_sha256": "bea8d54773d8f6dc6e661f13da2ea6e3c88e3028367eae1cdef372062b56c754"
+}
