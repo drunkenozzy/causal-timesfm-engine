@@ -1,0 +1,412 @@
+{
+  "schema_version": "1.0",
+  "as_of_utc": "2026-09-29T12:00:00+00:00",
+  "purpose": "HUMAN_MACRO_CONTEXT",
+  "status": "READY",
+  "rules": {
+    "version": "MACRO_RULES_001",
+    "material_shock_sigma": 0.5,
+    "energy_shock_sigma": 1.5,
+    "forecast_neutral_pct": 0.25,
+    "max_source_age_days": 4,
+    "max_aligned_age_days": 3,
+    "meaning": "Descriptive thresholds chosen by policy; not fitted or validated probabilities."
+  },
+  "sources": {
+    "ETH": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    },
+    "TRY": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    },
+    "DXY": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    },
+    "TNX": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    },
+    "Brent": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    },
+    "WTI": {
+      "last_session": "2026-09-28",
+      "available_at_utc": "2026-09-29T06:00:00+00:00",
+      "age_calendar_days": 1
+    }
+  },
+  "indicators": {
+    "ETH": {
+      "latest_level": 2688.668701171875,
+      "latest_session": "2026-09-28",
+      "level_unit": "USD",
+      "aligned_move": 0.11811373786967763,
+      "move_unit": "percent",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": 0.03959608152900615,
+      "native_momentum_5_observations": 0.14812897706160122,
+      "momentum_unit": "percent"
+    },
+    "TRY": {
+      "latest_level": 48.97422,
+      "latest_session": "2026-09-28",
+      "level_unit": "TRY_per_USD",
+      "aligned_move": 0.0892514314902978,
+      "move_unit": "percent",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": 0.6852061866623927,
+      "native_momentum_5_observations": 0.3577691060362653,
+      "momentum_unit": "percent"
+    },
+    "DXY": {
+      "latest_level": 101.174,
+      "latest_session": "2026-09-28",
+      "level_unit": "index_points",
+      "aligned_move": -0.21234777627435453,
+      "move_unit": "percent",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": -0.6804203502257704,
+      "native_momentum_5_observations": 0.744827036823148,
+      "momentum_unit": "percent"
+    },
+    "TNX": {
+      "latest_level": 5.236,
+      "latest_session": "2026-09-28",
+      "level_unit": "yield_percent",
+      "aligned_move": -4.100000000000037,
+      "move_unit": "basis_points",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": -0.8418156017512047,
+      "native_momentum_5_observations": 28.500000000000014,
+      "momentum_unit": "basis_points"
+    },
+    "Brent": {
+      "latest_level": 98.76,
+      "latest_session": "2026-09-28",
+      "level_unit": "USD",
+      "aligned_move": -2.584830339321299,
+      "move_unit": "percent",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": -0.8687718361113943,
+      "native_momentum_5_observations": -1.2498750124987468,
+      "momentum_unit": "percent"
+    },
+    "WTI": {
+      "latest_level": 93.3,
+      "latest_session": "2026-09-28",
+      "level_unit": "USD",
+      "aligned_move": -2.4480320776617557,
+      "move_unit": "percent",
+      "aligned_start_date": "2026-09-24",
+      "aligned_end_date": "2026-09-25",
+      "shock_sigma": -0.8075807882243331,
+      "native_momentum_5_observations": 1.435094585779506,
+      "momentum_unit": "percent"
+    }
+  },
+  "market_regime": {
+    "code": "MIXED",
+    "label": "Mixed / no strong common pattern",
+    "interpretation": "The aligned moves do not meet a declared directional regime rule. No strong common macro interpretation is assigned.",
+    "matched_patterns": [
+      {
+        "code": "MIXED",
+        "label": "Mixed / no strong common pattern",
+        "interpretation": "The aligned moves do not meet a declared directional regime rule. No strong common macro interpretation is assigned."
+      }
+    ],
+    "classification_kind": "DESCRIPTIVE_RULE_NOT_PROBABILITY",
+    "observation_date": "2026-09-25",
+    "freshness": "OLDER_ALIGNED_SESSION"
+  },
+  "indicator_translation": [
+    {
+      "indicator": "ETH",
+      "evidence_keys": [
+        "indicators.ETH.aligned_move",
+        "indicators.ETH.shock_sigma"
+      ],
+      "text": "ETH moved +0.12 percent over the aligned interval ending 2026-09-25 (+0.04 times past daily volatility)."
+    },
+    {
+      "indicator": "TRY",
+      "evidence_keys": [
+        "indicators.TRY.aligned_move",
+        "indicators.TRY.shock_sigma"
+      ],
+      "text": "USD/TRY moved +0.09 percent over the aligned interval ending 2026-09-25 (+0.69 times past daily volatility). A positive USD/TRY move means lira depreciation."
+    },
+    {
+      "indicator": "DXY",
+      "evidence_keys": [
+        "indicators.DXY.aligned_move",
+        "indicators.DXY.shock_sigma"
+      ],
+      "text": "DXY moved -0.21 percent over the aligned interval ending 2026-09-25 (-0.68 times past daily volatility)."
+    },
+    {
+      "indicator": "TNX",
+      "evidence_keys": [
+        "indicators.TNX.aligned_move",
+        "indicators.TNX.shock_sigma"
+      ],
+      "text": "US10Y moved -4.10 basis points over the aligned interval ending 2026-09-25 (-0.84 times past daily volatility)."
+    },
+    {
+      "indicator": "Brent",
+      "evidence_keys": [
+        "indicators.Brent.aligned_move",
+        "indicators.Brent.shock_sigma"
+      ],
+      "text": "Brent moved -2.58 percent over the aligned interval ending 2026-09-25 (-0.87 times past daily volatility)."
+    },
+    {
+      "indicator": "WTI",
+      "evidence_keys": [
+        "indicators.WTI.aligned_move",
+        "indicators.WTI.shock_sigma"
+      ],
+      "text": "WTI moved -2.45 percent over the aligned interval ending 2026-09-25 (-0.81 times past daily volatility)."
+    },
+    {
+      "indicator": "TIMESFM_ETH",
+      "evidence_keys": [
+        "forecast.median_move_pct",
+        "forecast.p10",
+        "forecast.p90"
+      ],
+      "text": "TimesFM projects a median terminal move of +0.07% over 1 daily bar(s) from the origin close. Its p10-p90 band is a raw nominal 80% interval whose actual coverage is unverified here."
+    }
+  ],
+  "network": {
+    "status": "AVAILABLE",
+    "features": {
+      "downside_excess_connection": -0.005401234567901203,
+      "co_crash_intensity": 0.19842927896719123,
+      "risk_safety_interaction": 0.08352043143941187,
+      "strength_x_target_shock": 0.00012267713680897104,
+      "instability_x_target_shock": 5.531400441719149e-05
+    },
+    "audit": {
+      "decision_utc": "2026-09-29T06:00:00+00:00",
+      "source_last_labels": {
+        "ETH": "2026-09-28",
+        "TRY": "2026-09-28",
+        "DXY": "2026-09-28",
+        "TNX": "2026-09-28",
+        "Brent": "2026-09-28",
+        "WTI": "2026-09-28"
+      },
+      "source_available_utc": {
+        "ETH": "2026-09-29T06:00:00+00:00",
+        "TRY": "2026-09-29T06:00:00+00:00",
+        "DXY": "2026-09-29T06:00:00+00:00",
+        "TNX": "2026-09-29T06:00:00+00:00",
+        "Brent": "2026-09-29T06:00:00+00:00",
+        "WTI": "2026-09-29T06:00:00+00:00"
+      },
+      "source_age_days": {
+        "ETH": 1,
+        "TRY": 1,
+        "DXY": 1,
+        "TNX": 1,
+        "Brent": 1,
+        "WTI": 1
+      },
+      "stress_observation_date": "2026-09-25",
+      "target_origin": "2026-09-28"
+    },
+    "predictive_use": "DESCRIPTIVE_ONLY",
+    "interpretation": "Downside excess measures co-declines beyond independent sign frequencies. Co-crash and safety interaction are price proxies, not measured money flows or a trust score.",
+    "daily_readout": "Across the rolling risk pairs, joint declines were 0.54 percentage points less frequent than the independent-sign reference. On 2026-09-25, co-crash intensity was 0.198 and its dollar/yield safety interaction was 0.084. These dimensionless intensity measures have no calibrated alarm threshold; they do not override the regime or forecast."
+  },
+  "forecast": {
+    "p10": 2594.107421875,
+    "p50": 2690.6748046875,
+    "p90": 2795.42919921875,
+    "asset": "ETH-USD",
+    "quote": "USD",
+    "origin_date": "2026-09-28",
+    "origin_close": 2688.668701171875,
+    "horizon_days": 1,
+    "target_close_utc": "2026-09-30T00:00:00+00:00",
+    "context_sha256": "bd9b58aff3cd179d179ecf60da7d73e455e5f028b1810b2a730e2f6c8419a591",
+    "quantile_kind": "RAW_TIMESFM_TERMINAL",
+    "produced_at_utc": "2026-09-29T15:31:49.697751+00:00",
+    "mode": "RETROSPECTIVE_REPLAY",
+    "engine": "M1_TIMESFM",
+    "timesfm_executed": true,
+    "degraded_mode": false,
+    "checkpoint_repository": "google/timesfm-2.0-500m-pytorch",
+    "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+    "hparams": {
+      "context_len": 2048,
+      "horizon_len": 90,
+      "input_patch_len": 32,
+      "output_patch_len": 128,
+      "num_layers": 50,
+      "num_heads": 16,
+      "model_dims": 1280,
+      "per_core_batch_size": 1,
+      "backend": "cpu",
+      "quantiles": [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9
+      ],
+      "use_positional_embedding": false,
+      "point_forecast_mode": "median"
+    },
+    "torch_threads": 4,
+    "python": "3.12.14",
+    "packages": {
+      "timesfm": "1.3.0",
+      "torch": "2.14.0",
+      "numpy": "2.5.3",
+      "pandas": "3.0.6"
+    },
+    "status": "AVAILABLE",
+    "median_move_pct": 0.07461326547040237,
+    "direction": "NEUTRAL",
+    "nominal_interval_mass": 0.8,
+    "empirical_coverage": null,
+    "calibration_status": "NOT_VERIFIED_FOR_THIS_BRIEFING",
+    "interval_contains_origin_close": true
+  },
+  "momentum_macro_divergence": {
+    "status": "INDETERMINATE",
+    "forecast_direction": "NEUTRAL",
+    "macro_context_direction": null,
+    "eth_observed_momentum_5_pct": 0.14812897706160122,
+    "interpretation": "TimesFM median direction is neutral; the descriptive ETH macro context is not directional. This is a qualitative comparison of a future terminal forecast with recent observations, not a second return forecast.",
+    "forecast_is_pure_momentum": false
+  },
+  "limitations": [
+    "Price co-movement cannot establish trust, capital flows, or geopolitical causation.",
+    "US10Y is a nominal yield; changes can reflect policy, inflation, growth, or term premium.",
+    "ETH, oil and inverted USD/TRY are a narrow, imperfect risk basket.",
+    "Session labels align calendar intervals, not exact exchange closing times.",
+    "Availability is assumed at 06:00 UTC after the session; provider publication times are not observed.",
+    "Historical snapshots may contain revisions; replay is not a historical vintage backtest.",
+    "TimesFM quantiles are terminal prices, not intraday paths; coverage and directional skill are unverified here.",
+    "Regime rules and network features have no established incremental predictive edge.",
+    "This briefing does not estimate profitable entry/exit timing or validate longer investment horizons.",
+    "Regime evidence ends on 2026-09-25; newer native-session prices are displayed separately and do not refresh this classification."
+  ],
+  "errors": [],
+  "mode": "RETROSPECTIVE_REPLAY",
+  "information_cutoff_utc": "2026-09-29T06:00:00+00:00",
+  "aligned_observation_date": "2026-09-25",
+  "aligned_observation_age_days": 3,
+  "input_manifest": {
+    "collection_started_utc": "2026-09-29T09:25:28.691385+00:00",
+    "requested_start": "2021-01-01",
+    "requested_tv_bars": 5000,
+    "sources": {
+      "ETH": {
+        "provider": "Yahoo Finance",
+        "symbol": "ETH-USD",
+        "quote": "USD",
+        "bar_convention": "UTC daily label",
+        "auto_adjust": false
+      },
+      "TRY": {
+        "provider": "TradingView/tvDatafeed",
+        "symbol": "USDTRY",
+        "exchange": "FX_IDC",
+        "bar_convention": "provider daily session label"
+      },
+      "DXY": {
+        "provider": "TradingView/tvDatafeed",
+        "symbol": "DXY",
+        "exchange": "TVC",
+        "bar_convention": "provider daily session label"
+      },
+      "TNX": {
+        "provider": "TradingView/tvDatafeed",
+        "symbol": "US10Y",
+        "exchange": "TVC",
+        "bar_convention": "provider daily session label"
+      },
+      "Brent": {
+        "provider": "TradingView/tvDatafeed",
+        "symbol": "UKOIL",
+        "exchange": "TVC",
+        "bar_convention": "provider daily session label"
+      },
+      "WTI": {
+        "provider": "TradingView/tvDatafeed",
+        "symbol": "USOIL",
+        "exchange": "TVC",
+        "bar_convention": "provider daily session label"
+      }
+    },
+    "series": {
+      "ETH": {
+        "rows": 2097,
+        "first": "2021-01-01",
+        "last": "2026-09-28",
+        "sha256": "5883b22a18964bb1944736da144ad98aefed8b446eb85d82c986fabd85c27513"
+      },
+      "TRY": {
+        "rows": 1497,
+        "first": "2021-01-01",
+        "last": "2026-09-28",
+        "sha256": "d6cb212acbd1438967577f40248049804e79107b7e4d9050fdd40f384562f983"
+      },
+      "DXY": {
+        "rows": 1470,
+        "first": "2021-01-04",
+        "last": "2026-09-28",
+        "sha256": "c54a1ca56483e4798a3acbb4f4c8a7d7c55131cddac35187eacfa30f9a80524c"
+      },
+      "TNX": {
+        "rows": 1460,
+        "first": "2021-01-01",
+        "last": "2026-09-28",
+        "sha256": "b9dfd351a31388a0008ab6f63992b3ccc684955579fd45dd0fcbfeeffe5d8e6e"
+      },
+      "Brent": {
+        "rows": 1481,
+        "first": "2021-01-04",
+        "last": "2026-09-28",
+        "sha256": "f7dc33415634b47b87b448f05896e7daf5406991d036f220240d3fe8438af798"
+      },
+      "WTI": {
+        "rows": 1439,
+        "first": "2021-01-04",
+        "last": "2026-09-28",
+        "sha256": "6950b8ca857de1d24309a6b817c70a9b37e11cb10c689882a85a3b3322944cea"
+      }
+    },
+    "status": "READY",
+    "availability_rule": "session label + 1 calendar day at 06:00 UTC",
+    "availability_status": "CONSERVATIVE_ASSUMPTION_NOT_OBSERVED_PUBLICATION_TIMESTAMPS",
+    "tv_host_timezone": "Europe/London",
+    "tv_session_rule": "recover UTC opening timestamp, then 17:00 America/New_York session roll",
+    "data_vintage": "current retrospective snapshot; not a historical vintage archive"
+  },
+  "history_directory": "network_outputs\\trust_history_002",
+  "generated_at_utc": "2026-09-29T15:31:49.753797+00:00",
+  "refresh_due_utc": null
+}
