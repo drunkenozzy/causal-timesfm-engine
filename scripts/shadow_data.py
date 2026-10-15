@@ -60,10 +60,32 @@ def fetch_tv_close(symbol, exchange='TVC'):
         if raw is not None and not raw.empty and 'symbol' in raw.columns:
             if not raw['symbol'].eq(f'{exchange}:{symbol}').all():
                 raise ValueError('Provider returned a different instrument')
-        return normalize_close(raw)
+        return closed_tv_sessions(raw)
     except Exception as exc:
         print(f'[Shadow] DATA_NOT_READY - {exchange}:{symbol}: {exc}')
         return normalize_close(None)
+
+
+def closed_tv_sessions(raw, now=None):
+    """Recover tvDatafeed's host-local opens and retain only completed sessions.
+
+    A Sunday evening FX open belongs to Monday. The conservative availability
+    cutoff matches the macro collector: next calendar day at 06:00 UTC.
+    """
+    if raw is None or raw.empty:
+        return normalize_close(None)
+    opens = pd.DatetimeIndex([value.to_pydatetime().astimezone(timezone.utc)
+                              for value in pd.DatetimeIndex(raw.index)])
+    labels = (opens.tz_convert('America/New_York').tz_localize(None)
+              + pd.Timedelta(hours=7)).normalize()
+    adjusted = raw.copy()
+    adjusted.index = labels
+    frame = normalize_close(adjusted)
+    now = pd.Timestamp(now) if now is not None else pd.Timestamp.now(tz='UTC')
+    if now.tzinfo is None:
+        raise ValueError('Availability cutoff requires a timezone-aware time')
+    available = frame.index.tz_localize('UTC') + pd.Timedelta(days=1, hours=6)
+    return frame.loc[available <= now]
 
 
 def fetch_eth_close():

@@ -73,6 +73,17 @@ def test_duplicate_dates_fail_closed():
         data.normalize_close(pd.concat([raw, raw.iloc[-1:]]))
 
 
+def test_fx_evening_opens_map_to_session_and_exclude_unfinished_close():
+    raw = pd.DataFrame({'close': [49.26, 49.32, 49.42]}, index=pd.to_datetime([
+        '2026-10-08T22:00:00Z', '2026-10-11T22:00:00Z', '2026-10-14T22:00:00Z']))
+    result = data.closed_tv_sessions(raw, now='2026-10-15T12:00:00Z')
+    assert list(result.index.strftime('%Y-%m-%d')) == ['2026-10-09', '2026-10-12']
+    assert list(result.Close) == [49.26, 49.32]
+    before = data.closed_tv_sessions(raw, now='2026-10-16T05:59:00Z')
+    after = data.closed_tv_sessions(raw, now='2026-10-16T06:00:00Z')
+    assert len(before) == 2 and after.Close.iloc[-1] == 49.42
+
+
 def test_snapshot_hash_binds_instrument_and_values():
     raw = prices()
     original = data.snapshot_hash(raw, {'source': 'A'})
