@@ -116,6 +116,62 @@ class NeuralStub:
                 'p90_upside': hist[-1] * 1.1, 'timesfm_executed': True, 'degraded_mode': False}
 
 
+@pytest.mark.parametrize('module,target', [(oil, 'UKOIL'), (fx, 'USDTRY')])
+@pytest.mark.parametrize('missing_controls', [False, True])
+def test_weekend_resolves_friday_without_new_forecast(monkeypatch, tmp_path, module, target, missing_controls):
+    class Sunday(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 10, 18, 12, tzinfo=timezone.utc)
+    raw = pd.DataFrame({'Close': [50.]}, index=pd.to_datetime(['2026-10-16']))
+    monkeypatch.setattr(module, 'datetime', Sunday)
+    monkeypatch.setattr(module, 'fetch_tv_close', lambda symbol, exchange: raw if symbol == target or not missing_controls else raw.iloc[:0])
+    constructor = Mock(side_effect=AssertionError('Weekend must not initialize TimesFM'))
+    monkeypatch.setattr(module, 'TimesFmBaselineEngine', constructor)
+    events = Ledger()
+    monkeypatch.setattr(module, 'event_ledger', lambda _: events)
+    path = tmp_path / 'ledger.json'
+    fc = {'forecast_id': 'friday', 'm1_forecast': 49., 'm4_forecast': None,
+          'experiment_status': 'EXPLORATORY', 'actual_close': None}
+    path.write_text(json.dumps({'2026-10-16': {'forecast': fc}}))
+    monkeypatch.setattr(module, 'LEDGER_FILE', str(path))
+    module.run_shadow()
+    module.run_shadow()
+    result = json.loads(path.read_text())['2026-10-16']['forecast']
+    assert result['actual_close'] == 50. and result['m1_error'] == 1.
+    assert result['m4_error'] is None
+    assert len(events.resolutions) == 1 and not events.records
+    constructor.assert_not_called()
+
+
+def test_resolution_recovers_existing_event_and_rejects_conflicts(tmp_path):
+    from scripts.resolve_shadow_closes import resolve_closed_sessions
+    path = tmp_path / 'ledger.json'
+    original = {'2026-10-16': {'forecast': {'forecast_id': 'f', 'm1_forecast': 49., 'm4_forecast': 48., 'actual_close': None}}}
+    path.write_text(json.dumps(original))
+    raw = pd.DataFrame({'Close': [50.]}, index=pd.to_datetime(['2026-10-16']))
+    append = Mock(side_effect=AssertionError('Must not duplicate event'))
+    existing = SimpleNamespace(list_resolutions=lambda _: [{'realized_actual': 50.}], resolve_forecast=append)
+    resolve_closed_sessions(path, raw, '2026-10-18', lambda: existing)
+    assert json.loads(path.read_text())['2026-10-16']['forecast']['actual_close'] == 50.
+    append.assert_not_called()
+    path.write_text(json.dumps(original))
+    raw.iloc[0, 0] = 51.
+    with pytest.raises(ValueError, match='Conflicting'):
+        resolve_closed_sessions(path, raw, '2026-10-18', lambda: existing)
+    assert json.loads(path.read_text()) == original
+
+
+def test_resolution_never_scores_current_session(tmp_path):
+    from scripts.resolve_shadow_closes import resolve_closed_sessions
+    path = tmp_path / 'ledger.json'
+    original = {'2026-10-16': {'forecast': {'m1_forecast': 49., 'm4_forecast': 48., 'actual_close': None}}}
+    path.write_text(json.dumps(original))
+    raw = pd.DataFrame({'Close': [50.]}, index=pd.to_datetime(['2026-10-16']))
+    resolve_closed_sessions(path, raw, '2026-10-16', Mock(side_effect=AssertionError('No event')))
+    assert json.loads(path.read_text()) == original
+
+
 @pytest.mark.parametrize('module,target,expected', [
     (oil, 'UKOIL', [('UKOIL', 'TVC'), ('USOIL', 'TVC'), ('DXY', 'TVC')]),
     (fx, 'USDTRY', [('USDTRY', 'FX_IDC'), ('DXY', 'TVC'), ('US10Y', 'TVC'), ('UKOIL', 'TVC')]),

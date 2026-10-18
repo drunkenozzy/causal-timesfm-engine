@@ -12,6 +12,8 @@ from core.engine_timesfm import TimesFmBaselineEngine
 from scripts.shadow_data import (ROOT, ETH_SOURCE, tv_source, fetch_eth_close,
     fetch_tv_close, snapshot_hash, event_ledger, registration_still_open)
 
+from scripts.resolve_shadow_closes import resolve_closed_sessions
+
 LEDGER_FILE = str(ROOT / 'OIL_V2_SHADOW_LEDGER.json')
 
 def get_oil_data(ticker_symbol, exchange='TVC'):
@@ -84,6 +86,9 @@ def run_shadow():
     df_wti = get_oil_data("USOIL", "TVC")
     df_dxy = get_oil_data("DXY", "TVC")
     
+    resolve_closed_sessions(LEDGER_FILE, df_brent, datetime.now(timezone.utc).strftime('%Y-%m-%d'),
+                            lambda: event_ledger('OIL'))
+
     if any(frame.empty for frame in (df_brent, df_wti, df_dxy)):
         print('[Shadow] DATA_NOT_READY - missing oil input')
         return
@@ -192,38 +197,6 @@ def run_shadow():
         ledger[target_date]["forecast"] = forecast_entry
         print(f"[Shadow] Recorded forecast for {target_date}: M1={m1_pred:.2f}, M4={m4_pred:.2f}")
 
-    df_all = df_brent
-    ledger_obj = event_ledger("OIL")
-    
-    for t_date, data in ledger.items():
-        if t_date < target_date:
-            if "forecast" in data and data["forecast"].get("actual_close") is None:
-                mask = df_all.index.strftime('%Y-%m-%d') == t_date
-                if mask.any():
-                    actual = df_all[mask]['Close'].iloc[0]
-                    fcst = data["forecast"]
-                    fcst["actual_close"] = float(actual)
-                    m1 = fcst["m1_forecast"]
-                    m4 = fcst["m4_forecast"]
-                    if m1 is not None:
-                        fcst["m1_error"] = float(actual - m1)
-                    if m4 is not None:
-                        fcst["m4_error"] = float(actual - m4)
-                    print(f"[Shadow] Scored {t_date}: Actual={actual:.2f}, M1 Err={fcst.get('m1_error'):.2f}, M4 Err={fcst.get('m4_error'):.2f}")
-                    
-                    if "forecast_id" in fcst and fcst.get("experiment_status") not in ["PILOT_NOWCAST", "LEDGER_RESOLUTION_ERROR"]:
-                        try:
-                            ledger_obj.resolve_forecast(
-                                forecast_id=fcst["forecast_id"],
-                                realized_actual=float(actual),
-                                secondary_metrics={"m1_error": fcst.get("m1_error"), "m4_error": fcst.get("m4_error")},
-                                notes="M4_OIL_SPREAD_V2 daily resolution"
-                            )
-                            print(f"[Shadow] Successfully resolved {fcst['forecast_id']} in immutable ledger.")
-                        except Exception as e:
-                            print(f"[Shadow] Failed to resolve {fcst['forecast_id']} in immutable ledger: {e}")
-                            fcst["experiment_status"] = "LEDGER_RESOLUTION_ERROR"
-    
     with open(LEDGER_FILE, 'w') as f:
         json.dump(ledger, f, indent=4)
         
