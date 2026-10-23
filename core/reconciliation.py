@@ -134,6 +134,23 @@ class ReconciliationEngine:
           3. Valuation & Risk Numbers (Foundation Prior vs Scenario Envelope)
           4. Observable Falsifiability Condition
         """
+        if "central_forecast" in forecast_output:
+            central = forecast_output["central_forecast"]
+            interval = forecast_output["prediction_interval"]
+            macro = forecast_output["macro_interpretation"]
+            return (
+                f"RESEARCH BRIEF: {asset_name}\n"
+                f"Current price: {currency_symbol}{current_price:,.2f}\n\n"
+                f"CENTRAL FORECAST\nMedian estimate: {currency_symbol}{central['value']:,.2f}. "
+                f"Source: {central['source']}. Macro assumptions have not shifted this estimate.\n\n"
+                f"UNCERTAINTY RANGE\nLower estimate: {currency_symbol}{interval['lower']:,.2f}; "
+                f"upper estimate: {currency_symbol}{interval['upper']:,.2f}. "
+                f"Calibration status: {interval['calibration_status']}. "
+                "This is a terminal-price range, not a guaranteed limit or an intraday stop.\n\n"
+                f"MACRO INTERPRETATION\n{macro['explanation']} "
+                f"Liquidity input status: {macro.get('liquidity_feature_status', 'NOT_APPLICABLE')}.\n\n"
+                "This research brief does not generate allocation, entry, exit, or stop instructions."
+            )
         regime = allocation_output["regime"]
         alloc_disabled = allocation_output.get("allocation_disabled", False)
         risk_w = int(allocation_output.get("target_risk_weight", 0.0) * 100)

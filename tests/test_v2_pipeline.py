@@ -12,6 +12,7 @@ import os
 import sys
 import math
 import numpy as np
+import pytest
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
@@ -20,6 +21,17 @@ from core.markov_regime import InstitutionalMarkovEngine
 from core.onchain_liquidity import OnChainLiquidityEngine
 from core.reconciliation import ReconciliationEngine
 from core.econometrics import EconometricFilter
+
+
+@pytest.fixture(autouse=True)
+def isolate_pipeline_runtime(monkeypatch, tmp_path):
+    """Unit tests must neither download models nor append to the live ledger."""
+    import core.pipeline as pipeline
+    from core.engine_timesfm import TimesFmBaselineEngine
+    from core.forecast_ledger import ImmutableForecastLedger
+    monkeypatch.setattr(pipeline, 'ImmutableForecastLedger',
+                        lambda: ImmutableForecastLedger(str(tmp_path/'ledger.jsonl')))
+    monkeypatch.setattr(TimesFmBaselineEngine, '_try_init_timesfm', lambda *a, **kw: False)
 
 def test_econometric_stationarity():
     ef = EconometricFilter()
@@ -208,15 +220,15 @@ def test_unified_pipeline_crypto_and_guardrails():
     assert synth_res["is_synthetic"] is True
     assert synth_res["allocation"]["allocation_disabled"] is True
     assert synth_res["allocation"]["target_risk_weight"] == 0.0
-    assert "[ALLOCATION DISABLED: SYNTHETIC DEMONSTRATION CONE ACTIVE]" in synth_res["summary"]
-    assert "Downside Scenario Floor" in synth_res["summary"]
+    assert "RESEARCH BRIEF" in synth_res["summary"]
+    assert "UNCERTAINTY RANGE" in synth_res["summary"]
     
     # 2. Empirical history run
     sample_csv = os.path.join(BASE_DIR, "data", "btc_sample_history.csv")
     emp_res = pipeline.run_crypto_pipeline(ticker="BTC-USD", history_file=sample_csv)
     assert emp_res["is_synthetic"] is False
-    assert emp_res["allocation"]["allocation_disabled"] is False
-    assert emp_res["allocation"]["target_risk_weight"] > 0.0
+    assert emp_res["allocation"]["allocation_disabled"] is True
+    assert emp_res["allocation"]["target_risk_weight"] == 0.0
     assert emp_res["data_mode"] == "EMPIRICAL_HISTORICAL_DATA"
     print("  [PASS] Test 13: Unified Pipeline Crypto & Synthetic Guardrail Gating")
 
@@ -339,7 +351,7 @@ def test_theils_u_operational_pipeline_gating():
     # Gating check: if theils_u fails, target risk weight is strictly throttled to <= 0.35
     if not res["theils_u_passed"]:
         assert res["allocation"]["target_risk_weight"] <= 0.35
-        assert "RELEASE GATE: FAIL" in res["allocation"]["tactical_action"] or "THEIL'S U HURDLE WARNING" in res["allocation"]["tactical_action"]
+        assert "RESEARCH_ONLY" in res["allocation"]["tactical_action"]
     print("  [PASS] Test 20: Operational Pipeline Gate: Walk-Forward Theil's U Enforcement")
 
 def test_media_hill_exact_spend_ceiling_and_schema():
@@ -464,9 +476,9 @@ def test_structural_macro_anchor_weighting():
     )
     
     # Expected target with high structural anchor must be strictly greater than base
-    assert res_high["expected_target"] > res_base["expected_target"]
+    assert res_high["expected_target"] == res_base["expected_target"] == tfm_p50
     assert res_high["structural_target_anchor"] == struct_high
-    assert res_high["structural_weight"] == 0.30
+    assert res_high["structural_weight"] == 0.0
     print("  [PASS] Test 25: Stage 3 Structural Macro Target Anchoring in Scenario Corridors")
 
 def test_machine_falsification_resolver():
@@ -689,13 +701,16 @@ def test_baseline_tournament():
     for i in range(40):
         series.append(series[-1] * 1.01 + np.random.normal(0, 0.1))
         
-    res = run_baseline_tournament(series, h=1, min_train_len=30)
+    class StubNeural:
+        def forecast(self, history, horizon_days):
+            return dict(p50_expected=history[-1], timesfm_executed=True, degraded_mode=False)
+    res = run_baseline_tournament(series, h=1, min_train_len=30, forecast_engine=StubNeural())
     assert res["status"] == "EVALUATED"
     assert "models" in res
     assert "M0_Persistence" in res["models"]
     assert "M0b_Drift" in res["models"]
     assert "TimesFM-Neural" in res["models"]
-    assert "M4_TIMESFM_STRUCTURAL" in res["models"]
+    assert "M4_RETURN_BIAS_EXPLORATORY" in res["models"]
     assert "incremental_skill" in res
     assert res["models"]["M0_Persistence"]["theils_u2"] == 1.0
     print("  [PASS] Test 33: Multi-Model Tournament Hierarchy & Skill Delta Reporting")

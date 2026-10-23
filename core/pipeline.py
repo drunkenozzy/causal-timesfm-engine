@@ -25,6 +25,24 @@ from core.econometrics import EconometricFilter
 from core.engine_structural import StructuralMacroEngine
 from core.forecast_ledger import ImmutableForecastLedger, compute_sha256
 
+def finalize_research_outputs(cond, raw_prior, allocation, lineage):
+    """Bind actual runtime provenance and keep unvalidated outputs descriptive."""
+    source = raw_prior.get("engine", "UNKNOWN_MODEL")
+    for key in ("central_forecast", "prediction_interval"):
+        cond[key]["source"] = source
+    if not raw_prior.get("timesfm_executed") or raw_prior.get("degraded_mode"):
+        cond["prediction_interval"]["nominal_coverage"] = None
+        cond["prediction_interval"]["calibration_status"] = "DEGRADED_RUNTIME_UNCALIBRATED"
+    if "z_liq" in lineage:
+        liquidity = lineage["z_liq"]
+        cond["macro_interpretation"]["liquidity_feature_status"] = liquidity.get("feature_status", "UNKNOWN")
+        cond["macro_interpretation"]["liquidity_input"] = liquidity
+    allocation.update(
+        allocation_disabled=True, target_risk_weight=0., cash_buffer_weight=0.,
+        policy_type="DISABLED_RESEARCH",
+        tactical_action="RESEARCH_ONLY: no allocation or trade instructions.")
+
+
 def generate_synthetic_history(current_val, days=60, daily_vol=0.04, daily_drift=0.001):
     """
     Constructs a reproducible synthetic history cone ending at current_val
@@ -305,7 +323,7 @@ def map_horizon_to_steps(horizon_days, frequency):
     else:
         raise ValueError("Cannot map horizon steps for undefined or irregular time-series frequency ('U'). Establish time contract first.")
 
-def create_parameter_record(value, source, as_of=None, avail=None, transformation="identity", status="RAW_OBSERVED", notes=""):
+def create_parameter_record(value, source, as_of=None, avail=None, transformation="identity", status="RAW_OBSERVED", notes="", feature_status=None):
     """
     Parameter Provenance Taxonomy:
       - RAW_OBSERVED: Directly downloaded empirical market/chain data.
@@ -320,10 +338,11 @@ def create_parameter_record(value, source, as_of=None, avail=None, transformatio
     return {
         "value": value,
         "source": source,
-        "observation_timestamp": as_of or now_str,
-        "availability_timestamp": avail or as_of or now_str,
+        "observation_timestamp": as_of if feature_status is not None else (as_of or now_str),
+        "availability_timestamp": (avail or as_of) if feature_status is not None else (avail or as_of or now_str),
         "transformation": transformation,
         "parameter_status": status,
+        "feature_status": feature_status,
         "notes": notes
     }
 
@@ -536,14 +555,14 @@ class CausalTimesFmPipeline:
 
             # Ingest point-in-time DefiLlama aggregate liquidity features
             liq_features = self.liq_engine.get_liquidity_features_as_of(latest_date)
-            z_liq = liq_features["z_score"]
+            z_liq = liq_features["z_score"] if liq_features["feature_status"] == "AVAILABLE" else 0.0
             float_growth_30d = liq_features["float_growth_30d"]
             decoupling_active = liq_features["decoupling_active"]
             parameter_lineage["z_liq"] = create_parameter_record(
-                z_liq, source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], avail=liq_features["as_of_date"], transformation="rolling_float_zscore", status="DERIVED_OBSERVED"
+                liq_features["z_score"], source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], avail=liq_features["as_of_date"], transformation="rolling_float_zscore", status="DERIVED_OBSERVED", feature_status=liq_features["feature_status"]
             )
             parameter_lineage["float_growth_30d"] = create_parameter_record(
-                float_growth_30d, source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], avail=liq_features["as_of_date"], transformation="rolling_30d_float_growth", status="DERIVED_OBSERVED"
+                float_growth_30d, source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], avail=liq_features["as_of_date"], transformation="rolling_30d_float_growth", status="DERIVED_OBSERVED", feature_status=liq_features["feature_status"]
             )
             parameter_lineage["decoupling_active"] = create_parameter_record(
                 decoupling_active, source="liquidity_impulse_rule", as_of=liq_features["as_of_date"], avail=liq_features["as_of_date"], transformation="z_liq > 0.8 AND float_growth_30d > 0.0", status="POLICY"
@@ -644,7 +663,7 @@ class CausalTimesFmPipeline:
                 alloc["gate_intervention"] = "SUPPRESSED_FAIL_CLOSED"
                 alloc["tactical_action"] = f"[RELEASE GATE: {gate_status}]: {theils_gate_report['reason']} Capital allocation strictly suppressed under institutional fail-closed risk protocol."
 
-        currency = "£" if "GBP" in ticker or "UK" in ticker else "$"
+        currency = "Â£" if "GBP" in ticker or "UK" in ticker else "$"
         floor = cond["downside_floor"]
 
         falsify_obj = {
@@ -664,6 +683,7 @@ class CausalTimesFmPipeline:
         }
         falsify_str = f"Thesis falsified if price closes below {currency}{floor:,.2f} while 30-day stablecoin float growth contracts beyond -5.0%."
 
+        finalize_research_outputs(cond, tfm_prior, alloc, parameter_lineage)
         summary = self.reconciler.generate_plain_english_summary(
             asset_name=f"{ticker} [{data_mode} | Freq: {frequency} | AsOf: {latest_date} | Vintage: {vintage_id}]",
             current_price=current_price,
@@ -711,6 +731,9 @@ class CausalTimesFmPipeline:
             "gate_status": gate_status,
             "markov_state": state,
             "scenario_corridors": cond,
+            "central_forecast": cond["central_forecast"],
+            "prediction_interval": cond["prediction_interval"],
+            "macro_interpretation": cond["macro_interpretation"],
             "allocation": alloc,
             "parameter_lineage": parameter_lineage,
             "falsifiability_object": falsify_obj,
@@ -832,10 +855,11 @@ class CausalTimesFmPipeline:
         }
         falsify_str = f"Thesis falsified if local mortgage rates exceed 6.5% or regional transaction volume contracts > 30% over the {model_steps}-{frequency} forward horizon."
 
+        finalize_research_outputs(cond, tfm_prior, alloc, parameter_lineage)
         summary = self.reconciler.generate_plain_english_summary(
             asset_name=f"Residential Property ({postcode}) [{data_mode} | Freq: {frequency} | AsOf: {latest_date} | Vintage: {vintage_id}]",
             current_price=property_price,
-            currency_symbol="£",
+            currency_symbol="Â£",
             forecast_output=cond,
             allocation_output=alloc,
             falsifiability_condition=falsify_str,
@@ -861,7 +885,7 @@ class CausalTimesFmPipeline:
             "asset_name": f"Property ({postcode})",
             "forecast_id": ledger_entry["forecast_id"],
             "current_price": property_price,
-            "currency_symbol": "£",
+            "currency_symbol": "Â£",
             "postcode": postcode,
             "data_mode": data_mode,
             "is_synthetic": is_synthetic,
@@ -874,6 +898,9 @@ class CausalTimesFmPipeline:
             "raw_prior": tfm_prior,
             "markov_state": state,
             "scenario_corridors": cond,
+            "central_forecast": cond["central_forecast"],
+            "prediction_interval": cond["prediction_interval"],
+            "macro_interpretation": cond["macro_interpretation"],
             "allocation": alloc,
             "parameter_lineage": parameter_lineage,
             "falsifiability_object": falsify_obj,
@@ -960,14 +987,14 @@ class CausalTimesFmPipeline:
             z_trend = (history[-1] - m_v) / (s_v if s_v > 1e-6 else 1.0)
             
             liq_features = self.liq_engine.get_liquidity_features_as_of(latest_date)
-            z_liq = liq_features["z_score"]
+            z_liq = liq_features["z_score"] if liq_features["feature_status"] == "AVAILABLE" else 0.0
             decoupling_active = liq_features["decoupling_active"]
             
             parameter_lineage["period_volatility"] = create_parameter_record(round(period_vol, 4), source="portfolio_nav_series", as_of=latest_date, status="ESTIMATED")
             parameter_lineage["step_return"] = create_parameter_record(round(ret_t, 4), source="portfolio_nav_series", as_of=latest_date, status="DERIVED_OBSERVED")
             parameter_lineage["daily_ret"] = parameter_lineage["step_return"]
             parameter_lineage["z_trend"] = create_parameter_record(round(z_trend, 2), source="portfolio_nav_series", as_of=latest_date, status="DERIVED_OBSERVED")
-            parameter_lineage["z_liq"] = create_parameter_record(z_liq, source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], status="DERIVED_OBSERVED")
+            parameter_lineage["z_liq"] = create_parameter_record(liq_features["z_score"], source="defillama_aggregate_stablecoins", as_of=liq_features["as_of_date"], status="DERIVED_OBSERVED", feature_status=liq_features["feature_status"])
         else:
             ret_t = 0.010
             period_vol = 0.035
@@ -1018,6 +1045,7 @@ class CausalTimesFmPipeline:
             alloc["tactical_action"] = directive
 
         falsify_str = f"Thesis falsified if portfolio aggregate drops below ${cond['downside_floor']:,.2f} on macro stablecoin contraction."
+        finalize_research_outputs(cond, tfm_prior, alloc, parameter_lineage)
         summary = self.reconciler.generate_plain_english_summary(
             asset_name=f"Custom Multi-Asset Portfolio ({len(target_holdings)} Assets) [{data_mode}]",
             current_price=current_holdings_value,
@@ -1074,6 +1102,9 @@ class CausalTimesFmPipeline:
             "raw_prior": tfm_prior,
             "markov_state": state,
             "scenario_corridors": cond,
+            "central_forecast": cond["central_forecast"],
+            "prediction_interval": cond["prediction_interval"],
+            "macro_interpretation": cond["macro_interpretation"],
             "allocation": alloc,
             "parameter_lineage": parameter_lineage,
             "falsifiability_condition": falsify_str,

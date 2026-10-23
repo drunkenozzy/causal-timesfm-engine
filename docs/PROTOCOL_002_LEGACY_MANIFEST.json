@@ -1,0 +1,29 @@
+{
+  "purpose": "Preserve the legacy Protocol 002 evaluation; repaired code must not silently overwrite it.",
+  "legacy_git_revision": "49c18310e675856545818db76270bf3ee3f8fbb8",
+  "sha256_lf": {
+    "core\\calibration.py": "953e1ec84f414beb34a77efcadb723ce86be23ef28957fec1c4430c57f7ee444",
+    "core\\econometrics.py": "f2bb01b20ad5a84122a013008fe54639dd4de0db01f50d04ad2f76736630100d",
+    "core\\engine_structural.py": "b7b992957854a9965c1f3152e388f1fa0583d3e848c79d994aa3757db4bc2c59",
+    "core\\engine_timesfm.py": "bc9ed8d9711c58bc29d1290efd5e4fd10d0c7b28da7136a136e9a4d53ddb7932",
+    "core\\forecast_ledger.py": "852616bbce8e0ee3a9ad75618e5127a2df5826e463e9f79d924400a8fbf12ed6",
+    "core\\markov_regime.py": "7a62225aa608dc5d84e4fb0a8c63ab328e6c3daeeee3d20eee6589adb568d2ec",
+    "core\\monitor_service.py": "757de51e5d663240f680a50c2334998b1b85dcc4412ffce298dde1a7b76ff9ba",
+    "core\\onchain_liquidity.py": "887f2222d52a7c0a7210dc3df02f4a2fc1ce7854ec069c125090d158ce37e58d",
+    "core\\pipeline.py": "0963693846a060780bd988f98cd56850fccbc5000e7ab2b18d537b9d4121cf48",
+    "core\\reconciliation.py": "d5ef1d164eeb72e232041141f78abdd540ba1bcf740b3d9f22e94a32b3ca1543",
+    "core\\research_protocol.py": "d58e4ec366d4d6190a9c7ab4a57e056153a071d1e52321a90fcdfce03f5be09b",
+    "data\\btc_protocol_002_snapshot.csv": "eb44adab2837267ae55b27ea85413886091162ee175c108c8ce1f69361a3997f",
+    "data\\stablecoins_aggregate_history.json": "323a5ffe192c68d07e30f2c1024088811c60de254eebfccad028c44807391aec",
+    "docs\\CTE_CONFIRMATORY_HOLDOUT_002_RESULTS.json": "0962ef86739c394f95b614c68d8eb4dfd422be42bcad4737a658f7fa9d66eb18"
+  },
+  "verified_checks": {
+    "rows_293": true,
+    "snapshot_hash": true,
+    "persistence_no_direction": true,
+    "history_hashes": true,
+    "prices_match_snapshot": true,
+    "m0_no_rounding_drift": true,
+    "metrics": true
+  }
+}

@@ -13,7 +13,7 @@ Eliminates traditional market weekend closures and arbitrary hardcoded threshold
 import os
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timezone
 
 class OnChainLiquidityEngine:
     def __init__(self, cache_file=None):
@@ -31,7 +31,7 @@ class OnChainLiquidityEngine:
                     data = json.load(f)
                 for item in data:
                     ts = item["timestamp"]
-                    dt_str = datetime.fromtimestamp(ts).strftime("%Y-%m-%d")
+                    dt_str = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
                     self.history_by_date[dt_str] = item["stablecoin_circulating_usd"]
             except Exception as e:
                 print(f"[OnChainLiquidityEngine] Error loading cache: {e}")
@@ -144,44 +144,35 @@ class OnChainLiquidityEngine:
         return results
 
     def get_liquidity_features_as_of(self, target_date_str=None):
-        """
-        Retrieves empirical rolling liquidity features as of target_date_str.
-        If target_date_str is None or beyond available range, uses latest verified date.
-        Derives rolling 30-day float growth, rolling Z-score, and decoupling impulse.
-        """
-        sorted_dates = sorted(self.history_by_date.keys())
-        if not sorted_dates:
-            return {
-                "as_of_date": None,
-                "z_score": 0.0,
-                "float_growth_30d": 0.0,
-                "decoupling_active": False,
-                "regime": "NO_DATA",
-                "data_status": "INVALID_NO_DATA"
-            }
-        
-        if target_date_str and target_date_str in self.history_by_date:
-            anchor_date = target_date_str
-        elif target_date_str:
-            eligible = [d for d in sorted_dates if d <= target_date_str]
-            anchor_date = eligible[-1] if eligible else sorted_dates[0]
-        else:
-            anchor_date = sorted_dates[-1]
+        """Age is measured against the request, never against the chosen cache row.
 
-        anchor_idx = sorted_dates.index(anchor_date)
-        window_size = min(anchor_idx + 1, 300)
-        eval_dates = sorted_dates[anchor_idx - window_size + 1 : anchor_idx + 1]
-        
-        features = self.compute_rolling_features(eval_dates, window=min(120, max(20, len(eval_dates) - 35)))
-        latest = features[-1]
-        
-        return {
-            "as_of_date": latest["date"],
-            "stablecoin_mcap": latest["stablecoin_mcap"],
-            "z_score": latest["z_score"] if latest["z_score"] is not None else 0.0,
-            "float_growth_30d": latest["float_growth_30d"] if latest["float_growth_30d"] is not None else 0.0,
-            "decoupling_active": latest["decoupling_active"],
-            "regime": latest["regime"],
-            "data_status": latest["data_status"]
-        }
-
+        Missing/stale/warmup features remain None. Consumers may disable the
+        liquidity component but must not relabel this as an observed neutral signal.
+        """
+        requested = target_date_str or datetime.now(timezone.utc).date().isoformat()
+        datetime.strptime(requested, "%Y-%m-%d")
+        prov = self.get_stablecoin_mcap_with_provenance(requested)
+        result = dict(requested_date=requested, as_of_date=prov['as_of'],
+            staleness_days=prov['staleness_days'], data_status=prov['status'],
+            feature_status='DATA_UNAVAILABLE', stablecoin_mcap=None, z_score=None,
+            float_growth_30d=None, decoupling_active=False, regime='DATA_UNAVAILABLE')
+        if prov['status'] in ('INVALID_NO_DATA','DATA_STALE_CRITICAL'):
+            return result
+        # Use a calendar grid so a 30-day change cannot become 30 irregular records.
+        from datetime import timedelta
+        anchor = datetime.strptime(prov['as_of'], "%Y-%m-%d").date()
+        start = max(datetime.strptime(min(self.history_by_date), "%Y-%m-%d").date(), anchor-timedelta(days=299))
+        dates = [(start+timedelta(days=i)).isoformat() for i in range((anchor-start).days+1)]
+        features = self.compute_rolling_features(dates, window=min(120,max(20,len(dates)-35)))
+        last=features[-1]
+        # Do not train through long missing stretches disguised by cached levels.
+        if any(f['data_status'] in ('INVALID_NO_DATA','DATA_STALE_CRITICAL') for f in features):
+            result['feature_status']='HISTORY_GAPS'
+            return result
+        if last['z_score'] is None or last['float_growth_30d'] is None:
+            result['feature_status']='WARMUP_INSUFFICIENT_HISTORY'
+            return result
+        result.update(stablecoin_mcap=last['stablecoin_mcap'],z_score=last['z_score'],
+            float_growth_30d=last['float_growth_30d'],decoupling_active=last['decoupling_active'],
+            regime=last['regime'],feature_status='AVAILABLE')
+        return result

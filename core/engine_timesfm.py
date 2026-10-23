@@ -8,7 +8,8 @@ Works natively with pure Python standard library and accelerates with TimesFM/Nu
 import math
 
 class TimesFmBaselineEngine:
-    def __init__(self, repo_id="google/timesfm-2.0-500m-pytorch", backend="cpu"):
+    def __init__(self, repo_id="google/timesfm-2.0-500m-pytorch", backend="cpu", checkpoint_path=None):
+        self.checkpoint_path = checkpoint_path
         self.repo_id = repo_id
         self.backend = backend
         self._model = None
@@ -21,6 +22,10 @@ class TimesFmBaselineEngine:
             return self._model is not None
         try:
             import timesfm
+            if self.checkpoint_path is not None:
+                from pathlib import Path
+                if not Path(self.checkpoint_path).is_file():
+                    raise FileNotFoundError("Explicit local checkpoint missing")
             self._model = timesfm.TimesFm(
                 hparams=timesfm.TimesFmHparams(
                     backend=self.backend,
@@ -28,9 +33,11 @@ class TimesFmBaselineEngine:
                     horizon_len=max(90, required_horizon),
                     num_layers=50,
                     context_len=2048,
-                    use_positional_embedding=False
+                    use_positional_embedding=False,
+                    point_forecast_mode="median"
                 ),
-                checkpoint=timesfm.TimesFmCheckpoint(huggingface_repo_id=self.repo_id)
+                checkpoint=(timesfm.TimesFmCheckpoint(path=str(self.checkpoint_path)) if self.checkpoint_path is not None
+                            else timesfm.TimesFmCheckpoint(huggingface_repo_id=self.repo_id))
             )
             self._initialized = True
             self._init_failure_reason = None
