@@ -9,7 +9,7 @@ local model checkpoint hash were also verified during the audit. This is an audi
 of the saved replay, not an independent rerun of all its neural predictions.
 
 Persistence had the lowest MSPE over the 30 one-day targets, 21 September through
-20 October. RMSE was $1,404.46 for persistence, $1,438.55 for TimesFM, and $1,421.21
+20 October. RMSE was $1,404.47 for persistence, $1,438.55 for TimesFM, and $1,421.21
 for the diagnostic damped-momentum variant. H1 was not confirmed. The legacy M4
 fixed-anchor output had invalid quantile ordering on all 30 rows. The four M4
 variants are diagnostic comparisons, not four independently preregistered tests.
