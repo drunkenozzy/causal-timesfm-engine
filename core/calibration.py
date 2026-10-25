@@ -19,6 +19,8 @@ def compute_pinball_loss(actual: float, quantile_pred: float, tau: float) -> flo
     Computes Pinball (asymmetric Laplace) loss for quantile tau in (0, 1):
       L_tau(y, q) = max(tau * (y - q), (1 - tau) * (q - y))
     """
+    if not 0 < tau < 1 or not all(math.isfinite(v) for v in [actual, quantile_pred]):
+        raise ValueError("Invalid quantile score input")
     diff = actual - quantile_pred
     return tau * diff if diff >= 0 else (tau - 1.0) * diff
 
@@ -64,166 +66,77 @@ def compute_winkler_interval_score(actual: float, lower: float, upper: float, al
       WIS = (upper - lower) + (2/alpha)*(lower - actual)*I(actual < lower) + (2/alpha)*(actual - upper)*I(actual > upper)
     Penalizes wider intervals and severely penalizes realizations outside the interval.
     """
+    if not 0 < alpha < 1 or not all(math.isfinite(v) for v in [actual, lower, upper]) or lower > upper:
+        raise ValueError("Invalid prediction interval")
     width = upper - lower
     penalty = 0.0
     if actual < lower:
         penalty = (2.0 / alpha) * (lower - actual)
     elif actual > upper:
         penalty = (2.0 / alpha) * (actual - upper)
-    return round(width + penalty, 4)
+    return width + penalty
 
 def run_baseline_tournament(series: List[float], h: int = 1, min_train_len: int = 30, **kwargs) -> Dict[str, Any]:
+    """Genuine rolling-origin forecasts; no future outcomes enter model selection.
+
+    M4 is an explicitly exploratory log-residual correction, not the legacy
+    structural anchor. Its weight is selected from earlier prequential losses
+    and stays zero unless it beats BOTH persistence and M1 on those losses.
+    Any degraded/invalid origin invalidates the neural tournament, not just
+    that row. An injected engine makes offline tests possible.
     """
-    Executes a multi-model tournament on the provided historical series across rolling origins:
-      M0  : Persistence (Naive Random Walk y_{t+h} = y_t)
-      M0b : Drift Baseline (Trend extrapolated from recent train window)
-      M1  : Autoregressive Baseline (TimesFM Target-Only Prior Proxy)
-      M4  : Fitted Hybrid (Ensemble with in-fold estimated alpha)
-      
-    Computes RMSE, Theil's U2, and formal statistical significance (Clark-West test).
-    """
-    from core.econometrics import EconometricFilter
-    from core.markov_regime import InstitutionalMarkovEngine
-
-    series = [float(x) for x in series]
-    n = len(series)
-    if n < min_train_len + h:
-        return {"status": "INSUFFICIENT_DATA", "reason": f"Need at least {min_train_len + h} observations"}
-
-    err_m0 = []
-    err_m0b = []
-    err_m1 = []
-    err_m4 = []
-    actuals = []
-
-    # Precompute historical mock predictions for nested alpha optimization
-    p_m1_hist = []
-    v_struct_hist = []
-    for t in range(n):
-        if t < 5:
-            p_m1_hist.append(series[t])
-            v_struct_hist.append(series[t])
-            continue
-        w = min(5, t)
-        mom = (series[t] / series[t-w]) ** (1.0 / w)
-        p_m1_hist.append(series[t] * (mom ** h))
-        v_struct_hist.append(series[t] * (mom ** (h * 0.8)))
-
-    for t in range(min_train_len, n - h + 1):
-        train = series[:t]
-        y_actual = series[t + h - 1]
-        actuals.append(y_actual)
-
-        # M0: Persistence
-        p_m0 = train[-1]
-        err_m0.append(y_actual - p_m0)
-
-        # M0b: Drift
-        drift = (train[-1] / train[0]) ** (1.0 / len(train))
-        p_m0b = train[-1] * (drift ** h)
-        err_m0b.append(y_actual - p_m0b)
-
-        # M1: 5-step Momentum AR
-        w = min(5, len(train))
-        mom = (train[-1] / train[-w]) ** (1.0 / w)
-        p_m1 = train[-1] * (mom ** h)
-        err_m1.append(y_actual - p_m1)
-
-        # M4: Hybrid with nested in-fold alpha
-        v_struct = train[-1] * (mom ** (h * 0.8))  # damped structural target
-        
-        # We pass histories up to t (length t). Since they align with y_{k+h},
-        # wait, actual_history needs to align with the predictions made h steps prior.
-        # For simplicity in this mock tournament, we align the histories up to t-h.
-        
-        # Proper alignment: prediction made at k for k+h should be compared to series[k+h]
-        hist_actual = []
-        hist_p_m1 = []
-        hist_v_struct = []
-        for k in range(5, t - h + 1):
-            hist_actual.append(series[k + h - 1])
-            hist_p_m1.append(p_m1_hist[k-1])
-            hist_v_struct.append(v_struct_hist[k-1])
-            
-        if len(hist_actual) >= 10:
-            alpha_res = InstitutionalMarkovEngine.estimate_optimal_structural_weight(
-                hist_actual, hist_p_m1, hist_v_struct, min_inner_train=5
-            )
-            alpha_fold = alpha_res["alpha_star"]
-        else:
-            alpha_fold = 0.20
-
-        p_m4 = ((1.0 - alpha_fold) * p_m1) + (alpha_fold * v_struct)
-        err_m4.append(y_actual - p_m4)
-
-    def rmse(errs):
-        return math.sqrt(sum(e**2 for e in errs) / len(errs))
-
-    r0 = rmse(err_m0)
-    r0b = rmse(err_m0b)
-    r1 = rmse(err_m1)
-    r4 = rmse(err_m4)
-
-    u0 = 1.0
-    u0b = round(r0b / r0, 4) if r0 > 0 else 1.0
-    u1 = round(r1 / r0, 4) if r0 > 0 else 1.0
-    u4 = round(r4 / r0, 4) if r0 > 0 else 1.0
-
-    delta_m1_m0 = round((1.0 - (r1 / r0)) * 100, 2) if r0 > 0 else 0.0
-    delta_m4_m1 = round(((r1 - r4) / r1) * 100, 2) if r1 > 0 else 0.0
-
-    # Formal statistical significance
-    ef = EconometricFilter()
-    cw_res = ef.compute_clark_west_test(err_m4, err_m1, h=h)
-    
-    is_significant = cw_res.get("is_statistically_significant", False)
-    cw_stat = cw_res.get("clark_west_stat", 0.0)
-    cw_pval = cw_res.get("p_value", 1.0)
-    
-    if is_significant and delta_m4_m1 > 0.0:
-        inference_status = "STRUCTURAL_ALPHA_SIGNIFICANT"
-    elif delta_m4_m1 > 0.0:
-        inference_status = "INSIGNIFICANT_POINT_IMPROVEMENT"
-    else:
-        inference_status = "NO_IMPROVEMENT"
-
-    # Determine M1 telemetry label
     from core.engine_timesfm import TimesFmBaselineEngine
-    tfm = TimesFmBaselineEngine()
-    tfm_res = tfm.forecast(series[:min_train_len], horizon_days=h)
-    
-    timesfm_executed = tfm_res.get("timesfm_executed", False)
-    m1_label = tfm_res.get("engine", "M1_GEOMETRIC_FALLBACK")
-    
-    # Guard against masquerading
-    if not timesfm_executed:
-        if kwargs.get("enforce_confirmatory_timesfm", False):
-            return {"status": "NOT_EVALUATED_RUNTIME_FAILURE", "reason": "TimesFM runtime failure"}
-        m1_label = "M1_GEOMETRIC_FALLBACK"
-        m4_label = "M4_GEOMETRIC_FALLBACK_STRUCTURAL"
-    else:
-        m4_label = "M4_TIMESFM_STRUCTURAL"
-
-    tourney_results = {
-        "status": "EVALUATED",
-        "n_origins": len(actuals),
-        "horizon": h,
-        "TIMESFM_COMPARISON_VALID": timesfm_executed,
-        "models": {
-            "M0_Persistence": {"rmse": round(r0, 4), "theils_u2": u0},
-            "M0b_Drift": {"rmse": round(r0b, 4), "theils_u2": u0b},
-            m1_label: {"rmse": round(r1, 4), "theils_u2": u1},
-            m4_label: {"rmse": round(r4, 4), "theils_u2": u4}
-        },
-        "incremental_skill": {
-            "delta_skill_m1_vs_m0_pct": delta_m1_m0,
-            "delta_skill_m4_vs_m1_pct": delta_m4_m1,
-            "structural_layer_adds_value": bool(delta_m4_m1 > 0.0),
-            "clark_west_stat": cw_stat,
-            "clark_west_p_value": cw_pval,
-            "hac_kernel": cw_res.get("hac_kernel", "Bartlett"),
-            "hac_max_lag": cw_res.get("hac_max_lag", max(0, h-1)),
-            "structural_inference_status": inference_status
-        }
-    }
-    return tourney_results
+    series = [float(v) for v in series]
+    if not isinstance(h, int) or h < 1 or min_train_len < 5:
+        raise ValueError("Invalid horizon or minimum context")
+    if any(not math.isfinite(v) or v <= 0 for v in series):
+        raise ValueError("Prices must be finite and positive")
+    if len(series) < min_train_len + h:
+        return {"status": "INSUFFICIENT_DATA", "n_origins": 0}
+    engine = kwargs.get('forecast_engine') or TimesFmBaselineEngine()
+    records = []
+    weights = (0., .25, .5, 1.)
+    for origin in range(min_train_len-1, len(series)-h):
+        history = series[:origin+1]
+        forecast = engine.forecast(history, horizon_days=h)
+        if not forecast.get('timesfm_executed') or forecast.get('degraded_mode', True):
+            return dict(status='NOT_EVALUATED_RUNTIME_FAILURE', failed_origin=origin,
+                        n_origins=len(records), TIMESFM_COMPARISON_VALID=False)
+        p1 = float(forecast['p50_expected'])
+        if not math.isfinite(p1) or p1 <= 0:
+            return dict(status='NOT_EVALUATED_RUNTIME_FAILURE', failed_origin=origin,
+                        n_origins=len(records), TIMESFM_COMPARISON_VALID=False)
+        # At origin i, only targets through i have closed.
+        known = [r for r in records if r['target_index'] <= origin]
+        train = known[-60:]
+        bias = sum(math.log(r['actual']/r['m1']) for r in train)/len(train) if len(train)>=20 else 0.
+        candidates = {a:p1*math.exp(a*bias) for a in weights}
+        validation = [r for r in known if r['training_count']>=20][-30:]
+        alpha = 0.
+        if len(validation)>=10:
+            def loss(key):
+                return sum(((r['actual']-r[key])/r['origin_close'])**2 for r in validation)/len(validation)
+            losses = {a:sum(((r['actual']-r['candidates'][a])/r['origin_close'])**2 for r in validation)/len(validation) for a in weights}
+            best = min(weights, key=lambda a:(losses[a],a))
+            if losses[best] < min(loss('m0'),loss('m1')):
+                alpha=best
+        records.append(dict(origin_index=origin,target_index=origin+h,
+            origin_close=history[-1],actual=series[origin+h],m0=history[-1],
+            m0b=history[-1]*(history[-1]/history[0])**(h/(len(history)-1)),
+            m1=p1,m4=candidates[alpha],alpha=alpha,candidates=candidates,
+            training_count=len(train),latest_training_target=max((r['target_index'] for r in train),default=None),
+            engine=forecast.get('engine'),timesfm_executed=True,degraded_mode=False))
+    models={}
+    for label,key in [('M0_Persistence','m0'),('M0b_Drift','m0b'),('TimesFM-Neural','m1'),('M4_RETURN_BIAS_EXPLORATORY','m4')]:
+        errs=[r['actual']-r[key] for r in records]
+        mspe=sum(e*e for e in errs)/len(errs)
+        models[label]=dict(mspe=mspe,rmse=math.sqrt(mspe),mae=sum(abs(e) for e in errs)/len(errs))
+    denom=models['M0_Persistence']['rmse']
+    for model in models.values():
+        model['theils_u2']=model['rmse']/denom if denom else None
+    r1=models['TimesFM-Neural']['mspe']; r4=models['M4_RETURN_BIAS_EXPLORATORY']['mspe']
+    # Selection and diagnostics are exploratory; no post-hoc confirmatory claim.
+    return dict(status='EVALUATED',n_origins=len(records),horizon=h,TIMESFM_COMPARISON_VALID=True,
+        evaluation_type='EXPLORATORY_ROLLING_ORIGIN',models=models,origins=records,
+        incremental_skill=dict(delta_mspe_m4_vs_m1_pct=100*(1-r4/r1) if r1 else None,
+                               structural_inference_status='EXPLORATORY_NOT_CONFIRMATORY'))

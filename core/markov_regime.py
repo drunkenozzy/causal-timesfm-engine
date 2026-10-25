@@ -192,10 +192,9 @@ class InstitutionalMarkovEngine:
                                    horizon_steps=30, transition_matrix=None, horizon_mode="frozen_transition",
                                    covariate_scenario_path=None, structural_target=None, structural_weight=None):
         """
-        Reconciles TimesFM statistical priors against forward structural Markov scenarios
-        and operational structural valuation anchors.
-        Propagates state vector to horizon h if transition_matrix is provided.
-        Outputs a mechanism-aware scenario corridor (Downside Floor, Central Target, Upside Ceiling).
+        Preserve ordered input quantiles; expose Markov scenarios separately.
+        Propagate the descriptive state to horizon h when a matrix is provided.
+        Legacy corridor keys remain aliases, never macro-adjusted predictions.
         """
         # Propagate forward if matrix provided and forward_xi is current state
         if transition_matrix is not None and horizon_steps > 1:
@@ -206,47 +205,38 @@ class InstitutionalMarkovEngine:
                 covariate_scenario_path=covariate_scenario_path
             )
 
-        p_h, p_s, p_p = forward_xi[0], forward_xi[1], forward_xi[2]
-
-        reconciled_p50 = (p_h * tfm_p50) + (p_s * min(tfm_p50, tfm_p90 * 0.95)) + (p_p * tfm_p10)
-        
-        # Volatility-scaled downside floor
-        floor_penalty = 1.0 - (asset_vol_scale * (2.0 if p_p > 0.35 else 0.5))
-        reconciled_floor = min(reconciled_p50, tfm_p10 * floor_penalty)
-        reconciled_ceiling = max(reconciled_p50, tfm_p90 * (0.85 if p_p > 0.35 else 1.00))
-
-        # Operationally integrate Structural Macro Anchor (Stage 3 -> Stage 6 linkage)
-        structural_impact_note = "None (Pure statistical/Markov conditioning)"
-        active_alpha = 0.0
-        if structural_target is not None and structural_target > 0:
-            if structural_weight is not None:
-                active_alpha = float(structural_weight)
-            else:
-                active_alpha = 0.25 if p_p <= 0.35 else 0.40
-            reconciled_p50 = ((1.0 - active_alpha) * reconciled_p50) + (active_alpha * structural_target)
-            reconciled_floor = min(reconciled_floor, structural_target * 0.85)
-            if p_p > 0.35:
-                reconciled_ceiling = min(reconciled_ceiling, structural_target * 1.15)
-            structural_impact_note = f"Integrated (alpha={active_alpha:.2f}; structural_target={structural_target:.2f})"
-
+        values = [float(tfm_p10), float(tfm_p50), float(tfm_p90)]
+        if not all(math.isfinite(v) and v > 0 for v in values) or not values[0] <= values[1] <= values[2]:
+            raise ValueError("INVALID_QUANTILES: require positive finite p10 <= p50 <= p90")
+        xi = np.asarray(forward_xi, dtype=float)
+        if xi.shape != (3,) or not np.isfinite(xi).all() or np.any(xi < 0) or xi.sum() <= 0:
+            raise ValueError("INVALID_REGIME_WEIGHTS")
+        xi = xi / xi.sum()
+        if structural_target is not None and (not math.isfinite(structural_target) or structural_target <= 0):
+            raise ValueError("INVALID_SCENARIO_ANCHOR")
+        lower, middle, upper = values
+        interpretation = dict(
+            regime_weights=xi.tolist(),
+            fragility_indicator=float(xi[2]),
+            scenario_anchor=structural_target,
+            scenario_anchor_applied_to_forecast=False,
+            status='DESCRIPTIVE_UNCALIBRATED',
+            explanation='Regime weights describe a model scenario, not established probabilities of a crash. '
+                        'Structural valuation assumptions do not adjust the central forecast or its quantiles.')
         return {
-            "downside_floor": round(reconciled_floor, 2),
-            "expected_target": round(reconciled_p50, 2),
-            "upside_ceiling": round(reconciled_ceiling, 2),
-            "reconciled_p10": round(reconciled_floor, 2),  # Compatibility alias
-            "reconciled_p50": round(reconciled_p50, 2),  # Compatibility alias
-            "reconciled_p90": round(reconciled_ceiling, 2),  # Compatibility alias
-            "forward_xi": [round(float(x), 4) for x in forward_xi],
-            "fragility_score": round(float(p_p) * 100, 1),
-            "ponzi_probability": round(float(p_p), 4),
-            "horizon_mode": horizon_mode,
-            "structural_impact": structural_impact_note,
-            "structural_target_anchor": structural_target,
-            "structural_weight": active_alpha if structural_target is not None else 0.0,
-            "structural_value_added": bool(active_alpha > 0.0),
-            "corridor_type": "MECHANISM_AWARE_SCENARIO_ENVELOPE",
-            "epistemic_note": "Outputs represent scenario stress corridors, distinct from unconditioned mixture quantiles. (Market Regime != Financing Regime: Minsky states model financing leverage & liquidity buffers)."
-        }
+            'central_forecast': {'value':middle,'statistic':'median','source':'INPUT_MODEL_QUANTILES'},
+            'prediction_interval': {'lower':lower,'upper':upper,'nominal_coverage':0.8,
+                                    'calibration_status':'NOT_ESTABLISHED','source':'INPUT_MODEL_QUANTILES'},
+            'macro_interpretation':interpretation,
+            'downside_floor':lower, 'expected_target':middle, 'upside_ceiling':upper,
+            'reconciled_p10':lower,'reconciled_p50':middle,'reconciled_p90':upper,
+            'forward_xi':[round(float(v),4) for v in xi],
+            'fragility_score':round(float(xi[2])*100,1),'ponzi_probability':float(xi[2]),
+            'horizon_mode':horizon_mode,'structural_impact':'DESCRIPTIVE_ONLY',
+            'structural_target_anchor':structural_target,'structural_weight':0.,'structural_value_added':False,
+            'corridor_type':'UNADJUSTED_MODEL_QUANTILES',
+            'epistemic_note':'Macro scenarios are distinct from unconditioned mixture quantiles. '
+                             'The interval is not a guaranteed floor/ceiling or an intraday stop.'}
 
     @staticmethod
     def estimate_optimal_structural_weight(actual_history, tfm_p50_history, struct_target_history, min_inner_train=10, loss_metric="mae"):

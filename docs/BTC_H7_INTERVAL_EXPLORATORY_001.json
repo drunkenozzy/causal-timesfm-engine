@@ -1,0 +1,6677 @@
+{
+  "config": {
+    "experiment": "BTC_H7_INTERVAL_EXPLORATORY_001",
+    "horizon": 7,
+    "minimum_context": 60,
+    "calibration_minimum": 20,
+    "calibration_window": 120,
+    "interval_shrinkage": 0.5,
+    "bootstrap_block": 14,
+    "bootstrap_repetitions": 1000,
+    "seed": 42,
+    "primary_metric": "mean_spot_normalized_80pct_interval_score",
+    "arms": [
+      "timesfm",
+      "volatility",
+      "residual_interval"
+    ],
+    "evaluation_type": "RETROSPECTIVE_EXPLORATORY"
+  },
+  "generated_at_utc": "2026-10-23T10:59:24.257101+00:00",
+  "input_sha256": "eb44adab2837267ae55b27ea85413886091162ee175c108c8ce1f69361a3997f",
+  "checkpoint_sha256": "a3a1362cdc26f0dde45c9790c438951ff02af96b2d1d6445fdb58f28c77e18de",
+  "source_sha256": {
+    "scripts\\interval_screen.py": "51059023e38bf90cb5c1d8b3f216bcef848337d6c7898569096b626b229d9da3",
+    "core\\engine_timesfm.py": "fb2c0b8ca912fcda56c5c8b6c07bc5eeeec434c83cb695a5beb1a988aa575528",
+    "core\\calibration.py": "430b36cc9a4faba6999e6d8f629d32d321b154706ae092900d4b31935b477c71"
+  },
+  "provenance": "Frozen retrospective prices; historical availability/vintages not independently established. No macro effect tested.",
+  "summary": {
+    "evaluation_origins": 201,
+    "first_origin": "2026-03-27",
+    "last_origin": "2026-10-13",
+    "overlapping_targets": true,
+    "nonoverlapping_origin_count": 29,
+    "metrics": {
+      "timesfm": {
+        "mean_interval_score": 0.2508709348941327,
+        "mean_pinball_p10": 0.01185458636945396,
+        "mean_pinball_p90": 0.01323250711995931,
+        "coverage": 0.845771144278607,
+        "below_p10_rate": 0.04975124378109453,
+        "above_p90_rate": 0.1044776119402985,
+        "mean_relative_width": 0.15997988809812128,
+        "median_relative_mae": 0.04603894346665771
+      },
+      "volatility": {
+        "mean_interval_score": 0.240334321227815,
+        "mean_pinball_p10": 0.010912520419163275,
+        "mean_pinball_p90": 0.013120911703618223,
+        "coverage": 0.8706467661691543,
+        "below_p10_rate": 0.05472636815920398,
+        "above_p90_rate": 0.07462686567164178,
+        "mean_relative_width": 0.14152060733358857,
+        "median_relative_mae": 0.04248647907303335
+      },
+      "residual_interval": {
+        "mean_interval_score": 0.24751780992022518,
+        "mean_pinball_p10": 0.011359048152392118,
+        "mean_pinball_p90": 0.013392732839630401,
+        "coverage": 0.8109452736318408,
+        "below_p10_rate": 0.04477611940298507,
+        "above_p90_rate": 0.14427860696517414,
+        "mean_relative_width": 0.158016596823574,
+        "median_relative_mae": 0.04603894346665771
+      }
+    },
+    "comparisons": {
+      "timesfm": {
+        "status": "DESCRIPTIVE_ONLY",
+        "mean_reference_minus_candidate": 0.0033531249739075474,
+        "ci95": [
+          -0.005653681922339139,
+          0.017934119271576798
+        ],
+        "block_length": 14,
+        "replications": 1000
+      },
+      "volatility": {
+        "status": "DESCRIPTIVE_ONLY",
+        "mean_reference_minus_candidate": -0.0071834886924102195,
+        "ci95": [
+          -0.03528889160426057,
+          0.02270792485275403
+        ],
+        "block_length": 14,
+        "replications": 1000
+      }
+    },
+    "promotion_allowed": false,
+    "verdict": "EXPLORATORY_ONLY_NO_CONFIRMATORY_CLAIM"
+  },
+  "records": [
+    {
+      "origin_index": 59,
+      "target_index": 66,
+      "origin_date": "2026-03-01",
+      "target_date": "2026-03-08",
+      "origin_close": 65738.1015625,
+      "actual": 65969.78125,
+      "history_sha256": "e17dcdcbefe6221d5d5e74665a0d0b8f807b59b28cc29577b0136c8c8425fb36",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          61518.3516,
+          66744.8672,
+          72090.8594
+        ],
+        "volatility": [
+          58602.739187248764,
+          65738.1015625,
+          73742.25261439434
+        ],
+        "residual_interval": [
+          61518.3516,
+          66744.8672,
+          72090.8594
+        ]
+      }
+    },
+    {
+      "origin_index": 60,
+      "target_index": 67,
+      "origin_date": "2026-03-02",
+      "target_date": "2026-03-09",
+      "origin_close": 68775.8515625,
+      "actual": 68402.3828125,
+      "history_sha256": "ee2ce9ab690989b5bb36e8065787916c12a89fed494dc248e7b96d7e6c008553",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64028.0078,
+          68925.9766,
+          74550.5703
+        ],
+        "volatility": [
+          61241.712741492265,
+          68775.8515625,
+          77236.86269378781
+        ],
+        "residual_interval": [
+          64028.0078,
+          68925.9766,
+          74550.5703
+        ]
+      }
+    },
+    {
+      "origin_index": 61,
+      "target_index": 68,
+      "origin_date": "2026-03-03",
+      "target_date": "2026-03-10",
+      "origin_close": 68293.6484375,
+      "actual": 69926.921875,
+      "history_sha256": "61440cddd01eca08b69c571aacf8d8b6a506d6fae542aeadd2101cf998eb3041",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          63896.125,
+          68823.75,
+          74331.8281
+        ],
+        "volatility": [
+          60828.53541803488,
+          68293.6484375,
+          76674.90898559467
+        ],
+        "residual_interval": [
+          63896.125,
+          68823.75,
+          74331.8281
+        ]
+      }
+    },
+    {
+      "origin_index": 62,
+      "target_index": 69,
+      "origin_date": "2026-03-04",
+      "target_date": "2026-03-11",
+      "origin_close": 72710.578125,
+      "actual": 70204.8828125,
+      "history_sha256": "c86deb51508f0e4b5b946b717c9e84d645c64eec36437a5c58ba252adafacda2",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64700.9961,
+          71318.2891,
+          78649.0703
+        ],
+        "volatility": [
+          64530.572205641576,
+          72710.578125,
+          81927.49561283959
+        ],
+        "residual_interval": [
+          64700.9961,
+          71318.2891,
+          78649.0703
+        ]
+      }
+    },
+    {
+      "origin_index": 63,
+      "target_index": 70,
+      "origin_date": "2026-03-05",
+      "target_date": "2026-03-12",
+      "origin_close": 70841.125,
+      "actual": 70493.4609375,
+      "history_sha256": "c625ba0b4f441a989c952c00cd1363e6986d9d8cc79a329e61fe8bc64d295bc9",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64434.7344,
+          70840.6797,
+          78332.2031
+        ],
+        "volatility": [
+          62854.90181241344,
+          70841.125,
+          79842.06237793392
+        ],
+        "residual_interval": [
+          64434.7344,
+          70840.6797,
+          78332.2031
+        ]
+      }
+    },
+    {
+      "origin_index": 64,
+      "target_index": 71,
+      "origin_date": "2026-03-06",
+      "target_date": "2026-03-13",
+      "origin_close": 68136.4921875,
+      "actual": 70968.265625,
+      "history_sha256": "3df31a31056abda8c9491a0919315197a54411faa763058387bae31703faed89",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64939.7344,
+          69897.9844,
+          76259.4062
+        ],
+        "volatility": [
+          60446.51263651374,
+          68136.4921875,
+          76804.78765639853
+        ],
+        "residual_interval": [
+          64939.7344,
+          69897.9844,
+          76259.4062
+        ]
+      }
+    },
+    {
+      "origin_index": 65,
+      "target_index": 72,
+      "origin_date": "2026-03-07",
+      "target_date": "2026-03-14",
+      "origin_close": 67272.59375,
+      "actual": 71214.625,
+      "history_sha256": "2a25657ecd4995e63ea9b271d4c9fb75aedfb7139f17d77fe0e61312395b439c",
+      "training_count": 0,
+      "latest_training_target": null,
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64654.1133,
+          69308.7891,
+          75658.9062
+        ],
+        "volatility": [
+          59678.21046317569,
+          67272.59375,
+          75833.4044323439
+        ],
+        "residual_interval": [
+          64654.1133,
+          69308.7891,
+          75658.9062
+        ]
+      }
+    },
+    {
+      "origin_index": 66,
+      "target_index": 73,
+      "origin_date": "2026-03-08",
+      "target_date": "2026-03-15",
+      "origin_close": 65969.78125,
+      "actual": 72789.9140625,
+      "history_sha256": "8903a1ace73e7637b0a260b44247b44cc9c4f54aedd420bc1ad84fa98dbcf2a9",
+      "training_count": 1,
+      "latest_training_target": "2026-03-08",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          62361.7266,
+          68197.7969,
+          74790.8984
+        ],
+        "volatility": [
+          58533.42937314405,
+          65969.78125,
+          74350.88093727198
+        ],
+        "residual_interval": [
+          62361.7266,
+          68197.7969,
+          74790.8984
+        ]
+      }
+    },
+    {
+      "origin_index": 67,
+      "target_index": 74,
+      "origin_date": "2026-03-09",
+      "target_date": "2026-03-16",
+      "origin_close": 68402.3828125,
+      "actual": 74861.0859375,
+      "history_sha256": "dba2420a73fb5b88b0426c0ea8bc524cfc467b89647e5d4e43fb4786bd894682",
+      "training_count": 2,
+      "latest_training_target": "2026-03-09",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64310.7578,
+          68343.1406,
+          73866.4375
+        ],
+        "volatility": [
+          60608.22318653822,
+          68402.3828125,
+          77198.86392358437
+        ],
+        "residual_interval": [
+          64310.7578,
+          68343.1406,
+          73866.4375
+        ]
+      }
+    },
+    {
+      "origin_index": 68,
+      "target_index": 75,
+      "origin_date": "2026-03-10",
+      "target_date": "2026-03-17",
+      "origin_close": 69926.921875,
+      "actual": 73922.4765625,
+      "history_sha256": "bd490815663965a6793e08ea480b35dd9a9e768d99a276e353f2de58b4d2e96c",
+      "training_count": 3,
+      "latest_training_target": "2026-03-10",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          66242.3281,
+          70423.0469,
+          76921.6875
+        ],
+        "volatility": [
+          61923.96429447173,
+          69926.921875,
+          78964.16934257695
+        ],
+        "residual_interval": [
+          66242.3281,
+          70423.0469,
+          76921.6875
+        ]
+      }
+    },
+    {
+      "origin_index": 69,
+      "target_index": 76,
+      "origin_date": "2026-03-11",
+      "target_date": "2026-03-18",
+      "origin_close": 70204.8828125,
+      "actual": 71245.578125,
+      "history_sha256": "2086a25eb7fe07443ee56ebb85a080ff6c9644aab2c661830bbb798785a7ca0e",
+      "training_count": 4,
+      "latest_training_target": "2026-03-11",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          66568.8438,
+          71488.0625,
+          78689.6406
+        ],
+        "volatility": [
+          62167.151129001366,
+          70204.8828125,
+          79281.83101859363
+        ],
+        "residual_interval": [
+          66568.8438,
+          71488.0625,
+          78689.6406
+        ]
+      }
+    },
+    {
+      "origin_index": 70,
+      "target_index": 77,
+      "origin_date": "2026-03-12",
+      "target_date": "2026-03-19",
+      "origin_close": 70493.4609375,
+      "actual": 69912.7890625,
+      "history_sha256": "e06246c99f1ec17bfaec1abad0383f650f2d678fbc18344777572b95f4d1be46",
+      "training_count": 5,
+      "latest_training_target": "2026-03-12",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          66790.3672,
+          72274.3438,
+          79172.3047
+        ],
+        "volatility": [
+          62423.35425047435,
+          70493.4609375,
+          79606.87301434265
+        ],
+        "residual_interval": [
+          66790.3672,
+          72274.3438,
+          79172.3047
+        ]
+      }
+    },
+    {
+      "origin_index": 71,
+      "target_index": 78,
+      "origin_date": "2026-03-13",
+      "target_date": "2026-03-20",
+      "origin_close": 70968.265625,
+      "actual": 70522.5859375,
+      "history_sha256": "ce56e7449ae664b5c72d8bba9be6dd18f721729bd04b5008714baabc596a7f7a",
+      "training_count": 6,
+      "latest_training_target": "2026-03-13",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          68142.1562,
+          73479.1562,
+          79982.3984
+        ],
+        "volatility": [
+          62841.205609462966,
+          70968.265625,
+          80146.3733385493
+        ],
+        "residual_interval": [
+          68142.1562,
+          73479.1562,
+          79982.3984
+        ]
+      }
+    },
+    {
+      "origin_index": 72,
+      "target_index": 79,
+      "origin_date": "2026-03-14",
+      "target_date": "2026-03-21",
+      "origin_close": 71214.625,
+      "actual": 68711.5234375,
+      "history_sha256": "a01107a337e94c86372de1650996dd6d150630aa37f6e8e8400704334febfb9f",
+      "training_count": 7,
+      "latest_training_target": "2026-03-14",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          68819.6094,
+          74496.0,
+          81352.8984
+        ],
+        "volatility": [
+          63177.447678374636,
+          71214.625,
+          80274.2592532206
+        ],
+        "residual_interval": [
+          68819.6094,
+          74496.0,
+          81352.8984
+        ]
+      }
+    },
+    {
+      "origin_index": 73,
+      "target_index": 80,
+      "origin_date": "2026-03-15",
+      "target_date": "2026-03-22",
+      "origin_close": 72789.9140625,
+      "actual": 67845.2109375,
+      "history_sha256": "39fd78642c6f98192b86531b5192f959bf6997f2034b5d434a27a07f266c6a3d",
+      "training_count": 8,
+      "latest_training_target": "2026-03-15",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          70121.3906,
+          76045.25,
+          82961.3594
+        ],
+        "volatility": [
+          64561.89940993647,
+          72789.9140625,
+          82066.53827800306
+        ],
+        "residual_interval": [
+          70121.3906,
+          76045.25,
+          82961.3594
+        ]
+      }
+    },
+    {
+      "origin_index": 74,
+      "target_index": 81,
+      "origin_date": "2026-03-16",
+      "target_date": "2026-03-23",
+      "origin_close": 74861.0859375,
+      "actual": 70914.859375,
+      "history_sha256": "b91710bffdf3051dfb74a03e48bbe38c434441a29956d8b07a3a412ea84fac06",
+      "training_count": 9,
+      "latest_training_target": "2026-03-16",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          72113.4688,
+          77812.1016,
+          84680.3047
+        ],
+        "volatility": [
+          66347.53770554431,
+          74861.0859375,
+          84467.07114608487
+        ],
+        "residual_interval": [
+          72113.4688,
+          77812.1016,
+          84680.3047
+        ]
+      }
+    },
+    {
+      "origin_index": 75,
+      "target_index": 82,
+      "origin_date": "2026-03-17",
+      "target_date": "2026-03-24",
+      "origin_close": 73922.4765625,
+      "actual": 70517.859375,
+      "history_sha256": "d2cec7574496681fb58ee7371634feb477397e8173ff31f40e142780286ae9cc",
+      "training_count": 10,
+      "latest_training_target": "2026-03-17",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          71826.4844,
+          77304.3672,
+          83657.7578
+        ],
+        "volatility": [
+          65512.70217389428,
+          73922.4765625,
+          83411.80198350736
+        ],
+        "residual_interval": [
+          71826.4844,
+          77304.3672,
+          83657.7578
+        ]
+      }
+    },
+    {
+      "origin_index": 76,
+      "target_index": 83,
+      "origin_date": "2026-03-18",
+      "target_date": "2026-03-25",
+      "origin_close": 71245.578125,
+      "actual": 71309.8828125,
+      "history_sha256": "13c6227bc55b3ffd537c3f32816235f72b87d7de0d9dc8d496e64f215eba1a2a",
+      "training_count": 11,
+      "latest_training_target": "2026-03-18",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          69293.7344,
+          74615.5,
+          80503.0312
+        ],
+        "volatility": [
+          63087.27149228059,
+          71245.578125,
+          80458.89895533957
+        ],
+        "residual_interval": [
+          69293.7344,
+          74615.5,
+          80503.0312
+        ]
+      }
+    },
+    {
+      "origin_index": 77,
+      "target_index": 84,
+      "origin_date": "2026-03-19",
+      "target_date": "2026-03-26",
+      "origin_close": 69912.7890625,
+      "actual": 68791.625,
+      "history_sha256": "ef33097675d9ed2768570fa30c5aadfeee3e21ed8278455c2e73b672212cc86b",
+      "training_count": 12,
+      "latest_training_target": "2026-03-19",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          68654.9922,
+          73942.0,
+          79831.75
+        ],
+        "volatility": [
+          61902.9867063385,
+          69912.7890625,
+          78959.00237713632
+        ],
+        "residual_interval": [
+          68654.9922,
+          73942.0,
+          79831.75
+        ]
+      }
+    },
+    {
+      "origin_index": 78,
+      "target_index": 85,
+      "origin_date": "2026-03-20",
+      "target_date": "2026-03-27",
+      "origin_close": 70522.5859375,
+      "actual": 66338.375,
+      "history_sha256": "9f3dbce35e74b7560764d2b4a98a17607f0e6faf5703dda3f09854273bff6ec8",
+      "training_count": 13,
+      "latest_training_target": "2026-03-20",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          70835.3828,
+          75927.3594,
+          81565.0391
+        ],
+        "volatility": [
+          62436.35391535679,
+          70522.5859375,
+          79656.07879752906
+        ],
+        "residual_interval": [
+          70835.3828,
+          75927.3594,
+          81565.0391
+        ]
+      }
+    },
+    {
+      "origin_index": 79,
+      "target_index": 86,
+      "origin_date": "2026-03-21",
+      "target_date": "2026-03-28",
+      "origin_close": 68711.5234375,
+      "actual": 66319.6953125,
+      "history_sha256": "e8c87bee13ff7980cf274e7fdfa463f9a70f35552e7e11eba1a735c39b9a130d",
+      "training_count": 14,
+      "latest_training_target": "2026-03-21",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          67933.0312,
+          73296.0547,
+          79204.7891
+        ],
+        "volatility": [
+          60898.62995161984,
+          68711.5234375,
+          77526.75974570969
+        ],
+        "residual_interval": [
+          67933.0312,
+          73296.0547,
+          79204.7891
+        ]
+      }
+    },
+    {
+      "origin_index": 80,
+      "target_index": 87,
+      "origin_date": "2026-03-22",
+      "target_date": "2026-03-29",
+      "origin_close": 67845.2109375,
+      "actual": 65954.921875,
+      "history_sha256": "ff7e298b1f4ac73b22b6f27303c0affa3effd0fa76c7e19be85ec1bfca7455d5",
+      "training_count": 15,
+      "latest_training_target": "2026-03-22",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          64470.6641,
+          70231.1016,
+          76356.9609
+        ],
+        "volatility": [
+          60140.51996477808,
+          67845.2109375,
+          76536.9612675389
+        ],
+        "residual_interval": [
+          64470.6641,
+          70231.1016,
+          76356.9609
+        ]
+      }
+    },
+    {
+      "origin_index": 81,
+      "target_index": 88,
+      "origin_date": "2026-03-23",
+      "target_date": "2026-03-30",
+      "origin_close": 70914.859375,
+      "actual": 66691.4453125,
+      "history_sha256": "a072cb6d25fbfc6502cce1e554bc0257309f0298e3a583ff17ae526a4bcb0e2c",
+      "training_count": 16,
+      "latest_training_target": "2026-03-23",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          66997.4922,
+          72404.5078,
+          78327.1016
+        ],
+        "volatility": [
+          62744.51990175895,
+          70914.859375,
+          80149.10765195046
+        ],
+        "residual_interval": [
+          66997.4922,
+          72404.5078,
+          78327.1016
+        ]
+      }
+    },
+    {
+      "origin_index": 82,
+      "target_index": 89,
+      "origin_date": "2026-03-24",
+      "target_date": "2026-03-31",
+      "origin_close": 70517.859375,
+      "actual": 68233.3125,
+      "history_sha256": "27b3abf39c06b84ef734b7ff828b3150d84c31efd38bc681903ecf576699f58e",
+      "training_count": 17,
+      "latest_training_target": "2026-03-24",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          65873.875,
+          71469.5312,
+          77464.2891
+        ],
+        "volatility": [
+          62394.072908625116,
+          70517.859375,
+          79699.37301760692
+        ],
+        "residual_interval": [
+          65873.875,
+          71469.5312,
+          77464.2891
+        ]
+      }
+    },
+    {
+      "origin_index": 83,
+      "target_index": 90,
+      "origin_date": "2026-03-25",
+      "target_date": "2026-04-01",
+      "origin_close": 71309.8828125,
+      "actual": 68078.5546875,
+      "history_sha256": "bd9af340430f1673f49bea612a57479a4d19bda1db6be0eeb81dd574f62908d7",
+      "training_count": 18,
+      "latest_training_target": "2026-03-25",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          66541.1016,
+          72189.125,
+          78176.7969
+        ],
+        "volatility": [
+          63083.5589614327,
+          71309.8828125,
+          80608.94899479837
+        ],
+        "residual_interval": [
+          66541.1016,
+          72189.125,
+          78176.7969
+        ]
+      }
+    },
+    {
+      "origin_index": 84,
+      "target_index": 91,
+      "origin_date": "2026-03-26",
+      "target_date": "2026-04-02",
+      "origin_close": 68791.625,
+      "actual": 66888.5703125,
+      "history_sha256": "d70ecd0084724bad4cdb6f67b255ca5a1666db8face4c64a9e222b197cb06b23",
+      "training_count": 19,
+      "latest_training_target": "2026-03-26",
+      "eligible": false,
+      "forecasts": {
+        "timesfm": [
+          63447.4922,
+          69109.8828,
+          74906.5859
+        ],
+        "volatility": [
+          60836.28771325935,
+          68791.625,
+          77787.25244455073
+        ],
+        "residual_interval": [
+          63447.4922,
+          69109.8828,
+          74906.5859
+        ]
+      }
+    },
+    {
+      "origin_index": 85,
+      "target_index": 92,
+      "origin_date": "2026-03-27",
+      "target_date": "2026-04-03",
+      "origin_close": 66338.375,
+      "actual": 66931.1015625,
+      "history_sha256": "3f30fb469f722f7c68b99566f5d485568fdbeca3f3ff1fd3af91b54219018b2f",
+      "training_count": 20,
+      "latest_training_target": "2026-03-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58972.4492,
+          65171.5,
+          71201.4453
+        ],
+        "volatility": [
+          58645.18934254209,
+          66338.375,
+          75040.76714521294
+        ],
+        "residual_interval": [
+          59120.26084762818,
+          65171.5,
+          69849.94522678935
+        ]
+      }
+    },
+    {
+      "origin_index": 86,
+      "target_index": 93,
+      "origin_date": "2026-03-28",
+      "target_date": "2026-04-04",
+      "origin_close": 66319.6953125,
+      "actual": 67290.515625,
+      "history_sha256": "fc258b8f8c1853d723b77b9da2c8e1e3679c7494243e845fdf159f8c79b98c7d",
+      "training_count": 21,
+      "latest_training_target": "2026-03-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58366.6445,
+          64525.8203,
+          70361.8203
+        ],
+        "volatility": [
+          58637.14303134626,
+          66319.6953125,
+          75008.8042998887
+        ],
+        "residual_interval": [
+          58375.429947158125,
+          64525.8203,
+          69034.49446483604
+        ]
+      }
+    },
+    {
+      "origin_index": 87,
+      "target_index": 94,
+      "origin_date": "2026-03-29",
+      "target_date": "2026-04-05",
+      "origin_close": 65954.921875,
+      "actual": 68981.8984375,
+      "history_sha256": "b776e96b154a0af7c92c9989e592673de7acd2bc68a3c5b47beaf101fa9df863",
+      "training_count": 22,
+      "latest_training_target": "2026-03-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57849.5312,
+          63862.7578,
+          69550.8281
+        ],
+        "volatility": [
+          58316.215866976745,
+          65954.921875,
+          74594.20428547898
+        ],
+        "residual_interval": [
+          57837.71502410753,
+          63862.7578,
+          68209.01763537226
+        ]
+      }
+    },
+    {
+      "origin_index": 88,
+      "target_index": 95,
+      "origin_date": "2026-03-30",
+      "target_date": "2026-04-06",
+      "origin_close": 66691.4453125,
+      "actual": 68859.828125,
+      "history_sha256": "93721b7f87e01541d1b812f15a5c3c2893bf30fa1da5c4cc783d9844a45e7ca2",
+      "training_count": 23,
+      "latest_training_target": "2026-03-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58706.5469,
+          64628.6484,
+          70263.0469
+        ],
+        "volatility": [
+          59067.713797298646,
+          66691.4453125,
+          75299.15400371545
+        ],
+        "residual_interval": [
+          58634.00832739449,
+          64628.6484,
+          68893.58632176674
+        ]
+      }
+    },
+    {
+      "origin_index": 89,
+      "target_index": 96,
+      "origin_date": "2026-03-31",
+      "target_date": "2026-04-07",
+      "origin_close": 68233.3125,
+      "actual": 71940.703125,
+      "history_sha256": "8eeb486d5dc2e98a9dab1f219b97eda658b981b51a80027ccdc9bcd1e8cbf220",
+      "training_count": 24,
+      "latest_training_target": "2026-03-31",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60115.1719,
+          66180.8828,
+          71933.6016
+        ],
+        "volatility": [
+          60399.24312732524,
+          68233.3125,
+          77083.49796549573
+        ],
+        "residual_interval": [
+          60063.20644777551,
+          66180.8828,
+          70464.58632657683
+        ]
+      }
+    },
+    {
+      "origin_index": 90,
+      "target_index": 97,
+      "origin_date": "2026-04-01",
+      "target_date": "2026-04-08",
+      "origin_close": 68078.5546875,
+      "actual": 71123.359375,
+      "history_sha256": "bfce81d7df9b063ae5f3e5d09aeb39158749801a8d7387cf9b4ad56fd6d7c7f6",
+      "training_count": 25,
+      "latest_training_target": "2026-04-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60007.8203,
+          65978.4766,
+          71597.3984
+        ],
+        "volatility": [
+          60467.34727331728,
+          68078.5546875,
+          76647.8077397667
+        ],
+        "residual_interval": [
+          59939.29977749167,
+          65978.4766,
+          70117.18110687494
+        ]
+      }
+    },
+    {
+      "origin_index": 91,
+      "target_index": 98,
+      "origin_date": "2026-04-02",
+      "target_date": "2026-04-09",
+      "origin_close": 66888.5703125,
+      "actual": 71767.828125,
+      "history_sha256": "1558a77d143ac6b2ad599aff8a27d424c7241b1e27127cf9bacc2b38bfc800cc",
+      "training_count": 26,
+      "latest_training_target": "2026-04-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60202.3984,
+          65710.5078,
+          70993.25
+        ],
+        "volatility": [
+          59416.28089011719,
+          66888.5703125,
+          75300.58716944093
+        ],
+        "residual_interval": [
+          59935.93911825626,
+          65710.5078,
+          69604.382532354
+        ]
+      }
+    },
+    {
+      "origin_index": 92,
+      "target_index": 99,
+      "origin_date": "2026-04-03",
+      "target_date": "2026-04-10",
+      "origin_close": 66931.1015625,
+      "actual": 72979.046875,
+      "history_sha256": "8201c12748bd6d29e2c7a6bec5fe1fb534a457ff96109f592eb8a0db33341591",
+      "training_count": 27,
+      "latest_training_target": "2026-04-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          61256.5234,
+          67284.3203,
+          73157.8438
+        ],
+        "volatility": [
+          59483.10284544109,
+          66931.1015625,
+          75311.67915046027
+        ],
+        "residual_interval": [
+          61200.1550219542,
+          67284.3203,
+          71422.325522106
+        ]
+      }
+    },
+    {
+      "origin_index": 93,
+      "target_index": 100,
+      "origin_date": "2026-04-04",
+      "target_date": "2026-04-11",
+      "origin_close": 67290.515625,
+      "actual": 73054.2734375,
+      "history_sha256": "106388f95cf7018b3d40f3b66e30657973f7f828f35e2ed52629624f1b8e581b",
+      "training_count": 28,
+      "latest_training_target": "2026-04-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          61938.5156,
+          68709.0312,
+          75539.75
+        ],
+        "volatility": [
+          59868.58839430788,
+          67290.515625,
+          75632.54144654059
+        ],
+        "residual_interval": [
+          62210.419921967594,
+          68709.0312,
+          73642.92865095091
+        ]
+      }
+    },
+    {
+      "origin_index": 94,
+      "target_index": 101,
+      "origin_date": "2026-04-05",
+      "target_date": "2026-04-12",
+      "origin_close": 68981.8984375,
+      "actual": 70753.40625,
+      "history_sha256": "7dcc5233ef2db1724facc6329826ad4ba4443c3b71c3ee200dca30368c82a123",
+      "training_count": 29,
+      "latest_training_target": "2026-04-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57700.25,
+          67463.1953,
+          74700.8047
+        ],
+        "volatility": [
+          61396.326168827865,
+          68981.8984375,
+          77504.6750998849
+        ],
+        "residual_interval": [
+          59518.850319144665,
+          67463.1953,
+          72853.57344201338
+        ]
+      }
+    },
+    {
+      "origin_index": 95,
+      "target_index": 102,
+      "origin_date": "2026-04-06",
+      "target_date": "2026-04-13",
+      "origin_close": 68859.828125,
+      "actual": 74484.640625,
+      "history_sha256": "e02e498d59bae836b463465ad5305561205a7689a818ba07c33aa06dca355fb9",
+      "training_count": 30,
+      "latest_training_target": "2026-04-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59064.2148,
+          68298.8516,
+          75400.3516
+        ],
+        "volatility": [
+          62617.06519153684,
+          68859.828125,
+          75724.978724257
+        ],
+        "residual_interval": [
+          60611.852774087776,
+          68298.8516,
+          74080.14379560213
+        ]
+      }
+    },
+    {
+      "origin_index": 96,
+      "target_index": 103,
+      "origin_date": "2026-04-07",
+      "target_date": "2026-04-14",
+      "origin_close": 71940.703125,
+      "actual": 74181.609375,
+      "history_sha256": "80fec7f6bc18b32ab6fc537005d4dfde8526006ed7cb9e643bbe5f741a54979a",
+      "training_count": 31,
+      "latest_training_target": "2026-04-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          68115.0312,
+          75220.0156,
+          82713.5078
+        ],
+        "volatility": [
+          66279.01608705323,
+          71940.703125,
+          78086.02287218241
+        ],
+        "residual_interval": [
+          68333.43302664477,
+          75220.0156,
+          81490.19553979397
+        ]
+      }
+    },
+    {
+      "origin_index": 97,
+      "target_index": 104,
+      "origin_date": "2026-04-08",
+      "target_date": "2026-04-15",
+      "origin_close": 71123.359375,
+      "actual": 74805.078125,
+      "history_sha256": "2a7a17b37c0127901423a7c1a5ab8bd73d88d34ee532c3d403e46bc91d23e07d",
+      "training_count": 32,
+      "latest_training_target": "2026-04-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          64886.2266,
+          72958.6406,
+          79984.3438
+        ],
+        "volatility": [
+          65542.09301768627,
+          71123.359375,
+          77179.90097478847
+        ],
+        "residual_interval": [
+          65687.07539548616,
+          72958.6406,
+          79273.93073086023
+        ]
+      }
+    },
+    {
+      "origin_index": 98,
+      "target_index": 105,
+      "origin_date": "2026-04-09",
+      "target_date": "2026-04-16",
+      "origin_close": 71767.828125,
+      "actual": 75152.1328125,
+      "history_sha256": "893196582a8ce14a13b9111445c9f9cd989f95be1cafc68ad97d14496f9267f3",
+      "training_count": 33,
+      "latest_training_target": "2026-04-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          66846.9844,
+          72907.125,
+          78641.9375
+        ],
+        "volatility": [
+          66144.90780806573,
+          71767.828125,
+          77868.74794239976
+        ],
+        "residual_interval": [
+          66651.73299446638,
+          72907.125,
+          78680.6747814776
+        ]
+      }
+    },
+    {
+      "origin_index": 99,
+      "target_index": 106,
+      "origin_date": "2026-04-10",
+      "target_date": "2026-04-17",
+      "origin_close": 72979.046875,
+      "actual": 77126.875,
+      "history_sha256": "1b102fefd69ce5d32074416db9dd4deddf8108b9db76b247e6f5e62a2ca8cb47",
+      "training_count": 34,
+      "latest_training_target": "2026-04-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69112.9844,
+          75210.25,
+          81582.625
+        ],
+        "volatility": [
+          67240.64835347023,
+          72979.046875,
+          79207.16728943586
+        ],
+        "residual_interval": [
+          68837.34926598993,
+          75210.25,
+          81528.60020348587
+        ]
+      }
+    },
+    {
+      "origin_index": 100,
+      "target_index": 107,
+      "origin_date": "2026-04-11",
+      "target_date": "2026-04-18",
+      "origin_close": 73054.2734375,
+      "actual": 75726.2109375,
+      "history_sha256": "cc31ca8157403e58a7897c3368d8262286cb304065a6f582b8d7b3ed4c5a689e",
+      "training_count": 35,
+      "latest_training_target": "2026-04-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69566.1094,
+          76102.2891,
+          83180.7812
+        ],
+        "volatility": [
+          67341.88609121491,
+          73054.2734375,
+          79251.22352902508
+        ],
+        "residual_interval": [
+          69474.23386826296,
+          76102.2891,
+          82792.910004675
+        ]
+      }
+    },
+    {
+      "origin_index": 101,
+      "target_index": 108,
+      "origin_date": "2026-04-12",
+      "target_date": "2026-04-19",
+      "origin_close": 70753.40625,
+      "actual": 73856.3515625,
+      "history_sha256": "3301eef94277905cdab2672be731d130739bec839b43b4bfe3e390599210b181",
+      "training_count": 36,
+      "latest_training_target": "2026-04-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          67410.4219,
+          74276.5,
+          82002.1406
+        ],
+        "volatility": [
+          65195.2433256159,
+          70753.40625,
+          76785.42544852519
+        ],
+        "residual_interval": [
+          67567.1399597472,
+          74276.5,
+          81195.36865484624
+        ]
+      }
+    },
+    {
+      "origin_index": 102,
+      "target_index": 109,
+      "origin_date": "2026-04-13",
+      "target_date": "2026-04-20",
+      "origin_close": 74484.640625,
+      "actual": 75872.5234375,
+      "history_sha256": "4fac51a2fc0ba15a1b2c470a8e31a23d75590230f5ca41eff75f748db2518071",
+      "training_count": 37,
+      "latest_training_target": "2026-04-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71812.6797,
+          78375.9375,
+          85447.4141
+        ],
+        "volatility": [
+          68446.56015379632,
+          74484.640625,
+          81055.37629019459
+        ],
+        "residual_interval": [
+          71640.48020009168,
+          78375.9375,
+          85265.73815168755
+        ]
+      }
+    },
+    {
+      "origin_index": 103,
+      "target_index": 110,
+      "origin_date": "2026-04-14",
+      "target_date": "2026-04-21",
+      "origin_close": 74181.609375,
+      "actual": 76352.7734375,
+      "history_sha256": "381570efa72660f2a8c78620e9f91302d61a3793e193b9172c7455fe0d9e8931",
+      "training_count": 38,
+      "latest_training_target": "2026-04-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70793.5391,
+          76982.6875,
+          83458.9531
+        ],
+        "volatility": [
+          68276.7556877458,
+          74181.609375,
+          80597.1390121681
+        ],
+        "residual_interval": [
+          70498.54328403712,
+          76982.6875,
+          83506.22090082632
+        ]
+      }
+    },
+    {
+      "origin_index": 104,
+      "target_index": 111,
+      "origin_date": "2026-04-15",
+      "target_date": "2026-04-22",
+      "origin_close": 74805.078125,
+      "actual": 78203.1015625,
+      "history_sha256": "391591534e5f08c1aac1b9496bf619d6cc138aae60c78444f05fc05eea2c5947",
+      "training_count": 39,
+      "latest_training_target": "2026-04-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70437.5938,
+          76939.3672,
+          83385.625
+        ],
+        "volatility": [
+          68857.94550888015,
+          74805.078125,
+          81265.85351817825
+        ],
+        "residual_interval": [
+          70304.57826483634,
+          76939.3672,
+          83436.83820772679
+        ]
+      }
+    },
+    {
+      "origin_index": 105,
+      "target_index": 112,
+      "origin_date": "2026-04-16",
+      "target_date": "2026-04-23",
+      "origin_close": 75152.1328125,
+      "actual": 78268.953125,
+      "history_sha256": "9a4bcc1bb9acfd0ed0009fa7d355d3429139dec2120358f5c91b11b52754d11f",
+      "training_count": 40,
+      "latest_training_target": "2026-04-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70126.8906,
+          76314.8047,
+          82030.2031
+        ],
+        "volatility": [
+          69195.98659430814,
+          75152.1328125,
+          81620.96306799699
+        ],
+        "residual_interval": [
+          69867.30411872666,
+          76314.8047,
+          82410.27074985897
+        ]
+      }
+    },
+    {
+      "origin_index": 106,
+      "target_index": 113,
+      "origin_date": "2026-04-17",
+      "target_date": "2026-04-24",
+      "origin_close": 77126.875,
+      "actual": 77455.3125,
+      "history_sha256": "5d8b8002920a03d5cecf06e63c4f757415428115361e54c8d6cd37f6158860ba",
+      "training_count": 41,
+      "latest_training_target": "2026-04-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72043.25,
+          78066.0391,
+          83870.7969
+        ],
+        "volatility": [
+          70965.22146452488,
+          77126.875,
+          83823.52262846491
+        ],
+        "residual_interval": [
+          71626.7533332464,
+          78066.0391,
+          84271.09088647232
+        ]
+      }
+    },
+    {
+      "origin_index": 107,
+      "target_index": 114,
+      "origin_date": "2026-04-18",
+      "target_date": "2026-04-25",
+      "origin_close": 75726.2109375,
+      "actual": 77612.015625,
+      "history_sha256": "95a1963c7d25e218281f0a39312c75756e8c2fb2a28c813fea436a333dc9e7f8",
+      "training_count": 42,
+      "latest_training_target": "2026-04-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71640.8828,
+          77145.0,
+          82411.875
+        ],
+        "volatility": [
+          69681.45441762877,
+          75726.2109375,
+          82295.34057343067
+        ],
+        "residual_interval": [
+          71038.26946994022,
+          77145.0,
+          83023.5129880345
+        ]
+      }
+    },
+    {
+      "origin_index": 108,
+      "target_index": 115,
+      "origin_date": "2026-04-19",
+      "target_date": "2026-04-26",
+      "origin_close": 73856.3515625,
+      "actual": 78657.5390625,
+      "history_sha256": "0bfe50e41d0b2ace95d4631aaaf815d46a84bc6070ccfe8f574a6813dccbee5a",
+      "training_count": 43,
+      "latest_training_target": "2026-04-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          68416.5156,
+          74408.5156,
+          79855.9922
+        ],
+        "volatility": [
+          67928.82965237564,
+          73856.3515625,
+          80301.11359253824
+        ],
+        "residual_interval": [
+          68211.92175675795,
+          74408.5156,
+          80246.76797869532
+        ]
+      }
+    },
+    {
+      "origin_index": 109,
+      "target_index": 116,
+      "origin_date": "2026-04-20",
+      "target_date": "2026-04-27",
+      "origin_close": 75872.5234375,
+      "actual": 77366.625,
+      "history_sha256": "d4a2c00a7844d3d6a17c9ea8c77741b4633047ac1e5ccc4d7bafcba15a8806ed",
+      "training_count": 44,
+      "latest_training_target": "2026-04-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69174.5391,
+          75250.5938,
+          80650.8672
+        ],
+        "volatility": [
+          69735.55740017442,
+          75872.5234375,
+          82549.56334169328
+        ],
+        "residual_interval": [
+          69009.2111787751,
+          75250.5938,
+          81083.43122551218
+        ]
+      }
+    },
+    {
+      "origin_index": 110,
+      "target_index": 117,
+      "origin_date": "2026-04-21",
+      "target_date": "2026-04-28",
+      "origin_close": 76352.7734375,
+      "actual": 76350.671875,
+      "history_sha256": "9c54619bd67835509226f63f58360dbd65a451151b708a9e1c5a090da5761c39",
+      "training_count": 45,
+      "latest_training_target": "2026-04-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69397.0469,
+          75835.7734,
+          81637.6328
+        ],
+        "volatility": [
+          70190.30067850358,
+          76352.7734375,
+          83056.2906162848
+        ],
+        "residual_interval": [
+          69421.97857078817,
+          75835.7734,
+          81877.59011272539
+        ]
+      }
+    },
+    {
+      "origin_index": 111,
+      "target_index": 118,
+      "origin_date": "2026-04-22",
+      "target_date": "2026-04-29",
+      "origin_close": 78203.1015625,
+      "actual": 75776.1328125,
+      "history_sha256": "f4063ea0b8a7ee63cb4f2bbcab4d3c887621b99ca1434d0ffd97226e0b419b93",
+      "training_count": 46,
+      "latest_training_target": "2026-04-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70673.6875,
+          77065.2109,
+          82769.0234
+        ],
+        "volatility": [
+          71852.19926494475,
+          78203.1015625,
+          85115.35007361187
+        ],
+        "residual_interval": [
+          70657.45087704,
+          77065.2109,
+          83091.394724436
+        ]
+      }
+    },
+    {
+      "origin_index": 112,
+      "target_index": 119,
+      "origin_date": "2026-04-23",
+      "target_date": "2026-04-30",
+      "origin_close": 78268.953125,
+      "actual": 76304.3203125,
+      "history_sha256": "e8675be5a3d4e4dd52cac0d695f6a1782b1c3a19de141e79fdb95090f211be42",
+      "training_count": 47,
+      "latest_training_target": "2026-04-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72530.2578,
+          78600.3203,
+          84265.9922
+        ],
+        "volatility": [
+          71917.1072413021,
+          78268.953125,
+          85181.8052515502
+        ],
+        "residual_interval": [
+          72323.95108823548,
+          78600.3203,
+          84652.82052988837
+        ]
+      }
+    },
+    {
+      "origin_index": 113,
+      "target_index": 120,
+      "origin_date": "2026-04-24",
+      "target_date": "2026-05-01",
+      "origin_close": 77455.3125,
+      "actual": 78179.0,
+      "history_sha256": "a43da63ad9d3c1df78b84c1959766f132e7263ef196447e8873a288b9f363843",
+      "training_count": 48,
+      "latest_training_target": "2026-04-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70855.2891,
+          77339.375,
+          83039.875
+        ],
+        "volatility": [
+          71352.89607990586,
+          77455.3125,
+          84079.63466197926
+        ],
+        "residual_interval": [
+          70942.6346597701,
+          77339.375,
+          83340.66006372792
+        ]
+      }
+    },
+    {
+      "origin_index": 114,
+      "target_index": 121,
+      "origin_date": "2026-04-25",
+      "target_date": "2026-05-02",
+      "origin_close": 77612.015625,
+      "actual": 78657.25,
+      "history_sha256": "32764a1e848da0c9b9f516b59263ffc53a34d258729f242d89a201a42623ef7f",
+      "training_count": 49,
+      "latest_training_target": "2026-04-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70288.6719,
+          77202.0859,
+          83060.8906
+        ],
+        "volatility": [
+          71508.28768794994,
+          77612.015625,
+          84236.739042911
+        ],
+        "residual_interval": [
+          70629.88589287631,
+          77202.0859,
+          83259.96617875286
+        ]
+      }
+    },
+    {
+      "origin_index": 115,
+      "target_index": 122,
+      "origin_date": "2026-04-26",
+      "target_date": "2026-05-03",
+      "origin_close": 78657.5390625,
+      "actual": 78538.2265625,
+      "history_sha256": "6d115db2a5cad2bcb9db0071fc6aef1e78fad501c5a0f93aae694e641c983378",
+      "training_count": 50,
+      "latest_training_target": "2026-04-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70375.0938,
+          77679.9453,
+          83665.5156
+        ],
+        "volatility": [
+          72738.50919430646,
+          78657.5390625,
+          85058.22458969225
+        ],
+        "residual_interval": [
+          70926.04433041737,
+          77679.9453,
+          83803.33083583723
+        ]
+      }
+    },
+    {
+      "origin_index": 116,
+      "target_index": 123,
+      "origin_date": "2026-04-27",
+      "target_date": "2026-05-04",
+      "origin_close": 77366.625,
+      "actual": 79827.90625,
+      "history_sha256": "e45182ecf881e152e57e02c63c167e29d3683da0709f6158854f84497153f93e",
+      "training_count": 51,
+      "latest_training_target": "2026-04-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          66669.4844,
+          74991.8281,
+          81221.4062
+        ],
+        "volatility": [
+          71521.55806030566,
+          77366.625,
+          83689.37738805526
+        ],
+        "residual_interval": [
+          67861.39459959338,
+          74991.8281,
+          81112.15859269588
+        ]
+      }
+    },
+    {
+      "origin_index": 117,
+      "target_index": 124,
+      "origin_date": "2026-04-28",
+      "target_date": "2026-05-05",
+      "origin_close": 76350.671875,
+      "actual": 80927.0546875,
+      "history_sha256": "32a71f275630dcac52c8b414a1507c74f340269a8a7d0fbd98d3c89d50242296",
+      "training_count": 52,
+      "latest_training_target": "2026-04-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65437.625,
+          73848.7656,
+          79917.7734
+        ],
+        "volatility": [
+          70620.18037515876,
+          76350.671875,
+          82546.16548408681
+        ],
+        "residual_interval": [
+          66721.72277264038,
+          73848.7656,
+          79834.97063166481
+        ]
+      }
+    },
+    {
+      "origin_index": 118,
+      "target_index": 125,
+      "origin_date": "2026-04-29",
+      "target_date": "2026-05-06",
+      "origin_close": 75776.1328125,
+      "actual": 81427.53125,
+      "history_sha256": "ea038c2b5ac32c63490046fd0f2cc6de89dc9516372b26167065df4c6a225c47",
+      "training_count": 53,
+      "latest_training_target": "2026-04-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65800.0469,
+          73125.4453,
+          79228.7969
+        ],
+        "volatility": [
+          70098.78841574765,
+          75776.1328125,
+          81913.28885689695
+        ],
+        "residual_interval": [
+          66582.30645221012,
+          73125.4453,
+          79091.85830205242
+        ]
+      }
+    },
+    {
+      "origin_index": 119,
+      "target_index": 126,
+      "origin_date": "2026-04-30",
+      "target_date": "2026-05-07",
+      "origin_close": 76304.3203125,
+      "actual": 80009.9921875,
+      "history_sha256": "efc9cc426f9f565a9cfdca15fe786dfdaf795b7f2ea284563d85fb25e06c1716",
+      "training_count": 54,
+      "latest_training_target": "2026-04-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65787.4844,
+          73511.3672,
+          80120.3672
+        ],
+        "volatility": [
+          70625.37770360483,
+          76304.3203125,
+          82439.9031575787
+        ],
+        "residual_interval": [
+          66755.94787387906,
+          73511.3672,
+          79737.17186076923
+        ]
+      }
+    },
+    {
+      "origin_index": 120,
+      "target_index": 127,
+      "origin_date": "2026-05-01",
+      "target_date": "2026-05-08",
+      "origin_close": 78179.0,
+      "actual": 80186.765625,
+      "history_sha256": "d418ac6c87c6c14dfff3ef2964208f1869385e0dfb6e2dac6b9d962cec5816df",
+      "training_count": 55,
+      "latest_training_target": "2026-05-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65267.2266,
+          74602.6094,
+          81914.2578
+        ],
+        "volatility": [
+          72485.55425934533,
+          78179.0,
+          84319.64276815893
+        ],
+        "residual_interval": [
+          66987.73139151215,
+          74602.6094,
+          81212.89591905408
+        ]
+      }
+    },
+    {
+      "origin_index": 121,
+      "target_index": 128,
+      "origin_date": "2026-05-02",
+      "target_date": "2026-05-09",
+      "origin_close": 78657.25,
+      "actual": 80664.3671875,
+      "history_sha256": "76ae9340a6f148609c9eafb2b3f2f8adb3db44499ca21ac0db5d6d2f9073124d",
+      "training_count": 56,
+      "latest_training_target": "2026-05-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          67050.6172,
+          75999.1328,
+          83613.6875
+        ],
+        "volatility": [
+          72935.67891351531,
+          78657.25,
+          84827.66006605346
+        ],
+        "residual_interval": [
+          68533.98656186277,
+          75999.1328,
+          82807.06076635806
+        ]
+      }
+    },
+    {
+      "origin_index": 122,
+      "target_index": 129,
+      "origin_date": "2026-05-03",
+      "target_date": "2026-05-10",
+      "origin_close": 78538.2265625,
+      "actual": 82138.9296875,
+      "history_sha256": "6edc351f8922f8d1ec0b2a65ac167f52fe9b959401d204f1b924dfc020063441",
+      "training_count": 57,
+      "latest_training_target": "2026-05-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          68188.6328,
+          76413.3438,
+          83297.6797
+        ],
+        "volatility": [
+          73184.71250861253,
+          78538.2265625,
+          84283.35399769027
+        ],
+        "residual_interval": [
+          69305.94433739013,
+          76413.3438,
+          82866.98584155989
+        ]
+      }
+    },
+    {
+      "origin_index": 123,
+      "target_index": 130,
+      "origin_date": "2026-05-04",
+      "target_date": "2026-05-11",
+      "origin_close": 79827.90625,
+      "actual": 81728.296875,
+      "history_sha256": "edd12f39089cea73b86a4ddcdbe85e69a6c7a5faf733f31c9c88d5fbedbb1ff5",
+      "training_count": 58,
+      "latest_training_target": "2026-05-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69711.4375,
+          77370.4062,
+          84262.9844
+        ],
+        "volatility": [
+          74443.46192366768,
+          79827.90625,
+          85601.80372579895
+        ],
+        "residual_interval": [
+          70517.83239968291,
+          77370.4062,
+          83857.6079809862
+        ]
+      }
+    },
+    {
+      "origin_index": 124,
+      "target_index": 131,
+      "origin_date": "2026-05-05",
+      "target_date": "2026-05-12",
+      "origin_close": 80927.0546875,
+      "actual": 80477.4921875,
+      "history_sha256": "95f8d336d6a48fb426703c0db200d6f90b1e2481d44c9ffd51b9322c9013485a",
+      "training_count": 59,
+      "latest_training_target": "2026-05-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72909.0938,
+          80174.875,
+          86488.3672
+        ],
+        "volatility": [
+          75638.14958155583,
+          80927.0546875,
+          86585.78001477997
+        ],
+        "residual_interval": [
+          73417.41644304976,
+          80174.875,
+          86580.76444487742
+        ]
+      }
+    },
+    {
+      "origin_index": 125,
+      "target_index": 132,
+      "origin_date": "2026-05-06",
+      "target_date": "2026-05-13",
+      "origin_close": 81427.53125,
+      "actual": 79277.1171875,
+      "history_sha256": "7421898cc88b8eda4a29908020e6e82f2a794f10d0c34f62d2a2d44d103a5f50",
+      "training_count": 60,
+      "latest_training_target": "2026-05-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76001.3047,
+          82442.1797,
+          88211.2969
+        ],
+        "volatility": [
+          76132.24360055233,
+          81427.53125,
+          87091.1263335161
+        ],
+        "residual_interval": [
+          76015.81627080137,
+          82442.1797,
+          88823.29615044648
+        ]
+      }
+    },
+    {
+      "origin_index": 126,
+      "target_index": 133,
+      "origin_date": "2026-05-07",
+      "target_date": "2026-05-14",
+      "origin_close": 80009.9921875,
+      "actual": 81051.25,
+      "history_sha256": "ee4ee4b2b3a540d47334deed0e26df8f8ea0af69077a399423d8f6190e2d65f6",
+      "training_count": 61,
+      "latest_training_target": "2026-05-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75592.1953,
+          81931.1484,
+          87599.2891
+        ],
+        "volatility": [
+          74816.30391423627,
+          80009.9921875,
+          85564.2221671645
+        ],
+        "residual_interval": [
+          75580.7699471851,
+          81931.1484,
+          88327.48670300099
+        ]
+      }
+    },
+    {
+      "origin_index": 127,
+      "target_index": 134,
+      "origin_date": "2026-05-08",
+      "target_date": "2026-05-15",
+      "origin_close": 80186.765625,
+      "actual": 79065.6796875,
+      "history_sha256": "2db2d49afb86a76d9d01d1b4767e4547967a78382ed34f48f85599d4c1094dd6",
+      "training_count": 62,
+      "latest_training_target": "2026-05-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          77263.2812,
+          82730.5312,
+          87897.1328
+        ],
+        "volatility": [
+          75103.66532484718,
+          80186.765625,
+          85613.89585431348
+        ],
+        "residual_interval": [
+          76816.61746086332,
+          82730.5312,
+          88898.29499613636
+        ]
+      }
+    },
+    {
+      "origin_index": 128,
+      "target_index": 135,
+      "origin_date": "2026-05-09",
+      "target_date": "2026-05-16",
+      "origin_close": 80664.3671875,
+      "actual": 78131.4375,
+      "history_sha256": "3a4f82c023ae90e68d66ac4859762df9bde4339d0f71835a8fc26d94c86047bb",
+      "training_count": 63,
+      "latest_training_target": "2026-05-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          77235.0,
+          82729.9375,
+          88007.25
+        ],
+        "volatility": [
+          75592.72407421317,
+          80664.3671875,
+          86076.27537501934
+        ],
+        "residual_interval": [
+          76835.4272243283,
+          82729.9375,
+          88943.83561494398
+        ]
+      }
+    },
+    {
+      "origin_index": 129,
+      "target_index": 136,
+      "origin_date": "2026-05-10",
+      "target_date": "2026-05-17",
+      "origin_close": 82138.9296875,
+      "actual": 77429.3515625,
+      "history_sha256": "1a4208b71e4bbbbb93729956f94422cad51120f4506f0dc0b711dcb41dd55277",
+      "training_count": 64,
+      "latest_training_target": "2026-05-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78390.8203,
+          83973.3672,
+          89315.9922
+        ],
+        "volatility": [
+          76946.74238967351,
+          82138.9296875,
+          87681.4737138698
+        ],
+        "residual_interval": [
+          78021.42228548383,
+          83973.3672,
+          90263.62855474673
+        ]
+      }
+    },
+    {
+      "origin_index": 130,
+      "target_index": 137,
+      "origin_date": "2026-05-11",
+      "target_date": "2026-05-18",
+      "origin_close": 81728.296875,
+      "actual": 76954.171875,
+      "history_sha256": "b2bb1532c48fadda1c58276a2f4b5bcd24fa15aaccece9f2b930350d80dd8e5f",
+      "training_count": 65,
+      "latest_training_target": "2026-05-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          74140.1953,
+          82488.5078,
+          89210.2578
+        ],
+        "volatility": [
+          76555.83345056711,
+          81728.296875,
+          87250.23566494336
+        ],
+        "residual_interval": [
+          75235.2638845564,
+          82488.5078,
+          89399.19764494119
+        ]
+      }
+    },
+    {
+      "origin_index": 131,
+      "target_index": 138,
+      "origin_date": "2026-05-12",
+      "target_date": "2026-05-19",
+      "origin_close": 80477.4921875,
+      "actual": 76750.90625,
+      "history_sha256": "58049ff25edc951e6058aeec6cbb60ab3f9c1fa870e9229950f0fb5f525c9ed6",
+      "training_count": 66,
+      "latest_training_target": "2026-05-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76882.0703,
+          82531.9062,
+          87443.7031
+        ],
+        "volatility": [
+          75351.30860972096,
+          80477.4921875,
+          85952.41235072038
+        ],
+        "residual_interval": [
+          76667.04463852826,
+          82531.9062,
+          88523.14163217462
+        ]
+      }
+    },
+    {
+      "origin_index": 132,
+      "target_index": 139,
+      "origin_date": "2026-05-13",
+      "target_date": "2026-05-20",
+      "origin_close": 79277.1171875,
+      "actual": 77457.7734375,
+      "history_sha256": "19e0b52de702598c8f0396b4da93d0b3d78f9b4489fe3a6e81ecacd5eabadb91",
+      "training_count": 67,
+      "latest_training_target": "2026-05-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          73343.3906,
+          80194.5703,
+          86054.5469
+        ],
+        "volatility": [
+          74196.11383800984,
+          79277.1171875,
+          84706.07130829194
+        ],
+        "residual_interval": [
+          73845.76793178324,
+          80194.5703,
+          86555.18982323211
+        ]
+      }
+    },
+    {
+      "origin_index": 133,
+      "target_index": 140,
+      "origin_date": "2026-05-14",
+      "target_date": "2026-05-21",
+      "origin_close": 81051.25,
+      "actual": 77539.171875,
+      "history_sha256": "9336ba6f89ffee16e51fcef20161bfa391ad9c1d6f770e1d20f79f820604b97b",
+      "training_count": 68,
+      "latest_training_target": "2026-05-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75854.7812,
+          82538.5781,
+          88491.5859
+        ],
+        "volatility": [
+          75855.39852775683,
+          81051.25,
+          86603.00063097916
+        ],
+        "residual_interval": [
+          76221.93966021124,
+          82538.5781,
+          89035.9322058403
+        ]
+      }
+    },
+    {
+      "origin_index": 134,
+      "target_index": 141,
+      "origin_date": "2026-05-15",
+      "target_date": "2026-05-22",
+      "origin_close": 79065.6796875,
+      "actual": 75488.2421875,
+      "history_sha256": "e022fcc4783ba3c2795e22f10b768bd17b2931ee024062749d3d131ba25accb6",
+      "training_count": 69,
+      "latest_training_target": "2026-05-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72301.7031,
+          79465.5391,
+          85913.7812
+        ],
+        "volatility": [
+          74000.28832484143,
+          79065.6796875,
+          84477.80199185794
+        ],
+        "residual_interval": [
+          73048.46479735506,
+          79465.5391,
+          86071.38134628888
+        ]
+      }
+    },
+    {
+      "origin_index": 135,
+      "target_index": 142,
+      "origin_date": "2026-05-16",
+      "target_date": "2026-05-23",
+      "origin_close": 78131.4375,
+      "actual": 76673.3671875,
+      "history_sha256": "33f228d04f48bdc195568ef7f1b4f323067e7ce2529a32f5aa6bfc1a9592ae52",
+      "training_count": 70,
+      "latest_training_target": "2026-05-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70324.2031,
+          77937.7031,
+          84447.3594
+        ],
+        "volatility": [
+          73127.97078634103,
+          78131.4375,
+          83477.24489241016
+        ],
+        "residual_interval": [
+          71377.4471362338,
+          77937.7031,
+          84500.03470313098
+        ]
+      }
+    },
+    {
+      "origin_index": 136,
+      "target_index": 143,
+      "origin_date": "2026-05-17",
+      "target_date": "2026-05-24",
+      "origin_close": 77429.3515625,
+      "actual": 76981.125,
+      "history_sha256": "23270863b13470337143a2300c65aaf5aea71134a3288c993f9cb36c2fa56f4c",
+      "training_count": 71,
+      "latest_training_target": "2026-05-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          63923.8125,
+          74596.0938,
+          81499.8516
+        ],
+        "volatility": [
+          72616.5152471944,
+          77429.3515625,
+          82561.17032028543
+        ],
+        "residual_interval": [
+          66318.95728939652,
+          74596.0938,
+          81204.22220367765
+        ]
+      }
+    },
+    {
+      "origin_index": 137,
+      "target_index": 144,
+      "origin_date": "2026-05-18",
+      "target_date": "2026-05-25",
+      "origin_close": 76954.171875,
+      "actual": 77279.9296875,
+      "history_sha256": "a59bd3415116a288915358f89262904407dc6b945817c7e056aa4466f96fb300",
+      "training_count": 72,
+      "latest_training_target": "2026-05-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57553.0703,
+          70250.1094,
+          78096.7344
+        ],
+        "volatility": [
+          72210.13593831901,
+          76954.171875,
+          82009.87980448466
+        ],
+        "residual_interval": [
+          61093.281108145595,
+          70250.1094,
+          77124.4812915467
+        ]
+      }
+    },
+    {
+      "origin_index": 138,
+      "target_index": 145,
+      "origin_date": "2026-05-19",
+      "target_date": "2026-05-26",
+      "origin_close": 76750.90625,
+      "actual": 75825.734375,
+      "history_sha256": "54daea308150d9ffaab52cb3ec814b87397f90422d451c2b6aa8c170eac82699",
+      "training_count": 73,
+      "latest_training_target": "2026-05-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60904.0547,
+          70998.7812,
+          78286.6875
+        ],
+        "volatility": [
+          72023.18788599051,
+          76750.90625,
+          81788.95968227631
+        ],
+        "residual_interval": [
+          63205.28051072562,
+          70998.7812,
+          77612.53698043001
+        ]
+      }
+    },
+    {
+      "origin_index": 139,
+      "target_index": 146,
+      "origin_date": "2026-05-20",
+      "target_date": "2026-05-27",
+      "origin_close": 77457.7734375,
+      "actual": 74344.703125,
+      "history_sha256": "a103e93641b6ac3eed59f47a7a0c0c1c95182556a211ebfde947e9b770c02f62",
+      "training_count": 74,
+      "latest_training_target": "2026-05-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          49238.4336,
+          67054.0391,
+          75785.7656
+        ],
+        "volatility": [
+          72766.63563658675,
+          77457.7734375,
+          82451.34069216817
+        ],
+        "residual_interval": [
+          55251.955010030724,
+          67054.0391,
+          74195.73219093282
+        ]
+      }
+    },
+    {
+      "origin_index": 140,
+      "target_index": 147,
+      "origin_date": "2026-05-21",
+      "target_date": "2026-05-28",
+      "origin_close": 77539.171875,
+      "actual": 73536.5546875,
+      "history_sha256": "b930c9c25613414b3ded5aa6bf370681a122c9aff1b7ae3cda7b4d2a69e8d5a9",
+      "training_count": 75,
+      "latest_training_target": "2026-05-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57174.1289,
+          71820.6484,
+          79598.4609
+        ],
+        "volatility": [
+          72867.9290795566,
+          77539.171875,
+          82509.86752342839
+        ],
+        "residual_interval": [
+          61643.28200106431,
+          71820.6484,
+          78679.17292323435
+        ]
+      }
+    },
+    {
+      "origin_index": 141,
+      "target_index": 148,
+      "origin_date": "2026-05-22",
+      "target_date": "2026-05-29",
+      "origin_close": 75488.2421875,
+      "actual": 73372.5234375,
+      "history_sha256": "33ccf75c7291d67a55c63c8f706dd3f98e197dfcebf257b9870cbb5d201ae999",
+      "training_count": 76,
+      "latest_training_target": "2026-05-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59969.3945,
+          70822.4844,
+          78286.8359
+        ],
+        "volatility": [
+          71054.1683859814,
+          75488.2421875,
+          80199.02052196748
+        ],
+        "residual_interval": [
+          62717.678645765416,
+          70822.4844,
+          77468.09862370403
+        ]
+      }
+    },
+    {
+      "origin_index": 142,
+      "target_index": 149,
+      "origin_date": "2026-05-23",
+      "target_date": "2026-05-30",
+      "origin_close": 76673.3671875,
+      "actual": 73754.8359375,
+      "history_sha256": "f556b63ca498044783bc435549f752ce9371e477259cf5953726e16020989199",
+      "training_count": 77,
+      "latest_training_target": "2026-05-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          67057.1562,
+          74877.6094,
+          81277.8203
+        ],
+        "volatility": [
+          72151.19425225312,
+          76673.3671875,
+          81478.97338075758
+        ],
+        "residual_interval": [
+          68220.73066776137,
+          74877.6094,
+          81145.62597201101
+        ]
+      }
+    },
+    {
+      "origin_index": 143,
+      "target_index": 150,
+      "origin_date": "2026-05-24",
+      "target_date": "2026-05-31",
+      "origin_close": 76981.125,
+      "actual": 73579.6875,
+      "history_sha256": "2b9141d31f5e4526273e252a30a3a153a010a71065e56f566bee76afa6daf6c7",
+      "training_count": 78,
+      "latest_training_target": "2026-05-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          67818.0703,
+          75132.8594,
+          81144.4688
+        ],
+        "volatility": [
+          72451.21291881685,
+          76981.125,
+          81794.26358128665
+        ],
+        "residual_interval": [
+          68751.74713405887,
+          75132.8594,
+          81200.30917971824
+        ]
+      }
+    },
+    {
+      "origin_index": 144,
+      "target_index": 151,
+      "origin_date": "2026-05-25",
+      "target_date": "2026-06-01",
+      "origin_close": 77279.9296875,
+      "actual": 71319.7734375,
+      "history_sha256": "be783c2e2d5fe8c610f160da2439bbfe5456813d2a186230dd362643270553a6",
+      "training_count": 79,
+      "latest_training_target": "2026-05-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72651.0469,
+          77755.9688,
+          82910.3281
+        ],
+        "volatility": [
+          72900.04499140813,
+          77279.9296875,
+          81922.96085974728
+        ],
+        "residual_interval": [
+          72420.60084766314,
+          77755.9688,
+          83639.05639513962
+        ]
+      }
+    },
+    {
+      "origin_index": 145,
+      "target_index": 152,
+      "origin_date": "2026-05-26",
+      "target_date": "2026-06-02",
+      "origin_close": 75825.734375,
+      "actual": 66703.65625,
+      "history_sha256": "79f551ee34029f99ca76d05c9990fa6bbe7b999578cbe67606ac3058e36bdfd2",
+      "training_count": 80,
+      "latest_training_target": "2026-05-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          69405.9141,
+          75209.5234,
+          80299.4375
+        ],
+        "volatility": [
+          71653.26672097134,
+          75825.734375,
+          80241.17052328741
+        ],
+        "residual_interval": [
+          69644.5641743623,
+          75209.5234,
+          80943.6378134264
+        ]
+      }
+    },
+    {
+      "origin_index": 146,
+      "target_index": 153,
+      "origin_date": "2026-05-27",
+      "target_date": "2026-06-03",
+      "origin_close": 74344.703125,
+      "actual": 64014.3671875,
+      "history_sha256": "172305c0a6075d332458b796f45fdace0ca9bb4ca2408c32d128ae84cb2b85c0",
+      "training_count": 81,
+      "latest_training_target": "2026-05-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          68080.5234,
+          73852.3281,
+          78900.8281
+        ],
+        "volatility": [
+          70197.39486669429,
+          74344.703125,
+          78737.03708293564
+        ],
+        "residual_interval": [
+          68379.25366515464,
+          73852.3281,
+          79587.33032260698
+        ]
+      }
+    },
+    {
+      "origin_index": 147,
+      "target_index": 154,
+      "origin_date": "2026-05-28",
+      "target_date": "2026-06-04",
+      "origin_close": 73536.5546875,
+      "actual": 63801.57421875,
+      "history_sha256": "0526d64d8c7ad7c4fd964446b525e0ffa2192f53e8934df59fad788573321265",
+      "training_count": 82,
+      "latest_training_target": "2026-05-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          67316.125,
+          73195.5625,
+          78308.9453
+        ],
+        "volatility": [
+          69421.48500483757,
+          73536.5546875,
+          77895.55171473
+        ],
+        "residual_interval": [
+          67692.70759607211,
+          73195.5625,
+          78926.20742751769
+        ]
+      }
+    },
+    {
+      "origin_index": 148,
+      "target_index": 155,
+      "origin_date": "2026-05-29",
+      "target_date": "2026-06-05",
+      "origin_close": 73372.5234375,
+      "actual": 60922.66796875,
+      "history_sha256": "61b1a00fd605dc3a53e40e975a06d19ff47da0f957e155002a1f9babd202777d",
+      "training_count": 83,
+      "latest_training_target": "2026-05-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65621.0312,
+          71882.9375,
+          77083.4531
+        ],
+        "volatility": [
+          69275.18871423154,
+          73372.5234375,
+          77712.1981983215
+        ],
+        "residual_interval": [
+          66234.38765606986,
+          71882.9375,
+          77592.32572955017
+        ]
+      }
+    },
+    {
+      "origin_index": 149,
+      "target_index": 156,
+      "origin_date": "2026-05-30",
+      "target_date": "2026-06-06",
+      "origin_close": 73754.8359375,
+      "actual": 60867.4140625,
+      "history_sha256": "24fca666ff9843e771458a3a8d53cef5c77f10a2ab498f252e799d4f0e93e046",
+      "training_count": 84,
+      "latest_training_target": "2026-05-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          66069.2266,
+          72324.875,
+          77506.4844
+        ],
+        "volatility": [
+          69688.98985195815,
+          73754.8359375,
+          78057.8945931542
+        ],
+        "residual_interval": [
+          66665.58375566741,
+          72324.875,
+          78035.14745875334
+        ]
+      }
+    },
+    {
+      "origin_index": 150,
+      "target_index": 157,
+      "origin_date": "2026-05-31",
+      "target_date": "2026-06-07",
+      "origin_close": 73579.6875,
+      "actual": 63239.51953125,
+      "history_sha256": "61aec4a05157def9d0504bd22473914cbf09c7082092ab03d6227fea67bb7d17",
+      "training_count": 85,
+      "latest_training_target": "2026-05-31",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          65978.4531,
+          72037.8125,
+          76895.3594
+        ],
+        "volatility": [
+          69523.4042647854,
+          73579.6875,
+          77872.6310923746
+        ],
+        "residual_interval": [
+          66488.82968953054,
+          72037.8125,
+          77563.93325787593
+        ]
+      }
+    },
+    {
+      "origin_index": 151,
+      "target_index": 158,
+      "origin_date": "2026-06-01",
+      "target_date": "2026-06-08",
+      "origin_close": 71319.7734375,
+      "actual": 63090.58984375,
+      "history_sha256": "d4385e44e7763b0ab8f3a84fe2d3d510afbbc37cd71e2137ea2f7f07ee1d3995",
+      "training_count": 86,
+      "latest_training_target": "2026-06-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          63576.6406,
+          69705.8984,
+          74579.7812
+        ],
+        "volatility": [
+          67308.56669714738,
+          71319.7734375,
+          75570.02522521255
+        ],
+        "residual_interval": [
+          64065.337350772126,
+          69705.8984,
+          75132.34201892404
+        ]
+      }
+    },
+    {
+      "origin_index": 152,
+      "target_index": 159,
+      "origin_date": "2026-06-02",
+      "target_date": "2026-06-09",
+      "origin_close": 66703.65625,
+      "actual": 61643.78125,
+      "history_sha256": "f47419de5e04954ab66d837ce891656d569ff629326920f6c0a278d2c592fac3",
+      "training_count": 87,
+      "latest_training_target": "2026-06-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57084.8477,
+          64546.0938,
+          70167.9531
+        ],
+        "volatility": [
+          62500.292871139776,
+          66703.65625,
+          71189.71052330405
+        ],
+        "residual_interval": [
+          58293.10698749444,
+          64546.0938,
+          70119.3862234772
+        ]
+      }
+    },
+    {
+      "origin_index": 153,
+      "target_index": 160,
+      "origin_date": "2026-06-03",
+      "target_date": "2026-06-10",
+      "origin_close": 64014.3671875,
+      "actual": 61449.2890625,
+      "history_sha256": "4ae5caebe4d1cec5656439a042fbb6679eeae3f55e3046219f6ce2214ec772a4",
+      "training_count": 88,
+      "latest_training_target": "2026-06-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54452.8906,
+          61850.3203,
+          68117.0781
+        ],
+        "volatility": [
+          59837.503077950205,
+          64014.3671875,
+          68482.79081895895
+        ],
+        "residual_interval": [
+          55717.87485074604,
+          61850.3203,
+          67621.50171784907
+        ]
+      }
+    },
+    {
+      "origin_index": 154,
+      "target_index": 161,
+      "origin_date": "2026-06-04",
+      "target_date": "2026-06-11",
+      "origin_close": 63801.57421875,
+      "actual": 63561.0546875,
+      "history_sha256": "b23fbf875ced78ad39e7494c4a23d9d64db103460b5c7e373516bf31e87f3783",
+      "training_count": 89,
+      "latest_training_target": "2026-06-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54908.8594,
+          61730.2891,
+          68181.0469
+        ],
+        "volatility": [
+          59696.32241075248,
+          63801.57421875,
+          68189.13977282899
+        ],
+        "residual_interval": [
+          55852.137428084374,
+          61730.2891,
+          67580.11513945668
+        ]
+      }
+    },
+    {
+      "origin_index": 155,
+      "target_index": 162,
+      "origin_date": "2026-06-05",
+      "target_date": "2026-06-12",
+      "origin_close": 60922.66796875,
+      "actual": 63543.19921875,
+      "history_sha256": "698c12d426c3f782e62fea813c63bd531b784ad844ba17382ab7719b3d628178",
+      "training_count": 90,
+      "latest_training_target": "2026-06-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          53463.2031,
+          59828.6953,
+          66589.3906
+        ],
+        "volatility": [
+          56840.97319400991,
+          60922.66796875,
+          65297.46525912218
+        ],
+        "residual_interval": [
+          54150.354751533974,
+          59828.6953,
+          65742.6695792375
+        ]
+      }
+    },
+    {
+      "origin_index": 156,
+      "target_index": 163,
+      "origin_date": "2026-06-06",
+      "target_date": "2026-06-13",
+      "origin_close": 60867.4140625,
+      "actual": 64421.32421875,
+      "history_sha256": "0270658d67efd20bdf413669fa827655ee23a0d2e9c1c211cf251ed593166d1b",
+      "training_count": 91,
+      "latest_training_target": "2026-06-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54129.0352,
+          59969.3594,
+          67591.9375
+        ],
+        "volatility": [
+          56963.51169476456,
+          60867.4140625,
+          65038.86408036059
+        ],
+        "residual_interval": [
+          54416.09759301172,
+          59969.3594,
+          66306.22627399072
+        ]
+      }
+    },
+    {
+      "origin_index": 157,
+      "target_index": 164,
+      "origin_date": "2026-06-07",
+      "target_date": "2026-06-14",
+      "origin_close": 63239.51953125,
+      "actual": 65710.3984375,
+      "history_sha256": "3779b24c9351844a8c1e3005879877f21001f721e532733b20a2cf7e93ca16ff",
+      "training_count": 92,
+      "latest_training_target": "2026-06-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          56851.0391,
+          62728.6172,
+          71188.0938
+        ],
+        "volatility": [
+          59049.635254701236,
+          63239.51953125,
+          67726.69828176375
+        ],
+        "residual_interval": [
+          57012.142293026816,
+          62728.6172,
+          69580.70993321399
+        ]
+      }
+    },
+    {
+      "origin_index": 158,
+      "target_index": 165,
+      "origin_date": "2026-06-08",
+      "target_date": "2026-06-15",
+      "origin_close": 63090.58984375,
+      "actual": 66289.5,
+      "history_sha256": "fcad0ffbf180dba723f245b3eccee84ba5f46f60c521809766b23cff33f826c7",
+      "training_count": 93,
+      "latest_training_target": "2026-06-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          55089.2148,
+          61073.4844,
+          68116.4609
+        ],
+        "volatility": [
+          58920.84562607271,
+          63090.58984375,
+          67555.42091322155
+        ],
+        "residual_interval": [
+          55221.30603714576,
+          61073.4844,
+          67145.18290891171
+        ]
+      }
+    },
+    {
+      "origin_index": 159,
+      "target_index": 166,
+      "origin_date": "2026-06-09",
+      "target_date": "2026-06-16",
+      "origin_close": 61643.78125,
+      "actual": 65600.640625,
+      "history_sha256": "1049256c9e873cec3782e7bb71d54fefc7170e62ba3ff37bed2f15d95731555c",
+      "training_count": 94,
+      "latest_training_target": "2026-06-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54320.0352,
+          60262.6953,
+          67422.625
+        ],
+        "volatility": [
+          57564.74107283996,
+          61643.78125,
+          66011.8624001027
+        ],
+        "residual_interval": [
+          54488.02706855185,
+          60262.6953,
+          66343.70735584806
+        ]
+      }
+    },
+    {
+      "origin_index": 160,
+      "target_index": 167,
+      "origin_date": "2026-06-10",
+      "target_date": "2026-06-17",
+      "origin_close": 61449.2890625,
+      "actual": 64418.4453125,
+      "history_sha256": "bc976aa0166f2700868d5d9dd2b48dfbad679d2d8877a05c6099e03f2da39db8",
+      "training_count": 95,
+      "latest_training_target": "2026-06-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54733.1289,
+          60310.2656,
+          67977.875
+        ],
+        "volatility": [
+          57384.339359750375,
+          61449.2890625,
+          65802.18868800285
+        ],
+        "residual_interval": [
+          54735.2739786058,
+          60310.2656,
+          66628.83237954054
+        ]
+      }
+    },
+    {
+      "origin_index": 161,
+      "target_index": 168,
+      "origin_date": "2026-06-11",
+      "target_date": "2026-06-18",
+      "origin_close": 63561.0546875,
+      "actual": 62896.47265625,
+      "history_sha256": "41bc723ebaba9bd66dee14cfe86adee5b93e95676b9cf08b28e262ad3ed4cafc",
+      "training_count": 96,
+      "latest_training_target": "2026-06-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          56193.9844,
+          61974.7812,
+          69425.6406
+        ],
+        "volatility": [
+          59320.68429941461,
+          63561.0546875,
+          68104.53589166085
+        ],
+        "residual_interval": [
+          56240.43929104928,
+          61974.7812,
+          68243.35925948677
+        ]
+      }
+    },
+    {
+      "origin_index": 162,
+      "target_index": 169,
+      "origin_date": "2026-06-12",
+      "target_date": "2026-06-19",
+      "origin_close": 63543.19921875,
+      "actual": 63540.8359375,
+      "history_sha256": "114e34ecbce73927e8a3cb29c2c7d60b045374e7cb4b3f7e5de7e2cf9f9b2ae4",
+      "training_count": 97,
+      "latest_training_target": "2026-06-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57192.3984,
+          62083.4375,
+          68318.0156
+        ],
+        "volatility": [
+          59552.22839973187,
+          63543.19921875,
+          67801.63019007917
+        ],
+        "residual_interval": [
+          56807.159546917836,
+          62083.4375,
+          67742.09207393596
+        ]
+      }
+    },
+    {
+      "origin_index": 163,
+      "target_index": 170,
+      "origin_date": "2026-06-13",
+      "target_date": "2026-06-20",
+      "origin_close": 64421.32421875,
+      "actual": 64239.67578125,
+      "history_sha256": "4cff8a2a222e5696b07cfb060626737ebf699e4c3193567f5271d7c3ffb00244",
+      "training_count": 98,
+      "latest_training_target": "2026-06-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58631.8594,
+          63575.8125,
+          70909.5625
+        ],
+        "volatility": [
+          60351.63164259758,
+          64421.32421875,
+          68765.44844179595
+        ],
+        "residual_interval": [
+          58224.87801294246,
+          63575.8125,
+          69825.10956852783
+        ]
+      }
+    },
+    {
+      "origin_index": 164,
+      "target_index": 171,
+      "origin_date": "2026-06-14",
+      "target_date": "2026-06-21",
+      "origin_close": 65710.3984375,
+      "actual": 63237.5390625,
+      "history_sha256": "4135548957b4057912cb2a8bdda4710e2b407eb5bf3dd3c54b814dad625c4536",
+      "training_count": 99,
+      "latest_training_target": "2026-06-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59757.3438,
+          65235.2031,
+          72247.2812
+        ],
+        "volatility": [
+          61525.0423013154,
+          65710.3984375,
+          70180.47125702971
+        ],
+        "residual_interval": [
+          59563.772760980886,
+          65235.2031,
+          71379.77666236793
+        ]
+      }
+    },
+    {
+      "origin_index": 165,
+      "target_index": 172,
+      "origin_date": "2026-06-15",
+      "target_date": "2026-06-22",
+      "origin_close": 66289.5,
+      "actual": 63952.10546875,
+      "history_sha256": "1e953a4d557ec95e6eb1184bc1cabd2c65ac473c36ae0918cc3d743c2ba2680b",
+      "training_count": 100,
+      "latest_training_target": "2026-06-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          61017.7109,
+          66455.5859,
+          73237.8906
+        ],
+        "volatility": [
+          62060.539462644985,
+          66289.5,
+          70806.63249624157
+        ],
+        "residual_interval": [
+          60769.96684556394,
+          66455.5859,
+          72659.29913585783
+        ]
+      }
+    },
+    {
+      "origin_index": 166,
+      "target_index": 173,
+      "origin_date": "2026-06-16",
+      "target_date": "2026-06-23",
+      "origin_close": 65600.640625,
+      "actual": 62668.01953125,
+      "history_sha256": "4a84969d1335a0ebd1eb8b3ad902458956a5c972b01af2645956708909b903f8",
+      "training_count": 101,
+      "latest_training_target": "2026-06-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60056.3906,
+          65656.125,
+          72241.7344
+        ],
+        "volatility": [
+          61483.202947906146,
+          65600.640625,
+          69993.81691381057
+        ],
+        "residual_interval": [
+          59946.28688726667,
+          65656.125,
+          71750.96198570066
+        ]
+      }
+    },
+    {
+      "origin_index": 167,
+      "target_index": 174,
+      "origin_date": "2026-06-17",
+      "target_date": "2026-06-24",
+      "origin_close": 64418.4453125,
+      "actual": 60995.1328125,
+      "history_sha256": "737f86179e3d1bea00ef4a9a856e78dfc308329f14e92a7c9344d5174ec4724d",
+      "training_count": 102,
+      "latest_training_target": "2026-06-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58385.1758,
+          63911.5781,
+          70358.75
+        ],
+        "volatility": [
+          60375.609377724126,
+          64418.4453125,
+          68731.99524194979
+        ],
+        "residual_interval": [
+          58318.50290368155,
+          63911.5781,
+          69860.14203843774
+        ]
+      }
+    },
+    {
+      "origin_index": 168,
+      "target_index": 175,
+      "origin_date": "2026-06-18",
+      "target_date": "2026-06-25",
+      "origin_close": 62896.47265625,
+      "actual": 59721.67578125,
+      "history_sha256": "3b2415f0baa0205b0b299591557e2b80162e6f7772507cd9575613b0c63a5e92",
+      "training_count": 103,
+      "latest_training_target": "2026-06-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54382.0742,
+          60655.4102,
+          66781.4922
+        ],
+        "volatility": [
+          58953.371308532915,
+          62896.47265625,
+          67103.30867924116
+        ],
+        "residual_interval": [
+          54833.782560049374,
+          60655.4102,
+          66302.22169606517
+        ]
+      }
+    },
+    {
+      "origin_index": 169,
+      "target_index": 176,
+      "origin_date": "2026-06-19",
+      "target_date": "2026-06-26",
+      "origin_close": 63540.8359375,
+      "actual": 60016.4296875,
+      "history_sha256": "60e144ccece3c3fe9ab696b640ad81e5747553f248ddb1650536c891c73d888f",
+      "training_count": 104,
+      "latest_training_target": "2026-06-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          52370.375,
+          59553.2969,
+          65676.4844
+        ],
+        "volatility": [
+          59622.06745996357,
+          63540.8359375,
+          67717.17257787891
+        ],
+        "residual_interval": [
+          53321.40021379057,
+          59553.2969,
+          65148.994410227344
+        ]
+      }
+    },
+    {
+      "origin_index": 170,
+      "target_index": 177,
+      "origin_date": "2026-06-20",
+      "target_date": "2026-06-27",
+      "origin_close": 64239.67578125,
+      "actual": 59940.09765625,
+      "history_sha256": "e0d4b3da0934ad60ee0f15ad1c49cab8884fb3be25655f40ce4e75186084b8b7",
+      "training_count": 105,
+      "latest_training_target": "2026-06-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54872.6953,
+          61107.2891,
+          66869.6875
+        ],
+        "volatility": [
+          60267.964237598106,
+          64239.67578125,
+          68473.1265886306
+        ],
+        "residual_interval": [
+          55290.52372292041,
+          61107.2891,
+          66587.9481339043
+        ]
+      }
+    },
+    {
+      "origin_index": 171,
+      "target_index": 178,
+      "origin_date": "2026-06-21",
+      "target_date": "2026-06-28",
+      "origin_close": 63237.5390625,
+      "actual": 59532.33984375,
+      "history_sha256": "8090303160e88341793310606fcab067aeb35274f496f1b43b7d6e1e06e65e88",
+      "training_count": 106,
+      "latest_training_target": "2026-06-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          50340.875,
+          57348.3633,
+          63107.3672
+        ],
+        "volatility": [
+          59380.78262892943,
+          63237.5390625,
+          67344.79017683015
+        ],
+        "residual_interval": [
+          51305.886003163,
+          57348.3633,
+          62664.2196115171
+        ]
+      }
+    },
+    {
+      "origin_index": 172,
+      "target_index": 179,
+      "origin_date": "2026-06-22",
+      "target_date": "2026-06-29",
+      "origin_close": 63952.10546875,
+      "actual": 60138.37890625,
+      "history_sha256": "7e89bd763dcb340746925c82d3c267e8cdf28cbe2c05e739c36b6bd7b49db08d",
+      "training_count": 107,
+      "latest_training_target": "2026-06-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54105.5703,
+          60373.9766,
+          66046.6797
+        ],
+        "volatility": [
+          60033.46747306937,
+          63952.10546875,
+          68126.52951823604
+        ],
+        "residual_interval": [
+          54577.347908408374,
+          60373.9766,
+          65773.97518185466
+        ]
+      }
+    },
+    {
+      "origin_index": 173,
+      "target_index": 180,
+      "origin_date": "2026-06-23",
+      "target_date": "2026-06-30",
+      "origin_close": 62668.01953125,
+      "actual": 58558.859375,
+      "history_sha256": "645186d94fdca52732eda1f23ed8b0098bff51eedf40562ccb8bbea9124c09c5",
+      "training_count": 108,
+      "latest_training_target": "2026-06-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          52621.5039,
+          58769.4453,
+          64365.5234
+        ],
+        "volatility": [
+          58806.88257891454,
+          62668.01953125,
+          66782.670662724
+        ],
+        "residual_interval": [
+          53106.076987539855,
+          58769.4453,
+          64060.56522489436
+        ]
+      }
+    },
+    {
+      "origin_index": 174,
+      "target_index": 181,
+      "origin_date": "2026-06-24",
+      "target_date": "2026-07-01",
+      "origin_close": 60995.1328125,
+      "actual": 60003.7578125,
+      "history_sha256": "1efa6b8e1f5a140f198eb6a8b402ca9554ef313dfc6e529705c729df26fe933b",
+      "training_count": 109,
+      "latest_training_target": "2026-06-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          52041.957,
+          57714.5898,
+          63043.5391
+        ],
+        "volatility": [
+          57192.75590734619,
+          60995.1328125,
+          65050.305196722344
+        ],
+        "residual_interval": [
+          52339.14970949586,
+          57714.5898,
+          62825.51116506098
+        ]
+      }
+    },
+    {
+      "origin_index": 175,
+      "target_index": 182,
+      "origin_date": "2026-06-25",
+      "target_date": "2026-07-02",
+      "origin_close": 59721.67578125,
+      "actual": 61485.30078125,
+      "history_sha256": "23095cb10ca0eff1674f31a3c733e307d76bd3127af58b78bff96a0781dab5ae",
+      "training_count": 110,
+      "latest_training_target": "2026-06-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          50743.8672,
+          56388.4648,
+          61635.2656
+        ],
+        "volatility": [
+          56001.28064378616,
+          59721.67578125,
+          63689.23205181198
+        ],
+        "residual_interval": [
+          51087.44843381376,
+          56388.4648,
+          61399.85089208493
+        ]
+      }
+    },
+    {
+      "origin_index": 176,
+      "target_index": 183,
+      "origin_date": "2026-06-26",
+      "target_date": "2026-07-03",
+      "origin_close": 60016.4296875,
+      "actual": 62544.19921875,
+      "history_sha256": "5c56e29abf8470b34611a241d877b5fb090979e28db22b7c260dc0a1c93d017d",
+      "training_count": 111,
+      "latest_training_target": "2026-06-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          53052.207,
+          58459.7188,
+          64178.8594
+        ],
+        "volatility": [
+          56282.8056544832,
+          60016.4296875,
+          63997.73057773491
+        ],
+        "residual_interval": [
+          53189.711443301305,
+          58459.7188,
+          63792.04386979
+        ]
+      }
+    },
+    {
+      "origin_index": 177,
+      "target_index": 184,
+      "origin_date": "2026-06-27",
+      "target_date": "2026-07-04",
+      "origin_close": 59940.09765625,
+      "actual": 63088.3046875,
+      "history_sha256": "8f10a93cf4642feb9a3eb6c896813567a1a7ab04c1e257e18a91624f7a07dd8a",
+      "training_count": 112,
+      "latest_training_target": "2026-06-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          51955.7852,
+          57243.8867,
+          62379.0391
+        ],
+        "volatility": [
+          56217.569778267505,
+          59940.09765625,
+          63909.11811399025
+        ],
+        "residual_interval": [
+          52101.246641625905,
+          57243.8867,
+          62220.88923040001
+        ]
+      }
+    },
+    {
+      "origin_index": 178,
+      "target_index": 185,
+      "origin_date": "2026-06-28",
+      "target_date": "2026-07-05",
+      "origin_close": 59532.33984375,
+      "actual": 63547.8828125,
+      "history_sha256": "9c8d9e9adab8891fc877ad98e6fe932dd02dfda3c0071ba38d1f75dac969b8bc",
+      "training_count": 113,
+      "latest_training_target": "2026-06-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          51434.1641,
+          56665.6016,
+          61798.9922
+        ],
+        "volatility": [
+          55835.52583536614,
+          59532.33984375,
+          63473.91618951882
+        ],
+        "residual_interval": [
+          51590.680121419275,
+          56665.6016,
+          61604.5688865163
+        ]
+      }
+    },
+    {
+      "origin_index": 179,
+      "target_index": 186,
+      "origin_date": "2026-06-29",
+      "target_date": "2026-07-06",
+      "origin_close": 60138.37890625,
+      "actual": 63995.015625,
+      "history_sha256": "b13207ad7bd47f4731a52d4ff6a78af95eff99af0d13553f907ee2a318e5df0d",
+      "training_count": 114,
+      "latest_training_target": "2026-06-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          52380.5469,
+          57683.7422,
+          62855.2422
+        ],
+        "volatility": [
+          56397.10113512042,
+          60138.37890625,
+          64127.84601830355
+        ],
+        "residual_interval": [
+          52543.19076578454,
+          57683.7422,
+          62671.501225737295
+        ]
+      }
+    },
+    {
+      "origin_index": 180,
+      "target_index": 187,
+      "origin_date": "2026-06-30",
+      "target_date": "2026-07-07",
+      "origin_close": 58558.859375,
+      "actual": 63297.39453125,
+      "history_sha256": "8bf09a62952094bce9a23972b6d015feb50be6f4ee9a4e93a283d46517ba976a",
+      "training_count": 115,
+      "latest_training_target": "2026-06-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          50475.4102,
+          55753.4688,
+          60926.6016
+        ],
+        "volatility": [
+          54943.2565810613,
+          58558.859375,
+          62412.39097725843
+        ],
+        "residual_interval": [
+          50722.38263347823,
+          55753.4688,
+          60648.80018738212
+        ]
+      }
+    },
+    {
+      "origin_index": 181,
+      "target_index": 188,
+      "origin_date": "2026-07-01",
+      "target_date": "2026-07-08",
+      "origin_close": 60003.7578125,
+      "actual": 62257.57421875,
+      "history_sha256": "dc45b80413871fa72e74a9dfdf12ed18ae02a58fecd4cf12eda850adc3cb7dd4",
+      "training_count": 116,
+      "latest_training_target": "2026-07-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          52518.7227,
+          57486.1758,
+          62499.3516
+        ],
+        "volatility": [
+          56236.90795518228,
+          60003.7578125,
+          64022.918089495884
+        ],
+        "residual_interval": [
+          52551.0761694297,
+          57486.1758,
+          62360.9055458592
+        ]
+      }
+    },
+    {
+      "origin_index": 182,
+      "target_index": 189,
+      "origin_date": "2026-07-02",
+      "target_date": "2026-07-09",
+      "origin_close": 61485.30078125,
+      "actual": 63193.1484375,
+      "history_sha256": "e9b1c7b014055496700864064acb7a58682082697aaaa683c28e7ab4172fb1bb",
+      "training_count": 117,
+      "latest_training_target": "2026-07-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          54664.0508,
+          59521.0234,
+          64628.5898
+        ],
+        "volatility": [
+          57555.54905842496,
+          61485.30078125,
+          65683.36631318093
+        ],
+        "residual_interval": [
+          54569.249913072,
+          59521.0234,
+          64602.784753974054
+        ]
+      }
+    },
+    {
+      "origin_index": 183,
+      "target_index": 190,
+      "origin_date": "2026-07-03",
+      "target_date": "2026-07-10",
+      "origin_close": 62544.19921875,
+      "actual": 64127.140625,
+      "history_sha256": "3686de8dd9061cb95473ccc1392eeb45b852492ac425779da9f793c740e821aa",
+      "training_count": 118,
+      "latest_training_target": "2026-07-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          55955.3789,
+          60877.9805,
+          66084.0781
+        ],
+        "volatility": [
+          58543.94670657731,
+          62544.19921875,
+          66817.78520195337
+        ],
+        "residual_interval": [
+          55851.131886587296,
+          60877.9805,
+          66064.30253745624
+        ]
+      }
+    },
+    {
+      "origin_index": 184,
+      "target_index": 191,
+      "origin_date": "2026-07-04",
+      "target_date": "2026-07-11",
+      "origin_close": 63088.3046875,
+      "actual": 63802.02734375,
+      "history_sha256": "f3831f8e5e4f81c9e6e2786332f40911e9277db9f71be92975bc2a68a5b8e029",
+      "training_count": 119,
+      "latest_training_target": "2026-07-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          56458.2656,
+          61422.1172,
+          66494.125
+        ],
+        "volatility": [
+          59066.609353987486,
+          63088.3046875,
+          67383.8270365208
+        ],
+        "residual_interval": [
+          56367.15997817303,
+          61422.1172,
+          66590.92676268944
+        ]
+      }
+    },
+    {
+      "origin_index": 185,
+      "target_index": 192,
+      "origin_date": "2026-07-05",
+      "target_date": "2026-07-12",
+      "origin_close": 63547.8828125,
+      "actual": 63758.21875,
+      "history_sha256": "40716993c9cac8d9feb812989a84a2989d34d1787c4a7f7972392a39f2765fb3",
+      "training_count": 120,
+      "latest_training_target": "2026-07-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57788.5547,
+          62830.3789,
+          68023.8594
+        ],
+        "volatility": [
+          59494.803441094125,
+          63547.8828125,
+          67877.07793588379
+        ],
+        "residual_interval": [
+          57693.22395725108,
+          62830.3789,
+          68165.38860797424
+        ]
+      }
+    },
+    {
+      "origin_index": 186,
+      "target_index": 193,
+      "origin_date": "2026-07-06",
+      "target_date": "2026-07-13",
+      "origin_close": 63995.015625,
+      "actual": 62239.12109375,
+      "history_sha256": "ef0d0f97df737648f4c52415fe4fcef81df052c226310aedf9206411bb64df4b",
+      "training_count": 120,
+      "latest_training_target": "2026-07-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58551.6445,
+          63601.1055,
+          68722.8984
+        ],
+        "volatility": [
+          59919.29059633042,
+          63995.015625,
+          68347.97248241791
+        ],
+        "residual_interval": [
+          58427.988294810595,
+          63601.1055,
+          68973.36590351138
+        ]
+      }
+    },
+    {
+      "origin_index": 187,
+      "target_index": 194,
+      "origin_date": "2026-07-07",
+      "target_date": "2026-07-14",
+      "origin_close": 63297.39453125,
+      "actual": 64956.11328125,
+      "history_sha256": "626850ade12d6322afb906c4f1771fad8ec6a3c0c8833d6a707bfe7856ce3d9d",
+      "training_count": 120,
+      "latest_training_target": "2026-07-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58288.8008,
+          63336.7891,
+          68556.1719
+        ],
+        "volatility": [
+          59264.840815015734,
+          63297.39453125,
+          67604.33503821355
+        ],
+        "residual_interval": [
+          58175.43432146413,
+          63336.7891,
+          68757.03498622346
+        ]
+      }
+    },
+    {
+      "origin_index": 188,
+      "target_index": 195,
+      "origin_date": "2026-07-08",
+      "target_date": "2026-07-15",
+      "origin_close": 62257.57421875,
+      "actual": 64712.375,
+      "history_sha256": "d789ad3f4c84f3ff02392f2b3e901503b94524722a132bc197fe0e0037112607",
+      "training_count": 120,
+      "latest_training_target": "2026-07-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57356.1523,
+          62388.832,
+          67562.3359
+        ],
+        "volatility": [
+          58286.673756772936,
+          62257.57421875,
+          66499.00050528739
+        ],
+        "residual_interval": [
+          57274.655400157804,
+          62388.832,
+          67744.11837220733
+        ]
+      }
+    },
+    {
+      "origin_index": 189,
+      "target_index": 196,
+      "origin_date": "2026-07-09",
+      "target_date": "2026-07-16",
+      "origin_close": 63193.1484375,
+      "actual": 63789.28125,
+      "history_sha256": "5ae6110395f3852e84f2a1f2a03513ac78a3c60876a479ea1a56cefbd71f2476",
+      "training_count": 120,
+      "latest_training_target": "2026-07-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58047.2812,
+          63350.8789,
+          69113.9531
+        ],
+        "volatility": [
+          59174.267700657925,
+          63193.1484375,
+          67484.97555804157
+        ],
+        "residual_interval": [
+          58061.241308129254,
+          63350.8789,
+          69043.85448935776
+        ]
+      }
+    },
+    {
+      "origin_index": 190,
+      "target_index": 197,
+      "origin_date": "2026-07-10",
+      "target_date": "2026-07-17",
+      "origin_close": 64127.140625,
+      "actual": 63899.4609375,
+      "history_sha256": "e528044e90c82033d469bd931d77865e3c51a013435eaa064bcf54518bbb0e40",
+      "training_count": 120,
+      "latest_training_target": "2026-07-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58791.6797,
+          63984.3711,
+          69348.5781
+        ],
+        "volatility": [
+          60017.322347910194,
+          64127.140625,
+          68518.38775645939
+        ],
+        "residual_interval": [
+          58723.77143765222,
+          63984.3711,
+          69505.88423030885
+        ]
+      }
+    },
+    {
+      "origin_index": 191,
+      "target_index": 198,
+      "origin_date": "2026-07-11",
+      "target_date": "2026-07-18",
+      "origin_close": 63802.02734375,
+      "actual": 64796.6015625,
+      "history_sha256": "09dd415dc1a75392f4dbb7ea4aa353d79877bc9dc3a983f30dd2d35035522e47",
+      "training_count": 120,
+      "latest_training_target": "2026-07-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58659.9375,
+          63694.2812,
+          69008.0781
+        ],
+        "volatility": [
+          59724.50047299049,
+          63802.02734375,
+          68157.93620598862
+        ],
+        "residual_interval": [
+          58524.81790215657,
+          63694.2812,
+          69177.68524716314
+        ]
+      }
+    },
+    {
+      "origin_index": 192,
+      "target_index": 199,
+      "origin_date": "2026-07-12",
+      "target_date": "2026-07-19",
+      "origin_close": 63758.21875,
+      "actual": 64690.8046875,
+      "history_sha256": "8107863036edf0bc4b66ab71ca3558f69db0f796ff5e7759f84789dd05538974",
+      "training_count": 120,
+      "latest_training_target": "2026-07-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58646.0234,
+          63502.1562,
+          68784.3828
+        ],
+        "volatility": [
+          59693.87828586352,
+          63758.21875,
+          68099.2854695376
+        ],
+        "residual_interval": [
+          58429.5542673051,
+          63502.1562,
+          68961.22979408958
+        ]
+      }
+    },
+    {
+      "origin_index": 193,
+      "target_index": 200,
+      "origin_date": "2026-07-13",
+      "target_date": "2026-07-20",
+      "origin_close": 62239.12109375,
+      "actual": 65230.02734375,
+      "history_sha256": "1ae4de9ba7b47a7a63276ccaee4a1714e319502cad832c457a84826af82fb6a0",
+      "training_count": 120,
+      "latest_training_target": "2026-07-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57417.0703,
+          62069.7734,
+          66946.125
+        ],
+        "volatility": [
+          58295.81543536757,
+          62239.12109375,
+          66449.1638995469
+        ],
+        "residual_interval": [
+          57158.34521222218,
+          62069.7734,
+          67261.82416929404
+        ]
+      }
+    },
+    {
+      "origin_index": 194,
+      "target_index": 201,
+      "origin_date": "2026-07-14",
+      "target_date": "2026-07-21",
+      "origin_close": 64956.11328125,
+      "actual": 66505.125,
+      "history_sha256": "5fe35c9ed5ac061262d636dbeba9cbe231a1ef4b2fcb32e13cd81d6e248216a3",
+      "training_count": 120,
+      "latest_training_target": "2026-07-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59857.0625,
+          64288.5547,
+          68898.0234
+        ],
+        "volatility": [
+          60687.24016517179,
+          64956.11328125,
+          69525.26826270185
+        ],
+        "residual_interval": [
+          59394.13801071013,
+          64288.5547,
+          69433.42147093121
+        ]
+      }
+    },
+    {
+      "origin_index": 195,
+      "target_index": 202,
+      "origin_date": "2026-07-15",
+      "target_date": "2026-07-22",
+      "origin_close": 64712.375,
+      "actual": 66100.796875,
+      "history_sha256": "0f79ddb93399f5495f1540e7141a8e16de4203daa3d07b1e0fef67ef29349dad",
+      "training_count": 120,
+      "latest_training_target": "2026-07-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60190.5312,
+          64896.8438,
+          69940.4062
+        ],
+        "volatility": [
+          60466.02500105152,
+          64712.375,
+          69256.9335931674
+        ],
+        "residual_interval": [
+          59840.460729161445,
+          64896.8438,
+          70286.87213717173
+        ]
+      }
+    },
+    {
+      "origin_index": 196,
+      "target_index": 203,
+      "origin_date": "2026-07-16",
+      "target_date": "2026-07-23",
+      "origin_close": 63789.28125,
+      "actual": 65044.8125,
+      "history_sha256": "d69d120666b5393c0ad1d195a622b4a0d6e08a05a0bdd3f1d3017d275e8885f4",
+      "training_count": 120,
+      "latest_training_target": "2026-07-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59580.4609,
+          64315.6211,
+          69560.1406
+        ],
+        "volatility": [
+          59595.732537171934,
+          63789.28125,
+          68277.91570232951
+        ],
+        "residual_interval": [
+          59269.220557063105,
+          64315.6211,
+          69780.93970703344
+        ]
+      }
+    },
+    {
+      "origin_index": 197,
+      "target_index": 204,
+      "origin_date": "2026-07-17",
+      "target_date": "2026-07-24",
+      "origin_close": 63899.4609375,
+      "actual": 64098.49609375,
+      "history_sha256": "a20a9962a28260c0ddbe5d3c0a4373498ed007832642cb6314a04c65f287347e",
+      "training_count": 120,
+      "latest_training_target": "2026-07-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59915.7266,
+          64624.0352,
+          69756.3438
+        ],
+        "volatility": [
+          59697.389702977765,
+          63899.4609375,
+          68397.31399343608
+        ],
+        "residual_interval": [
+          59578.0801090094,
+          64624.0352,
+          70046.62984958176
+        ]
+      }
+    },
+    {
+      "origin_index": 198,
+      "target_index": 205,
+      "origin_date": "2026-07-18",
+      "target_date": "2026-07-25",
+      "origin_close": 64796.6015625,
+      "actual": 64311.8125,
+      "history_sha256": "fe1dc7b20009443216f0e8db701a277e2f4dc6c8c28c4ce0d4f0f568f4578aa4",
+      "training_count": 120,
+      "latest_training_target": "2026-07-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60459.8359,
+          65310.8984,
+          70362.2969
+        ],
+        "volatility": [
+          60510.85073092203,
+          64796.6015625,
+          69385.89564241284
+        ],
+        "residual_interval": [
+          60165.19985074633,
+          65310.8984,
+          70723.08341519334
+        ]
+      }
+    },
+    {
+      "origin_index": 199,
+      "target_index": 206,
+      "origin_date": "2026-07-19",
+      "target_date": "2026-07-26",
+      "origin_close": 64690.8046875,
+      "actual": 65340.30078125,
+      "history_sha256": "b9caed8adb2386b55d81e8bed8b0c96dbfc292959eb48659ff28524323e58507",
+      "training_count": 120,
+      "latest_training_target": "2026-07-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60349.9883,
+          65062.0938,
+          69892.5078
+        ],
+        "volatility": [
+          60424.48167650957,
+          64690.8046875,
+          69258.35514023417
+        ],
+        "residual_interval": [
+          59995.912838413285,
+          65062.0938,
+          70352.20010079577
+        ]
+      }
+    },
+    {
+      "origin_index": 200,
+      "target_index": 207,
+      "origin_date": "2026-07-20",
+      "target_date": "2026-07-27",
+      "origin_close": 65230.02734375,
+      "actual": 63724.8984375,
+      "history_sha256": "1bfa0f8cd8a3679c5abd014c846cc09ad1ed4e9a771b3c750fdc1001fe9b02d1",
+      "training_count": 120,
+      "latest_training_target": "2026-07-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60518.2578,
+          65138.1875,
+          69590.7969
+        ],
+        "volatility": [
+          60918.54414092167,
+          65230.02734375,
+          69846.65387642005
+        ],
+        "residual_interval": [
+          60245.12226801153,
+          65138.1875,
+          70241.22772256933
+        ]
+      }
+    },
+    {
+      "origin_index": 201,
+      "target_index": 208,
+      "origin_date": "2026-07-21",
+      "target_date": "2026-07-28",
+      "origin_close": 66505.125,
+      "actual": 63871.36328125,
+      "history_sha256": "144f796e8a814ecd8a009a1571347ba9f76d83b0ecebcf71c9625caf6dbf0704",
+      "training_count": 120,
+      "latest_training_target": "2026-07-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          62237.375,
+          66650.3672,
+          70935.0781
+        ],
+        "volatility": [
+          62119.40228755414,
+          66505.125,
+          71200.48629559619
+        ],
+        "residual_interval": [
+          61842.346149447934,
+          66650.3672,
+          71734.84311618564
+        ]
+      }
+    },
+    {
+      "origin_index": 202,
+      "target_index": 209,
+      "origin_date": "2026-07-22",
+      "target_date": "2026-07-29",
+      "origin_close": 66100.796875,
+      "actual": 63908.16796875,
+      "history_sha256": "200f2265c98f2446422a00a46423f51783f71489ac48610033c6f47c9f3775c0",
+      "training_count": 120,
+      "latest_training_target": "2026-07-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          61657.5,
+          65998.375,
+          70234.3125
+        ],
+        "volatility": [
+          61768.7099653961,
+          66100.796875,
+          70736.71038229187
+        ],
+        "residual_interval": [
+          61490.14485142326,
+          65998.375,
+          71029.6448336662
+        ]
+      }
+    },
+    {
+      "origin_index": 203,
+      "target_index": 210,
+      "origin_date": "2026-07-23",
+      "target_date": "2026-07-30",
+      "origin_close": 65044.8125,
+      "actual": 64725.30859375,
+      "history_sha256": "63a4a7473cf04dd373daf564ae91fcdfa896615c8e8ff7e5156e533c69438619",
+      "training_count": 120,
+      "latest_training_target": "2026-07-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60567.9453,
+          64792.7578,
+          68841.3438
+        ],
+        "volatility": [
+          60769.97290581967,
+          65044.8125,
+          69620.36398661927
+        ],
+        "residual_interval": [
+          60385.21156159288,
+          64792.7578,
+          69676.48866290966
+        ]
+      }
+    },
+    {
+      "origin_index": 204,
+      "target_index": 211,
+      "origin_date": "2026-07-24",
+      "target_date": "2026-07-31",
+      "origin_close": 64098.49609375,
+      "actual": 62813.74609375,
+      "history_sha256": "610dec75de4d2668cd6b37cf223e452f718eac8bb7b3bd8d2cda5e167007dab6",
+      "training_count": 120,
+      "latest_training_target": "2026-07-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59395.4844,
+          63915.3594,
+          68353.8828
+        ],
+        "volatility": [
+          59878.13393744874,
+          64098.49609375,
+          68616.32003716951
+        ],
+        "residual_interval": [
+          59391.63360386397,
+          63915.3594,
+          68957.66803656207
+        ]
+      }
+    },
+    {
+      "origin_index": 205,
+      "target_index": 212,
+      "origin_date": "2026-07-25",
+      "target_date": "2026-08-01",
+      "origin_close": 64311.8125,
+      "actual": 62763.3203125,
+      "history_sha256": "616a7bf22b495a7fe382d109fcc01d9253bb3f30525733dfd248cb5b33513590",
+      "training_count": 120,
+      "latest_training_target": "2026-07-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58899.1016,
+          63731.6094,
+          68183.0469
+        ],
+        "volatility": [
+          60096.272422308095,
+          64311.8125,
+          68823.05774259377
+        ],
+        "residual_interval": [
+          59167.37264316201,
+          63731.6094,
+          68772.37129518103
+        ]
+      }
+    },
+    {
+      "origin_index": 206,
+      "target_index": 213,
+      "origin_date": "2026-07-26",
+      "target_date": "2026-08-02",
+      "origin_close": 65340.30078125,
+      "actual": 63482.0,
+      "history_sha256": "16c87e7a4b75f6d2f9b0a2c3e649b5796c095a21e876ed4a56432524bf2630b1",
+      "training_count": 120,
+      "latest_training_target": "2026-07-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59322.1562,
+          64240.7734,
+          68684.1172
+        ],
+        "volatility": [
+          61054.10771571819,
+          65340.30078125,
+          69927.39826881602
+        ],
+        "residual_interval": [
+          59803.79703542916,
+          64240.7734,
+          69299.78619503471
+        ]
+      }
+    },
+    {
+      "origin_index": 207,
+      "target_index": 214,
+      "origin_date": "2026-07-27",
+      "target_date": "2026-08-03",
+      "origin_close": 63724.8984375,
+      "actual": 63460.8984375,
+      "history_sha256": "5bf50bf307370c98f624cba6249d3ee013807bc2abe8f28bfaccbc1f848fb8e2",
+      "training_count": 120,
+      "latest_training_target": "2026-07-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57704.4648,
+          62639.418,
+          67045.5703
+        ],
+        "volatility": [
+          59506.96374421245,
+          63724.8984375,
+          68241.80609054587
+        ],
+        "residual_interval": [
+          58251.80414636902,
+          62639.418,
+          67609.42705920908
+        ]
+      }
+    },
+    {
+      "origin_index": 208,
+      "target_index": 215,
+      "origin_date": "2026-07-28",
+      "target_date": "2026-08-04",
+      "origin_close": 63871.36328125,
+      "actual": 64055.953125,
+      "history_sha256": "974b5ee10f7083ad89d2be1040b0b5b3bb5c201d75a71cb5213758909bcda8fe",
+      "training_count": 120,
+      "latest_training_target": "2026-07-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58468.1641,
+          63321.8516,
+          67828.0781
+        ],
+        "volatility": [
+          59641.9050216114,
+          63871.36328125,
+          68400.75020955777
+        ],
+        "residual_interval": [
+          59077.49707553956,
+          63321.8516,
+          68372.25640178185
+        ]
+      }
+    },
+    {
+      "origin_index": 209,
+      "target_index": 216,
+      "origin_date": "2026-07-29",
+      "target_date": "2026-08-05",
+      "origin_close": 63908.16796875,
+      "actual": 64597.5,
+      "history_sha256": "8187977bd3b68df55ef4488aba3bf392670ac3b25b9561468e66727f1619be76",
+      "training_count": 120,
+      "latest_training_target": "2026-07-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57845.2656,
+          62517.332,
+          66669.0469
+        ],
+        "volatility": [
+          59680.38165397033,
+          63908.16796875,
+          68435.45265515661
+        ],
+        "residual_interval": [
+          58387.47355042371,
+          62517.332,
+          67353.58165655368
+        ]
+      }
+    },
+    {
+      "origin_index": 210,
+      "target_index": 217,
+      "origin_date": "2026-07-30",
+      "target_date": "2026-08-06",
+      "origin_close": 64725.30859375,
+      "actual": 64262.11328125,
+      "history_sha256": "860bdf80d7a46ffa4df77dfaf338148a14653bbbc05e4b02bb065e1e33bdcf5b",
+      "training_count": 120,
+      "latest_training_target": "2026-07-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58866.9727,
+          63370.0312,
+          67345.0078
+        ],
+        "volatility": [
+          60424.23800527099,
+          64725.30859375,
+          69332.53460624057
+        ],
+        "residual_interval": [
+          59339.57393793792,
+          63370.0312,
+          68154.26181255231
+        ]
+      }
+    },
+    {
+      "origin_index": 211,
+      "target_index": 218,
+      "origin_date": "2026-07-31",
+      "target_date": "2026-08-07",
+      "origin_close": 62813.74609375,
+      "actual": 64880.19140625,
+      "history_sha256": "b7f1063a09518cbc30442abc2ead512b8329fcc58cdea53d3333fec00f9ed7e2",
+      "training_count": 120,
+      "latest_training_target": "2026-07-31",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57472.582,
+          62017.3984,
+          65999.6484
+        ],
+        "volatility": [
+          58645.461116008795,
+          62813.74609375,
+          67278.29610760872
+        ],
+        "residual_interval": [
+          58003.438311752645,
+          62017.3984,
+          66746.10647150912
+        ]
+      }
+    },
+    {
+      "origin_index": 212,
+      "target_index": 219,
+      "origin_date": "2026-08-01",
+      "target_date": "2026-08-08",
+      "origin_close": 62763.3203125,
+      "actual": 64904.6875,
+      "history_sha256": "3e9b871fc3b75bad22880ba340d800ae82dd27228a20c7ff490f1bdadd890ea5",
+      "training_count": 120,
+      "latest_training_target": "2026-08-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57060.4141,
+          61553.2812,
+          65466.6875
+        ],
+        "volatility": [
+          58971.805386926004,
+          62763.3203125,
+          66798.60572019726
+        ],
+        "residual_interval": [
+          57578.41107586815,
+          61553.2812,
+          66226.85655228833
+        ]
+      }
+    },
+    {
+      "origin_index": 213,
+      "target_index": 220,
+      "origin_date": "2026-08-02",
+      "target_date": "2026-08-09",
+      "origin_close": 63482.0,
+      "actual": 64844.88671875,
+      "history_sha256": "07a1fa64a5419adfbcf6c7d26f09247693ac049ed01561f9cd1c4a83394c44da",
+      "training_count": 120,
+      "latest_training_target": "2026-08-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58196.7188,
+          62532.3203,
+          66392.5938
+        ],
+        "volatility": [
+          59790.18753637094,
+          63482.0,
+          67401.76758182158
+        ],
+        "residual_interval": [
+          58609.51581788475,
+          62532.3203,
+          67221.84742409598
+        ]
+      }
+    },
+    {
+      "origin_index": 214,
+      "target_index": 221,
+      "origin_date": "2026-08-03",
+      "target_date": "2026-08-10",
+      "origin_close": 63460.8984375,
+      "actual": 63910.5859375,
+      "history_sha256": "08d423aa42711d62ea430812efd3ac05725b2361cc033a1c4f37b76a4bb5c906",
+      "training_count": 120,
+      "latest_training_target": "2026-08-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57343.0039,
+          61824.6953,
+          65476.5938
+        ],
+        "volatility": [
+          59771.31357323696,
+          63460.8984375,
+          67378.23530614084
+        ],
+        "residual_interval": [
+          57847.93016418859,
+          61824.6953,
+          66377.72838094342
+        ]
+      }
+    },
+    {
+      "origin_index": 215,
+      "target_index": 222,
+      "origin_date": "2026-08-04",
+      "target_date": "2026-08-11",
+      "origin_close": 64055.953125,
+      "actual": 63551.875,
+      "history_sha256": "94a8aaacb5324832fd4b27e9a2ce264fc4d8fffac2b0a1079cd0e5cfedb85139",
+      "training_count": 120,
+      "latest_training_target": "2026-08-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          56990.0898,
+          61693.7969,
+          65423.6016
+        ],
+        "volatility": [
+          60543.026220582884,
+          64055.953125,
+          67772.71284396484
+        ],
+        "residual_interval": [
+          57608.56170316032,
+          61693.7969,
+          66280.58425163952
+        ]
+      }
+    },
+    {
+      "origin_index": 216,
+      "target_index": 223,
+      "origin_date": "2026-08-05",
+      "target_date": "2026-08-12",
+      "origin_close": 64597.5,
+      "actual": 63402.43359375,
+      "history_sha256": "aa64bef824f49f35812de1ff808734639adb15a38ad6ec2ff08109434e2bb88f",
+      "training_count": 120,
+      "latest_training_target": "2026-08-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          57776.9062,
+          62630.8359,
+          66395.125
+        ],
+        "volatility": [
+          61049.287740562126,
+          64597.5,
+          68351.93596333312
+        ],
+        "residual_interval": [
+          58443.72082283883,
+          62630.8359,
+          67276.06081163116
+        ]
+      }
+    },
+    {
+      "origin_index": 217,
+      "target_index": 224,
+      "origin_date": "2026-08-06",
+      "target_date": "2026-08-13",
+      "origin_close": 64262.11328125,
+      "actual": 63402.171875,
+      "history_sha256": "5f5a035d33ce1d19e530797c4ccb8b360d9d136ab083fd42df74d7f734d13bde",
+      "training_count": 120,
+      "latest_training_target": "2026-08-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58438.3516,
+          62859.2969,
+          66642.5
+        ],
+        "volatility": [
+          60880.20770702957,
+          64262.11328125,
+          67831.8842676251
+        ],
+        "residual_interval": [
+          58884.413009093056,
+          62859.2969,
+          67524.09214234815
+        ]
+      }
+    },
+    {
+      "origin_index": 218,
+      "target_index": 225,
+      "origin_date": "2026-08-07",
+      "target_date": "2026-08-14",
+      "origin_close": 64880.19140625,
+      "actual": 62975.59375,
+      "history_sha256": "85158a9b0a17cf1e0abf5e2f5892e169aa0bbe05d9fdfb7a75323a990d886d72",
+      "training_count": 120,
+      "latest_training_target": "2026-08-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59152.9844,
+          63432.0078,
+          67137.9219
+        ],
+        "volatility": [
+          61457.20564414766,
+          64880.19140625,
+          68493.8274168423
+        ],
+        "residual_interval": [
+          59512.63388968149,
+          63432.0078,
+          67997.6780701502
+        ]
+      }
+    },
+    {
+      "origin_index": 219,
+      "target_index": 226,
+      "origin_date": "2026-08-08",
+      "target_date": "2026-08-15",
+      "origin_close": 64904.6875,
+      "actual": 63024.3203125,
+      "history_sha256": "77ad5764e1a62d5d1c39acb4a7fb5d7defa80af5ed1295198f3020c1a3192ddd",
+      "training_count": 120,
+      "latest_training_target": "2026-08-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59979.4141,
+          64036.9453,
+          67737.3906
+        ],
+        "volatility": [
+          61543.964114778886,
+          64904.6875,
+          68448.92947773341
+        ],
+        "residual_interval": [
+          60211.996142118915,
+          64036.9453,
+          68625.48731315094
+        ]
+      }
+    },
+    {
+      "origin_index": 220,
+      "target_index": 227,
+      "origin_date": "2026-08-09",
+      "target_date": "2026-08-16",
+      "origin_close": 64844.88671875,
+      "actual": 62818.65234375,
+      "history_sha256": "3981e204eba486d97d95cdfa699b05f5f1d6a838ee6a6ed232488ac6447a262d",
+      "training_count": 120,
+      "latest_training_target": "2026-08-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59950.8164,
+          63883.9766,
+          67377.9141
+        ],
+        "volatility": [
+          61488.732312997,
+          64844.88671875,
+          68384.22545716933
+        ],
+        "residual_interval": [
+          60125.69837906338,
+          63883.9766,
+          68361.35439992834
+        ]
+      }
+    },
+    {
+      "origin_index": 221,
+      "target_index": 228,
+      "origin_date": "2026-08-10",
+      "target_date": "2026-08-17",
+      "origin_close": 63910.5859375,
+      "actual": 64506.25390625,
+      "history_sha256": "8665452c18f0373e71ea953904e77ceef0ea3d04c0b88c8dd69bcdaf6e911066",
+      "training_count": 120,
+      "latest_training_target": "2026-08-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59940.7266,
+          63659.6875,
+          67084.7656
+        ],
+        "volatility": [
+          60702.55324881352,
+          63910.5859375,
+          67288.15801424973
+        ],
+        "residual_interval": [
+          60015.007521496926,
+          63659.6875,
+          68092.63039433306
+        ]
+      }
+    },
+    {
+      "origin_index": 222,
+      "target_index": 229,
+      "origin_date": "2026-08-11",
+      "target_date": "2026-08-18",
+      "origin_close": 63551.875,
+      "actual": 64680.7109375,
+      "history_sha256": "4e38f36e61ba122d44c06874487aef6336f6058259f5ca559f81467d462f209e",
+      "training_count": 120,
+      "latest_training_target": "2026-08-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59341.4141,
+          63058.2812,
+          66523.9531
+        ],
+        "volatility": [
+          60358.18438028681,
+          63551.875,
+          66914.55114966519
+        ],
+        "residual_interval": [
+          59431.49049857308,
+          63058.2812,
+          67409.73818511594
+        ]
+      }
+    },
+    {
+      "origin_index": 223,
+      "target_index": 230,
+      "origin_date": "2026-08-12",
+      "target_date": "2026-08-19",
+      "origin_close": 63402.43359375,
+      "actual": 69266.1875,
+      "history_sha256": "2f689225b36173d3f4d4cd1e2fd6d3fed099e2f3559461bccfa4487a1c3143e4",
+      "training_count": 120,
+      "latest_training_target": "2026-08-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59633.8594,
+          63236.5,
+          66555.6719
+        ],
+        "volatility": [
+          60237.615126820085,
+          63402.43359375,
+          66733.52816419983
+        ],
+        "residual_interval": [
+          59661.88669184274,
+          63236.5,
+          67521.02088617193
+        ]
+      }
+    },
+    {
+      "origin_index": 224,
+      "target_index": 231,
+      "origin_date": "2026-08-13",
+      "target_date": "2026-08-20",
+      "origin_close": 63402.171875,
+      "actual": 73032.7578125,
+      "history_sha256": "7995faae159bd4f03c4cf7f9022f72aa1a95d757843074645e17cdf4ae624e31",
+      "training_count": 120,
+      "latest_training_target": "2026-08-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59222.1953,
+          62805.707,
+          65995.5859
+        ],
+        "volatility": [
+          60284.69517808349,
+          63402.171875,
+          66680.86131301287
+        ],
+        "residual_interval": [
+          59252.73720775159,
+          62805.707,
+          67006.90372623058
+        ]
+      }
+    },
+    {
+      "origin_index": 225,
+      "target_index": 232,
+      "origin_date": "2026-08-14",
+      "target_date": "2026-08-21",
+      "origin_close": 62975.59375,
+      "actual": 78335.1875,
+      "history_sha256": "9e940826a25df34fbee0f5d34b02da882651619bc56cefb37ae63c813cb497c2",
+      "training_count": 120,
+      "latest_training_target": "2026-08-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          58725.0078,
+          62334.7969,
+          65532.9258
+        ],
+        "volatility": [
+          59885.339599829924,
+          62975.59375,
+          66225.31381914885
+        ],
+        "residual_interval": [
+          58781.87407429904,
+          62334.7969,
+          66520.82166560403
+        ]
+      }
+    },
+    {
+      "origin_index": 226,
+      "target_index": 233,
+      "origin_date": "2026-08-15",
+      "target_date": "2026-08-22",
+      "origin_close": 63024.3203125,
+      "actual": 77083.4140625,
+      "history_sha256": "f7928495556ad5c6425b56fcd2496f43611cc74d1adb77fc6e6d0fd8f1ebe496",
+      "training_count": 120,
+      "latest_training_target": "2026-08-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59217.6016,
+          62588.1133,
+          66082.0625
+        ],
+        "volatility": [
+          59942.30638337879,
+          63024.3203125,
+          66264.80011376407
+        ],
+        "residual_interval": [
+          59147.71193247635,
+          62588.1133,
+          66934.538954092
+        ]
+      }
+    },
+    {
+      "origin_index": 227,
+      "target_index": 234,
+      "origin_date": "2026-08-16",
+      "target_date": "2026-08-23",
+      "origin_close": 62818.65234375,
+      "actual": 77755.265625,
+      "history_sha256": "af091166e225d2d15a655cfedb72e642b2623857c6a52cd445cfd627a4c48424",
+      "training_count": 120,
+      "latest_training_target": "2026-08-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          59338.6133,
+          62680.6758,
+          66571.5156
+        ],
+        "volatility": [
+          59782.189587965884,
+          62818.65234375,
+          66009.34340951759
+        ],
+        "residual_interval": [
+          59251.88123914536,
+          62680.6758,
+          67231.62508636265
+        ]
+      }
+    },
+    {
+      "origin_index": 228,
+      "target_index": 235,
+      "origin_date": "2026-08-17",
+      "target_date": "2026-08-24",
+      "origin_close": 64506.25390625,
+      "actual": 78964.484375,
+      "history_sha256": "e8463ad18b9efd995edee24c49d25318743213a1e3c135d5a3aa60f1120fed0c",
+      "training_count": 120,
+      "latest_training_target": "2026-08-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          60694.1914,
+          64249.4766,
+          68498.1094
+        ],
+        "volatility": [
+          61372.44638216082,
+          64506.25390625,
+          67800.08030162362
+        ],
+        "residual_interval": [
+          60670.13678559026,
+          64249.4766,
+          69045.70065041128
+        ]
+      }
+    },
+    {
+      "origin_index": 229,
+      "target_index": 236,
+      "origin_date": "2026-08-18",
+      "target_date": "2026-08-25",
+      "origin_close": 64680.7109375,
+      "actual": 78564.9765625,
+      "history_sha256": "384f6759a5479dd8878abe2cf765ebb47c8e8baf537dff64503153325b673713",
+      "training_count": 120,
+      "latest_training_target": "2026-08-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          61561.5625,
+          65055.5039,
+          69197.7266
+        ],
+        "volatility": [
+          61549.43096205586,
+          64680.7109375,
+          67971.29237408457
+        ],
+        "residual_interval": [
+          61484.189403722456,
+          65055.5039,
+          69831.35794005978
+        ]
+      }
+    },
+    {
+      "origin_index": 230,
+      "target_index": 237,
+      "origin_date": "2026-08-19",
+      "target_date": "2026-08-26",
+      "origin_close": 69266.1875,
+      "actual": 79027.421875,
+      "history_sha256": "b8b1fcf39b224a0fbf09c11aa488558ddb5acf28b6273fc817df9a0b81a6d515",
+      "training_count": 120,
+      "latest_training_target": "2026-08-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          64828.0742,
+          69704.6562,
+          75030.9062
+        ],
+        "volatility": [
+          65378.946235835814,
+          69266.1875,
+          73384.55278062222
+        ],
+        "residual_interval": [
+          65309.90726744912,
+          69704.6562,
+          75354.10175192625
+        ]
+      }
+    },
+    {
+      "origin_index": 231,
+      "target_index": 238,
+      "origin_date": "2026-08-20",
+      "target_date": "2026-08-27",
+      "origin_close": 73032.7578125,
+      "actual": 80257.5390625,
+      "history_sha256": "131095f80f90ce37f3b5bb48a4ffb42f858f3b9bcf4cfd63d9a79472502373f1",
+      "training_count": 120,
+      "latest_training_target": "2026-08-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          66927.6875,
+          72507.3281,
+          78266.9141
+        ],
+        "volatility": [
+          68674.98860611707,
+          73032.7578125,
+          77667.04912455106
+        ],
+        "residual_interval": [
+          67680.01910642962,
+          72507.3281,
+          78592.01256980587
+        ]
+      }
+    },
+    {
+      "origin_index": 232,
+      "target_index": 239,
+      "origin_date": "2026-08-21",
+      "target_date": "2026-08-28",
+      "origin_close": 78335.1875,
+      "actual": 77830.2890625,
+      "history_sha256": "cf77aca083dbd931b07088d531c5fd713c09e7eddbd5007948b275a224bafdc3",
+      "training_count": 120,
+      "latest_training_target": "2026-08-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71034.7188,
+          77694.2109,
+          84024.2969
+        ],
+        "volatility": [
+          73170.74281822819,
+          78335.1875,
+          83864.14247432603
+        ],
+        "residual_interval": [
+          72176.57589095639,
+          77694.2109,
+          84306.80150058544
+        ]
+      }
+    },
+    {
+      "origin_index": 233,
+      "target_index": 240,
+      "origin_date": "2026-08-22",
+      "target_date": "2026-08-29",
+      "origin_close": 77083.4140625,
+      "actual": 78245.8125,
+      "history_sha256": "aa82074d5bdca9673c26ee51ba19da43c7885fa32abddbff59297cbd29aadaa3",
+      "training_count": 120,
+      "latest_training_target": "2026-08-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          70841.4141,
+          76645.2188,
+          82022.9062
+        ],
+        "volatility": [
+          72020.09234254932,
+          77083.4140625,
+          82502.70903943827
+        ],
+        "residual_interval": [
+          71590.06506959008,
+          76645.2188,
+          82813.13916434583
+        ]
+      }
+    },
+    {
+      "origin_index": 234,
+      "target_index": 241,
+      "origin_date": "2026-08-23",
+      "target_date": "2026-08-30",
+      "origin_close": 77755.265625,
+      "actual": 77667.5703125,
+      "history_sha256": "dd6f96d7ed70f8851b72470fdddbdf98766effc81bd71e152d2b88063b58dbf2",
+      "training_count": 120,
+      "latest_training_target": "2026-08-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71952.4297,
+          77795.5391,
+          83003.5312
+        ],
+        "volatility": [
+          72745.1658375188,
+          77755.265625,
+          83110.42064180852
+        ],
+        "residual_interval": [
+          72688.66477942822,
+          77795.5391,
+          84103.1405261052
+        ]
+      }
+    },
+    {
+      "origin_index": 235,
+      "target_index": 242,
+      "origin_date": "2026-08-24",
+      "target_date": "2026-08-31",
+      "origin_close": 78964.484375,
+      "actual": 78548.6328125,
+      "history_sha256": "7a30b752c823fc9c6311f53edff3e4b335df8869ba52a9cd82bbf6bc11290cea",
+      "training_count": 120,
+      "latest_training_target": "2026-08-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72520.2031,
+          78673.6797,
+          84000.1094
+        ],
+        "volatility": [
+          73933.5459739035,
+          78964.484375,
+          84337.76184373112
+        ],
+        "residual_interval": [
+          73385.6000421104,
+          78673.6797,
+          85116.4232764871
+        ]
+      }
+    },
+    {
+      "origin_index": 236,
+      "target_index": 243,
+      "origin_date": "2026-08-25",
+      "target_date": "2026-09-01",
+      "origin_close": 78564.9765625,
+      "actual": 77403.625,
+      "history_sha256": "2bcca29a5582cfa83bc8a2160900b6f04028809158391fb872c758ae3b00ddb5",
+      "training_count": 120,
+      "latest_training_target": "2026-08-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72133.9609,
+          78293.3047,
+          83704.7109
+        ],
+        "volatility": [
+          73549.39090040584,
+          78564.9765625,
+          83922.59224314142
+        ],
+        "residual_interval": [
+          73012.76818948425,
+          78293.3047,
+          84915.52928277863
+        ]
+      }
+    },
+    {
+      "origin_index": 237,
+      "target_index": 244,
+      "origin_date": "2026-08-26",
+      "target_date": "2026-09-02",
+      "origin_close": 79027.421875,
+      "actual": 77300.4765625,
+      "history_sha256": "ac643e84519262200262eafff66907bf1d32c9d2a79af47983004c37110762e0",
+      "training_count": 120,
+      "latest_training_target": "2026-08-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72935.2344,
+          79244.8516,
+          84823.4531
+        ],
+        "volatility": [
+          73985.82626198002,
+          79027.421875,
+          84412.56553782104
+        ],
+        "residual_interval": [
+          73861.9606705378,
+          79244.8516,
+          86096.1321780692
+        ]
+      }
+    },
+    {
+      "origin_index": 238,
+      "target_index": 245,
+      "origin_date": "2026-08-27",
+      "target_date": "2026-09-03",
+      "origin_close": 80257.5390625,
+      "actual": 81271.7421875,
+      "history_sha256": "c2740bb9ba903f47331addc57ba2e066f6661d4a3cbdf62df21b5f0f9ea66a3a",
+      "training_count": 120,
+      "latest_training_target": "2026-08-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          73731.125,
+          80229.2344,
+          85928.0156
+        ],
+        "volatility": [
+          75139.85820839384,
+          80257.5390625,
+          85723.77869684562
+        ],
+        "residual_interval": [
+          74723.69967659058,
+          80229.2344,
+          87361.83372625128
+        ]
+      }
+    },
+    {
+      "origin_index": 239,
+      "target_index": 246,
+      "origin_date": "2026-08-28",
+      "target_date": "2026-09-04",
+      "origin_close": 77830.2890625,
+      "actual": 79671.96875,
+      "history_sha256": "8ef93e59eb183b44f1f3926ff053bdd6cc710db87182a41544511c68b9bf1dbd",
+      "training_count": 120,
+      "latest_training_target": "2026-08-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72181.3594,
+          78283.1484,
+          83768.25
+        ],
+        "volatility": [
+          72737.86588007119,
+          77830.2890625,
+          83279.2359558622
+        ],
+        "residual_interval": [
+          73032.01486738802,
+          78283.1484,
+          85204.37388210456
+        ]
+      }
+    },
+    {
+      "origin_index": 240,
+      "target_index": 247,
+      "origin_date": "2026-08-29",
+      "target_date": "2026-09-05",
+      "origin_close": 78245.8125,
+      "actual": 79823.8671875,
+      "history_sha256": "24a27ade7eaf9954a5f46ac90ad5a26dbc3ed7ea49d80795689ad0768d4440b8",
+      "training_count": 120,
+      "latest_training_target": "2026-08-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72673.3594,
+          78503.9453,
+          83841.75
+        ],
+        "volatility": [
+          73229.65313873472,
+          78245.8125,
+          83605.57385388894
+        ],
+        "residual_interval": [
+          73383.76198468788,
+          78503.9453,
+          85361.87286378662
+        ]
+      }
+    },
+    {
+      "origin_index": 241,
+      "target_index": 248,
+      "origin_date": "2026-08-30",
+      "target_date": "2026-09-06",
+      "origin_close": 77667.5703125,
+      "actual": 80350.046875,
+      "history_sha256": "e6c4573b032165608649f03a9b1c4a197bdd24d9a839c387b7673a6617849aaa",
+      "training_count": 120,
+      "latest_training_target": "2026-08-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71756.6406,
+          77601.9375,
+          82919.5625
+        ],
+        "volatility": [
+          72715.15567785414,
+          77667.5703125,
+          82957.27929087404
+        ],
+        "residual_interval": [
+          72499.32172701551,
+          77601.9375,
+          84402.01390542397
+        ]
+      }
+    },
+    {
+      "origin_index": 242,
+      "target_index": 249,
+      "origin_date": "2026-08-31",
+      "target_date": "2026-09-07",
+      "origin_close": 78548.6328125,
+      "actual": 79115.8515625,
+      "history_sha256": "6667b8b14c2b51443820fda892a101e2e375b45f39ab932b4eed9da7580632a2",
+      "training_count": 120,
+      "latest_training_target": "2026-08-31",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72912.0469,
+          78399.1953,
+          83416.4453
+        ],
+        "volatility": [
+          73579.11165713,
+          78548.6328125,
+          83853.79461312202
+        ],
+        "residual_interval": [
+          73455.11786272617,
+          78399.1953,
+          85088.26498130325
+        ]
+      }
+    },
+    {
+      "origin_index": 243,
+      "target_index": 250,
+      "origin_date": "2026-09-01",
+      "target_date": "2026-09-08",
+      "origin_close": 77403.625,
+      "actual": 78438.578125,
+      "history_sha256": "8c23e59509688ebcd1b3de350415cea1f5f0534ebc1a4b4c950905bce81c4c90",
+      "training_count": 120,
+      "latest_training_target": "2026-09-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72089.8438,
+          77519.8203,
+          82452.2344
+        ],
+        "volatility": [
+          72488.58059917144,
+          77403.625,
+          82651.93101614004
+        ],
+        "residual_interval": [
+          72628.99472171781,
+          77519.8203,
+          84119.29406646617
+        ]
+      }
+    },
+    {
+      "origin_index": 244,
+      "target_index": 251,
+      "origin_date": "2026-09-02",
+      "target_date": "2026-09-09",
+      "origin_close": 77300.4765625,
+      "actual": 78259.5234375,
+      "history_sha256": "043e29c0102bffb1962255bd5b18a7d31d295c589aaeb0053b846b31c808ecc0",
+      "training_count": 120,
+      "latest_training_target": "2026-09-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71867.1953,
+          77210.0469,
+          82159.1875
+        ],
+        "volatility": [
+          72392.40073223783,
+          77300.4765625,
+          82541.3111921934
+        ],
+        "residual_interval": [
+          72371.71568905983,
+          77210.0469,
+          83801.7334450877
+        ]
+      }
+    },
+    {
+      "origin_index": 245,
+      "target_index": 252,
+      "origin_date": "2026-09-03",
+      "target_date": "2026-09-10",
+      "origin_close": 81271.7421875,
+      "actual": 76568.125,
+      "history_sha256": "87b609c86bbde23e77e1e2266534eab25611a2d11ceb4d12d6a9cfe605217fe4",
+      "training_count": 120,
+      "latest_training_target": "2026-09-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75681.7266,
+          81000.9062,
+          86161.0234
+        ],
+        "volatility": [
+          75875.94696281305,
+          81271.7421875,
+          87051.25066087989
+        ],
+        "residual_interval": [
+          76068.88782409312,
+          81000.9062,
+          87721.17589067247
+        ]
+      }
+    },
+    {
+      "origin_index": 246,
+      "target_index": 253,
+      "origin_date": "2026-09-04",
+      "target_date": "2026-09-11",
+      "origin_close": 79671.96875,
+      "actual": 77173.796875,
+      "history_sha256": "144e9913041d4981236245152046ec3e9391b5efde0f516a7bd9e2dca1bd1881",
+      "training_count": 120,
+      "latest_training_target": "2026-09-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          74979.6641,
+          80101.3672,
+          85052.9766
+        ],
+        "volatility": [
+          74324.24106401234,
+          79671.96875,
+          85404.47253318115
+        ],
+        "residual_interval": [
+          75293.64495338123,
+          80101.3672,
+          86670.0015962565
+        ]
+      }
+    },
+    {
+      "origin_index": 247,
+      "target_index": 254,
+      "origin_date": "2026-09-05",
+      "target_date": "2026-09-12",
+      "origin_close": 79823.8671875,
+      "actual": 77270.46875,
+      "history_sha256": "1d4ae70efeeb82e190283e0b7d1efa071dcc46022e762aae8c5815403528776c",
+      "training_count": 120,
+      "latest_training_target": "2026-09-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75099.3672,
+          80287.8438,
+          85257.5
+        ],
+        "volatility": [
+          74488.26205426622,
+          79823.8671875,
+          85541.66249879231
+        ],
+        "residual_interval": [
+          75441.38420060405,
+          80287.8438,
+          86875.09164529745
+        ]
+      }
+    },
+    {
+      "origin_index": 248,
+      "target_index": 255,
+      "origin_date": "2026-09-06",
+      "target_date": "2026-09-13",
+      "origin_close": 80350.046875,
+      "actual": 76838.15625,
+      "history_sha256": "177e0efadfd2e01fd892c6e3efaf477c5331f835b2b3e50716f8859c28d7b95a",
+      "training_count": 120,
+      "latest_training_target": "2026-09-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75556.2656,
+          80501.8281,
+          85270.3125
+        ],
+        "volatility": [
+          75023.71898626616,
+          80350.046875,
+          86054.51875821507
+        ],
+        "residual_interval": [
+          75771.29779035917,
+          80501.8281,
+          86997.32121641419
+        ]
+      }
+    },
+    {
+      "origin_index": 249,
+      "target_index": 256,
+      "origin_date": "2026-09-07",
+      "target_date": "2026-09-14",
+      "origin_close": 79115.8515625,
+      "actual": 78163.3828125,
+      "history_sha256": "9264d0a39c56307fe424440ae05b10c6e483ceec015b3727a4d9a7217a7716e7",
+      "training_count": 120,
+      "latest_training_target": "2026-09-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          74818.5859,
+          79636.3672,
+          84294.7266
+        ],
+        "volatility": [
+          73844.1108263347,
+          79115.8515625,
+          84763.94255975388
+        ],
+        "residual_interval": [
+          74994.09699166575,
+          79636.3672,
+          86031.99719158995
+        ]
+      }
+    },
+    {
+      "origin_index": 250,
+      "target_index": 257,
+      "origin_date": "2026-09-08",
+      "target_date": "2026-09-15",
+      "origin_close": 78438.578125,
+      "actual": 75612.5078125,
+      "history_sha256": "cb22d3085fa620d48c7b0b3e91a5b306827afd0841a7b45d62975332b872b8a7",
+      "training_count": 120,
+      "latest_training_target": "2026-09-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          74011.3125,
+          78666.8125,
+          83124.8516
+        ],
+        "volatility": [
+          73209.49172686915,
+          78438.578125,
+          84041.15905115094
+        ],
+        "residual_interval": [
+          74132.97718339377,
+          78666.8125,
+          84911.26278782138
+        ]
+      }
+    },
+    {
+      "origin_index": 251,
+      "target_index": 258,
+      "origin_date": "2026-09-09",
+      "target_date": "2026-09-16",
+      "origin_close": 78259.5234375,
+      "actual": 76150.3203125,
+      "history_sha256": "2eff7872c2004ea487470d5eefb18ec436ec3f13609fd681443a808964468e51",
+      "training_count": 120,
+      "latest_training_target": "2026-09-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          73715.7344,
+          78323.1641,
+          82715.0625
+        ],
+        "volatility": [
+          73046.4525496609,
+          78259.5234375,
+          83844.63303677633
+        ],
+        "residual_interval": [
+          73823.02249302302,
+          78323.1641,
+          84516.49820979273
+        ]
+      }
+    },
+    {
+      "origin_index": 252,
+      "target_index": 259,
+      "origin_date": "2026-09-10",
+      "target_date": "2026-09-17",
+      "origin_close": 76568.125,
+      "actual": 76403.7734375,
+      "history_sha256": "dcdf832e2b7eb359e3552cfb791cd065ff35b92dc013b27b8c2dea96cffba7c4",
+      "training_count": 120,
+      "latest_training_target": "2026-09-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71834.1875,
+          76650.1094,
+          81208.9922
+        ],
+        "volatility": [
+          71406.16003426086,
+          76568.125,
+          82103.24940036962
+        ],
+        "residual_interval": [
+          72092.25224311037,
+          76650.1094,
+          82844.28070248026
+        ]
+      }
+    },
+    {
+      "origin_index": 253,
+      "target_index": 260,
+      "origin_date": "2026-09-11",
+      "target_date": "2026-09-18",
+      "origin_close": 77173.796875,
+      "actual": 80901.4609375,
+      "history_sha256": "af489638249fe196bc55399bb9752007f2b1c69c0b853d788f860a35b19a2fcf",
+      "training_count": 120,
+      "latest_training_target": "2026-09-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72479.3047,
+          77124.1094,
+          81502.6641
+        ],
+        "volatility": [
+          72045.09603512623,
+          77173.796875,
+          82667.59643432162
+        ],
+        "residual_interval": [
+          72638.8069160641,
+          77124.1094,
+          83250.1577204061
+        ]
+      }
+    },
+    {
+      "origin_index": 254,
+      "target_index": 261,
+      "origin_date": "2026-09-12",
+      "target_date": "2026-09-19",
+      "origin_close": 77270.46875,
+      "actual": 81233.6796875,
+      "history_sha256": "fa12d26b2cdd4e9116f060f6f791bca6da1715450870eb90842715d3e9d15126",
+      "training_count": 120,
+      "latest_training_target": "2026-09-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72633.4531,
+          77232.6016,
+          81661.1172
+        ],
+        "volatility": [
+          72297.12331601822,
+          77270.46875,
+          82585.93242702157
+        ],
+        "residual_interval": [
+          72767.13734309317,
+          77232.6016,
+          83389.63488565489
+        ]
+      }
+    },
+    {
+      "origin_index": 255,
+      "target_index": 262,
+      "origin_date": "2026-09-13",
+      "target_date": "2026-09-20",
+      "origin_close": 76838.15625,
+      "actual": 81142.609375,
+      "history_sha256": "b99c163e33c48fa6ea5e73edc3c6119dc78a6a8b48bc5721ed74b79a90b6026a",
+      "training_count": 120,
+      "latest_training_target": "2026-09-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72843.2812,
+          77117.1172,
+          81335.5391
+        ],
+        "volatility": [
+          71889.68871280478,
+          76838.15625,
+          82127.24747614317
+        ],
+        "residual_interval": [
+          72847.47660237023,
+          77117.1172,
+          83160.9897482305
+        ]
+      }
+    },
+    {
+      "origin_index": 256,
+      "target_index": 263,
+      "origin_date": "2026-09-14",
+      "target_date": "2026-09-21",
+      "origin_close": 78163.3828125,
+      "actual": 86602.9140625,
+      "history_sha256": "34de2913b7b14e46bb63801c1b3e896c02308f3688dbec79cb341eae2d65947a",
+      "training_count": 120,
+      "latest_training_target": "2026-09-14",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          73383.2578,
+          77706.5859,
+          82143.1641
+        ],
+        "volatility": [
+          73141.42892217883,
+          78163.3828125,
+          83530.14840869234
+        ],
+        "residual_interval": [
+          73581.82078308795,
+          77706.5859,
+          83891.64482037493
+        ]
+      }
+    },
+    {
+      "origin_index": 257,
+      "target_index": 264,
+      "origin_date": "2026-09-15",
+      "target_date": "2026-09-22",
+      "origin_close": 75612.5078125,
+      "actual": 86172.28125,
+      "history_sha256": "38f0c19b20dd4c02a46562a2302716e74be1fda029b39620546985e71ec80d73",
+      "training_count": 120,
+      "latest_training_target": "2026-09-15",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71354.7891,
+          75877.5469,
+          80381.0625
+        ],
+        "volatility": [
+          70620.08986319133,
+          75612.5078125,
+          80957.8598493872
+        ],
+        "residual_interval": [
+          71866.29673710516,
+          75877.5469,
+          82004.48276749319
+        ]
+      }
+    },
+    {
+      "origin_index": 258,
+      "target_index": 265,
+      "origin_date": "2026-09-16",
+      "target_date": "2026-09-23",
+      "origin_close": 76150.3203125,
+      "actual": 84383.0078125,
+      "history_sha256": "260c87881718602030e7219485df339e3bd9ee04daa514667cc6564758f7b7a1",
+      "training_count": 120,
+      "latest_training_target": "2026-09-16",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          71628.2656,
+          76135.9609,
+          80622.25
+        ],
+        "volatility": [
+          71133.20706111414,
+          76150.3203125,
+          81521.29677935435
+        ],
+        "residual_interval": [
+          72147.24329166721,
+          76135.9609,
+          82267.15058387403
+        ]
+      }
+    },
+    {
+      "origin_index": 259,
+      "target_index": 266,
+      "origin_date": "2026-09-17",
+      "target_date": "2026-09-24",
+      "origin_close": 76403.7734375,
+      "actual": 84379.0625,
+      "history_sha256": "6be993951835c0c8f82c84820fc58fc679d76c2ecfe835cf8d301cff24ff43d1",
+      "training_count": 120,
+      "latest_training_target": "2026-09-17",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          72415.1875,
+          76681.4766,
+          81294.8438
+        ],
+        "volatility": [
+          71371.87150142484,
+          76403.7734375,
+          81790.4375027113
+        ],
+        "residual_interval": [
+          72801.89276812258,
+          76681.4766,
+          82905.01755322295
+        ]
+      }
+    },
+    {
+      "origin_index": 260,
+      "target_index": 267,
+      "origin_date": "2026-09-18",
+      "target_date": "2026-09-25",
+      "origin_close": 80901.4609375,
+      "actual": 84034.921875,
+      "history_sha256": "9ed684eea5ba3eb10462e9a07df7e32c87eb099020c425ad43a14692295b1237",
+      "training_count": 120,
+      "latest_training_target": "2026-09-18",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75443.2109,
+          80406.3672,
+          86018.4219
+        ],
+        "volatility": [
+          75270.36760949434,
+          80901.4609375,
+          86953.82511983732
+        ],
+        "residual_interval": [
+          76092.32868416622,
+          80406.3672,
+          87326.29552908895
+        ]
+      }
+    },
+    {
+      "origin_index": 261,
+      "target_index": 268,
+      "origin_date": "2026-09-19",
+      "target_date": "2026-09-26",
+      "origin_close": 81233.6796875,
+      "actual": 84406.453125,
+      "history_sha256": "62059244426f33808341a6cc33972ae14d5cf923603f0b01456aea73bc1d01a9",
+      "training_count": 120,
+      "latest_training_target": "2026-09-19",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76527.6719,
+          81540.9688,
+          87486.0
+        ],
+        "volatility": [
+          75605.28279195972,
+          81233.6796875,
+          87281.07973260716
+        ],
+        "residual_interval": [
+          77195.93496655958,
+          81540.9688,
+          88687.2717806013
+        ]
+      }
+    },
+    {
+      "origin_index": 262,
+      "target_index": 269,
+      "origin_date": "2026-09-20",
+      "target_date": "2026-09-27",
+      "origin_close": 81142.609375,
+      "actual": 84458.0859375,
+      "history_sha256": "95e4f0f8082a21cc8f9a4d5b08250a9bf23ef84649a3c15b2c66d0239a4c2d85",
+      "training_count": 120,
+      "latest_training_target": "2026-09-20",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76753.4844,
+          81777.0703,
+          87488.2891
+        ],
+        "volatility": [
+          75527.65210097043,
+          81142.609375,
+          87174.99979188736
+        ],
+        "residual_interval": [
+          77421.58735642018,
+          81777.0703,
+          88816.7377023289
+        ]
+      }
+    },
+    {
+      "origin_index": 263,
+      "target_index": 270,
+      "origin_date": "2026-09-21",
+      "target_date": "2026-09-28",
+      "origin_close": 86602.9140625,
+      "actual": 83502.609375,
+      "history_sha256": "6ab264c1f56eb3c3b11d8295b412f1539ded3605c87465bf3778d6a70d471174",
+      "training_count": 120,
+      "latest_training_target": "2026-09-21",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78848.1875,
+          85086.7109,
+          92409.7188
+        ],
+        "volatility": [
+          80258.36317153,
+          86602.9140625,
+          93449.01176326573
+        ],
+        "residual_interval": [
+          80043.11334062321,
+          85086.7109,
+          93299.156732444
+        ]
+      }
+    },
+    {
+      "origin_index": 264,
+      "target_index": 271,
+      "origin_date": "2026-09-22",
+      "target_date": "2026-09-29",
+      "origin_close": 86172.28125,
+      "actual": 83622.4296875,
+      "history_sha256": "4511136ced848c5a6b1f4f3f92f2f0461db57890f2818a197f2d574780392d33",
+      "training_count": 120,
+      "latest_training_target": "2026-09-22",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78674.5156,
+          85386.0547,
+          93191.3281
+        ],
+        "volatility": [
+          79888.37353283784,
+          86172.28125,
+          92950.47235849418
+        ],
+        "residual_interval": [
+          80095.43413714321,
+          85386.0547,
+          93930.61156465055
+        ]
+      }
+    },
+    {
+      "origin_index": 265,
+      "target_index": 272,
+      "origin_date": "2026-09-23",
+      "target_date": "2026-09-30",
+      "origin_close": 84383.0078125,
+      "actual": 83553.8515625,
+      "history_sha256": "c96f8ad7e9e93688f21229bf3ebb7ad0d71229d5cbdef244501d4b2a77d8093d",
+      "training_count": 120,
+      "latest_training_target": "2026-09-23",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78171.5156,
+          84355.9375,
+          91299.4375
+        ],
+        "volatility": [
+          78163.62540067872,
+          84383.0078125,
+          91097.25874386843
+        ],
+        "residual_interval": [
+          79355.92194007312,
+          84355.9375,
+          92409.75203762374
+        ]
+      }
+    },
+    {
+      "origin_index": 266,
+      "target_index": 273,
+      "origin_date": "2026-09-24",
+      "target_date": "2026-10-01",
+      "origin_close": 84379.0625,
+      "actual": 84853.1015625,
+      "history_sha256": "f67c7e6a73baec5b4811f3f9efea2554210068c4ec5ac8826570c32fe004e808",
+      "training_count": 120,
+      "latest_training_target": "2026-09-24",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78188.6875,
+          84444.5234,
+          91363.5391
+        ],
+        "volatility": [
+          78171.10847198243,
+          84379.0625,
+          91080.02083571255
+        ],
+        "residual_interval": [
+          79406.29872333507,
+          84444.5234,
+          92475.38827617888
+        ]
+      }
+    },
+    {
+      "origin_index": 267,
+      "target_index": 274,
+      "origin_date": "2026-09-25",
+      "target_date": "2026-10-02",
+      "origin_close": 84034.921875,
+      "actual": 84497.2109375,
+      "history_sha256": "2164ba917cf52ee27b373659cbf5d5eae14203d18623f8a6de53e0717b5391d9",
+      "training_count": 120,
+      "latest_training_target": "2026-09-25",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78363.3594,
+          84469.9453,
+          91169.9297
+        ],
+        "volatility": [
+          77931.850927941,
+          84034.921875,
+          90615.94213984533
+        ],
+        "residual_interval": [
+          79506.91026932272,
+          84469.9453,
+          92391.25753369862
+        ]
+      }
+    },
+    {
+      "origin_index": 268,
+      "target_index": 275,
+      "origin_date": "2026-09-26",
+      "target_date": "2026-10-03",
+      "origin_close": 84406.453125,
+      "actual": 84763.578125,
+      "history_sha256": "3523b46ea25046398acc1d634cd6f5a4f463201906a8c730e2046a80caee060e",
+      "training_count": 120,
+      "latest_training_target": "2026-09-26",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78615.3203,
+          84815.2969,
+          91570.4609
+        ],
+        "volatility": [
+          78276.94528381436,
+          84406.453125,
+          91015.93455533034
+        ],
+        "residual_interval": [
+          79797.25181978254,
+          84815.2969,
+          92783.0736230508
+        ]
+      }
+    },
+    {
+      "origin_index": 269,
+      "target_index": 276,
+      "origin_date": "2026-09-27",
+      "target_date": "2026-10-04",
+      "origin_close": 84458.0859375,
+      "actual": 86480.3046875,
+      "history_sha256": "7a848bde88ffb42b33a8bbe98292dbc8407e8ac59ea8c9153c69d04a9866d263",
+      "training_count": 120,
+      "latest_training_target": "2026-09-27",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78635.4609,
+          85023.0547,
+          91991.1719
+        ],
+        "volatility": [
+          78324.85767176082,
+          84458.0859375,
+          91071.57666496368
+        ],
+        "residual_interval": [
+          79905.1585681985,
+          85023.0547,
+          93109.79912946715
+        ]
+      }
+    },
+    {
+      "origin_index": 270,
+      "target_index": 277,
+      "origin_date": "2026-09-28",
+      "target_date": "2026-10-05",
+      "origin_close": 83502.609375,
+      "actual": 85786.59375,
+      "history_sha256": "5c8180afb0e4da6e63ff5240dfee6ebd3b26e497496b6655d1cca91d44afdce7",
+      "training_count": 120,
+      "latest_training_target": "2026-09-28",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          77717.4609,
+          83978.8359,
+          90791.4141
+        ],
+        "volatility": [
+          77420.56553334354,
+          83502.609375,
+          90062.44948483148
+        ],
+        "residual_interval": [
+          78948.06210069277,
+          83978.8359,
+          91930.85032563447
+        ]
+      }
+    },
+    {
+      "origin_index": 271,
+      "target_index": 278,
+      "origin_date": "2026-09-29",
+      "target_date": "2026-10-06",
+      "origin_close": 83622.4296875,
+      "actual": 85557.5625,
+      "history_sha256": "81e91ac00fec6a55f2494b01b104d6db8c61250d6b1f9c8b2a23074c6ad7ba01",
+      "training_count": 120,
+      "latest_training_target": "2026-09-29",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78166.5938,
+          84357.9688,
+          91022.6719
+        ],
+        "volatility": [
+          77650.80357460631,
+          83622.4296875,
+          90053.29532903465
+        ],
+        "residual_interval": [
+          79478.79130726062,
+          84357.9688,
+          92255.40267569818
+        ]
+      }
+    },
+    {
+      "origin_index": 272,
+      "target_index": 279,
+      "origin_date": "2026-09-30",
+      "target_date": "2026-10-07",
+      "origin_close": 83553.8515625,
+      "actual": 83275.9296875,
+      "history_sha256": "7b44df838f680d609c1a08ba5d0d44457a49ca91d949c0db160433910c8cea27",
+      "training_count": 120,
+      "latest_training_target": "2026-09-30",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78083.2031,
+          84179.0156,
+          90798.3906
+        ],
+        "volatility": [
+          77587.10300759532,
+          83553.8515625,
+          89979.46617809485
+        ],
+        "residual_interval": [
+          79472.4960917667,
+          84179.0156,
+          92043.88870403587
+        ]
+      }
+    },
+    {
+      "origin_index": 273,
+      "target_index": 280,
+      "origin_date": "2026-10-01",
+      "target_date": "2026-10-08",
+      "origin_close": 84853.1015625,
+      "actual": 81676.3359375,
+      "history_sha256": "9838f459a52e75be6d253baafd7417b7f0964d1415fab5e13b29763cb31eb25a",
+      "training_count": 120,
+      "latest_training_target": "2026-10-01",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78770.1406,
+          84909.1797,
+          91459.4844
+        ],
+        "volatility": [
+          78786.36295357886,
+          84853.1015625,
+          91386.99357169498
+        ],
+        "residual_interval": [
+          80222.04847688432,
+          84909.1797,
+          92778.13941158509
+        ]
+      }
+    },
+    {
+      "origin_index": 274,
+      "target_index": 281,
+      "origin_date": "2026-10-02",
+      "target_date": "2026-10-09",
+      "origin_close": 84497.2109375,
+      "actual": 82546.3203125,
+      "history_sha256": "84d136b94cb0da5ffd9c1104c5ac7e74b42c41eee4cc5233397913dc433198e4",
+      "training_count": 120,
+      "latest_training_target": "2026-10-02",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78322.125,
+          84604.2812,
+          91121.0312
+        ],
+        "volatility": [
+          78450.27960557905,
+          84497.2109375,
+          91010.23848624522
+        ],
+        "residual_interval": [
+          79857.96836531634,
+          84604.2812,
+          92439.89528997599
+        ]
+      }
+    },
+    {
+      "origin_index": 275,
+      "target_index": 282,
+      "origin_date": "2026-10-03",
+      "target_date": "2026-10-10",
+      "origin_close": 84763.578125,
+      "actual": 82912.2265625,
+      "history_sha256": "907a383e9908928655ab6c408b1f12f180834dd0c4fb1819050565e876a3be16",
+      "training_count": 120,
+      "latest_training_target": "2026-10-03",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          78476.1406,
+          84601.9219,
+          90775.8828
+        ],
+        "volatility": [
+          78699.52689915754,
+          84763.578125,
+          91294.88396746501
+        ],
+        "residual_interval": [
+          79974.32677416483,
+          84601.9219,
+          92263.37072417977
+        ]
+      }
+    },
+    {
+      "origin_index": 276,
+      "target_index": 283,
+      "origin_date": "2026-10-04",
+      "target_date": "2026-10-11",
+      "origin_close": 86480.3046875,
+      "actual": 83679.46875,
+      "history_sha256": "da808e6f30b4f7957efdc1862dbb81f4028d9e01009257fde73031b3ad409723",
+      "training_count": 120,
+      "latest_training_target": "2026-10-04",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          79736.0703,
+          85938.8203,
+          92122.1797
+        ],
+        "volatility": [
+          80270.26925965968,
+          86480.3046875,
+          93170.77378487596
+        ],
+        "residual_interval": [
+          81437.42091790935,
+          85938.8203,
+          93676.52208423508
+        ]
+      }
+    },
+    {
+      "origin_index": 277,
+      "target_index": 284,
+      "origin_date": "2026-10-05",
+      "target_date": "2026-10-12",
+      "origin_close": 85786.59375,
+      "actual": 81762.5625,
+      "history_sha256": "6c4d65b6c933aa8410fa84f979b1f76f5a7f15ca2c45a65dedbfa90023140b6a",
+      "training_count": 120,
+      "latest_training_target": "2026-10-05",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          79598.3516,
+          85487.5234,
+          91387.8516
+        ],
+        "volatility": [
+          79619.575054999,
+          85786.59375,
+          92431.28542376558
+        ],
+        "residual_interval": [
+          81213.15546277631,
+          85487.5234,
+          93057.11058162147
+        ]
+      }
+    },
+    {
+      "origin_index": 278,
+      "target_index": 285,
+      "origin_date": "2026-10-06",
+      "target_date": "2026-10-13",
+      "origin_close": 85557.5625,
+      "actual": 83095.125,
+      "history_sha256": "fe801dbc03e596859b423f0ee9e88c2536616866e6fe8f350b164436136712c5",
+      "training_count": 120,
+      "latest_training_target": "2026-10-06",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          79441.8906,
+          85116.375,
+          90609.0156
+        ],
+        "volatility": [
+          79403.80043523677,
+          85557.5625,
+          92188.23860845066
+        ],
+        "residual_interval": [
+          81069.53315902044,
+          85116.375,
+          92458.36890214344
+        ]
+      }
+    },
+    {
+      "origin_index": 279,
+      "target_index": 286,
+      "origin_date": "2026-10-07",
+      "target_date": "2026-10-14",
+      "origin_close": 83275.9296875,
+      "actual": 81562.4921875,
+      "history_sha256": "ea7b35c4f6a519af40adea07f1a78f29b83d70ee5c4b2dfa93f01576c04c9bff",
+      "training_count": 120,
+      "latest_training_target": "2026-10-07",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          77469.6797,
+          83001.8672,
+          88366.1953
+        ],
+        "volatility": [
+          77189.23109487377,
+          83275.9296875,
+          89842.59030633094
+        ],
+        "residual_interval": [
+          79185.17641238049,
+          83001.8672,
+          90165.61956184337
+        ]
+      }
+    },
+    {
+      "origin_index": 280,
+      "target_index": 287,
+      "origin_date": "2026-10-08",
+      "target_date": "2026-10-15",
+      "origin_close": 81676.3359375,
+      "actual": 82141.4609375,
+      "history_sha256": "5d379ce31fa8ceb54ba52020907b841f6c34631e54e4bf97b2df165d278079cb",
+      "training_count": 120,
+      "latest_training_target": "2026-10-08",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75649.0312,
+          80936.7109,
+          86172.3984
+        ],
+        "volatility": [
+          75655.95573085122,
+          81676.3359375,
+          88175.79247703592
+        ],
+        "residual_interval": [
+          77143.75739881465,
+          80936.7109,
+          87924.68639995385
+        ]
+      }
+    },
+    {
+      "origin_index": 281,
+      "target_index": 288,
+      "origin_date": "2026-10-09",
+      "target_date": "2026-10-16",
+      "origin_close": 82546.3203125,
+      "actual": 81500.8046875,
+      "history_sha256": "716bb2f78a8a94c39673f9f399e0129e45f70a9fac201f91db83d56ab7ee821d",
+      "training_count": 120,
+      "latest_training_target": "2026-10-09",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76397.9141,
+          81574.5859,
+          86739.8125
+        ],
+        "volatility": [
+          76491.2772361787,
+          82546.3203125,
+          89080.68008976881
+        ],
+        "residual_interval": [
+          77829.54945670333,
+          81574.5859,
+          88560.61836867359
+        ]
+      }
+    },
+    {
+      "origin_index": 282,
+      "target_index": 289,
+      "origin_date": "2026-10-10",
+      "target_date": "2026-10-17",
+      "origin_close": 82912.2265625,
+      "actual": 81382.1484375,
+      "history_sha256": "fab30ff2d75df758d9d2076a62564bc8ca13f765218d168d6a2d57ef2e9b01ac",
+      "training_count": 120,
+      "latest_training_target": "2026-10-10",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76764.7422,
+          81989.9766,
+          87145.5469
+        ],
+        "volatility": [
+          76840.13158309787,
+          82912.2265625,
+          89464.15332614377
+        ],
+        "residual_interval": [
+          78214.55991153012,
+          81989.9766,
+          88993.22452029298
+        ]
+      }
+    },
+    {
+      "origin_index": 283,
+      "target_index": 290,
+      "origin_date": "2026-10-11",
+      "target_date": "2026-10-18",
+      "origin_close": 83679.46875,
+      "actual": 82017.6015625,
+      "history_sha256": "cf7e29f7a0d56d6b6fd56e3bf8ec0b2e53047a8c93b77dc246f3636639e6e58f",
+      "training_count": 120,
+      "latest_training_target": "2026-10-11",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          77144.4062,
+          82592.3594,
+          87908.8906
+        ],
+        "volatility": [
+          77553.71303462397,
+          83679.46875,
+          90289.08115793321
+        ],
+        "residual_interval": [
+          78695.24349789089,
+          82592.3594,
+          89709.88457662678
+        ]
+      }
+    },
+    {
+      "origin_index": 284,
+      "target_index": 291,
+      "origin_date": "2026-10-12",
+      "target_date": "2026-10-19",
+      "origin_close": 81762.5625,
+      "actual": 81853.5390625,
+      "history_sha256": "673d4ea3ca724068a8967480b1d0ed76ddb1a1fe7c194d372c59e426c2332b34",
+      "training_count": 120,
+      "latest_training_target": "2026-10-12",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          75541.8281,
+          80939.2031,
+          86028.2891
+        ],
+        "volatility": [
+          75705.5147916601,
+          81762.5625,
+          88304.22255186691
+        ],
+        "residual_interval": [
+          76983.24037053858,
+          80939.2031,
+          87852.48832253735
+        ]
+      }
+    },
+    {
+      "origin_index": 285,
+      "target_index": 292,
+      "origin_date": "2026-10-13",
+      "target_date": "2026-10-20",
+      "origin_close": 83095.125,
+      "actual": 82941.0,
+      "history_sha256": "56603c19266bed20d05f04732ceef2ae0756e33d5eb1aa5c7c846ce1f6b568cc",
+      "training_count": 120,
+      "latest_training_target": "2026-10-13",
+      "eligible": true,
+      "forecasts": {
+        "timesfm": [
+          76699.3281,
+          82097.4688,
+          87158.0
+        ],
+        "volatility": [
+          76938.11814968237,
+          83095.125,
+          89744.84904000904
+        ],
+        "residual_interval": [
+          78123.85107998135,
+          82097.4688,
+          89057.90479009041
+        ]
+      }
+    }
+  ]
+}
