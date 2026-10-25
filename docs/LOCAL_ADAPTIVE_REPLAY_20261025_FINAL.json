@@ -1,0 +1,22 @@
+{
+  "mode": "RETROSPECTIVE_REPLAY",
+  "recipe_sha256": "74c9ce9674fc8278db10eda4de8099e993c952e5fc9facd50afc8f2a4bfdef03",
+  "input_content_sha256": "8b8265e0c7e284c3b49c0736cb2d0c21abf9a1cb493679aaf6fc52c5bce4872e",
+  "total_origins": 227,
+  "post_training_origins": 181,
+  "normalized_mspe": {
+    "timesfm": 0.004416135381351029,
+    "persistence": 0.003920216037611614,
+    "adaptive": 0.00415860670800569
+  },
+  "selected_counts": {
+    "timesfm": 83,
+    "persistence": 124,
+    "bias": 20,
+    "raw": 0,
+    "network": 0
+  },
+  "macro_features_tested": false,
+  "promotion_allowed": false,
+  "note": "Overlapping seven-day targets; functional replay, not independent evidence or a significance test."
+}

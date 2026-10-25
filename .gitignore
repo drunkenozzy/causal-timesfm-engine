@@ -17,3 +17,4 @@ shadow_eth_v2_history.csv
 network_outputs/
 data/macro_snapshots/
 data/MACRO_SYNTHESIS.json
+data/local_learning/

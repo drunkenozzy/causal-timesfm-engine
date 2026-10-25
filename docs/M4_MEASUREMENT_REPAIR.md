@@ -1,5 +1,9 @@
 # Measurement repair and BTC research record — 23 October 2026
 
+The 25 October extension adds a persistent local learning loop and registered
+explanatory-variable inputs. See [LOCAL_ADAPTIVE_RESEARCH.md](LOCAL_ADAPTIVE_RESEARCH.md)
+for its separate recipe, operating command, validation and retrospective results.
+
 ## Completed Protocol 002
 
 The supplied 293-row snapshot and regenerated report were checked locally: the
